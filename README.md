@@ -85,6 +85,6 @@ Please refer README.md in each project for details.
 ### Further reading
 [Mi-V soft CPUs](https://github.com/RISCV-on-Microsemi-FPGA/CPUs).
 
-[Hardware platforms](https://github.com/RISCV-on-Microsemi-FPGA/Hardware-Platforms) supported with Mi-V soft CPUs.
+[Hardware platforms supported with Mi-V soft CPUs.](https://github.com/RISCV-on-Microsemi-FPGA/Hardware-Platforms)
 ___
 Libero&reg; and PolarFire&reg; are the property of Microchip Technology Inc. (MCHP).
