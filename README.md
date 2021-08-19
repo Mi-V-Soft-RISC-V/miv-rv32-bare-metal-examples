@@ -1,5 +1,5 @@
 # Mi-V Soft processor Bare Metal Examples
-This repository provides bare metal embedded software example projects with Microchip's SoftConsole IDE.
+This repository provides bare metal embedded software example projects built with Microchip's SoftConsole IDE.
 
 ```
 <repo>
@@ -19,7 +19,7 @@ This repository provides bare metal embedded software example projects with Micr
 
 ```
 
-The *applications* directory contains applications that are ready for use with the hardware platforms.
+The *applications* directory contains applications that are ready for use with selected hardware platforms.
 
 The *driver-examples* directory contains example projects demonstrating the Soft-IP device drivers. These examples serve as an easy starting point for the users to start exploring FPGA devices.
 
@@ -54,7 +54,7 @@ The build configurations post-fixed with '-Release' are intended for the final p
 
 **Linker scripts:** Each build configuration needs a linker script. The linker script describes the memory layout of the executable. Each build configuration selects an appropriate linker scripts via project settings. For example, miv32imc-Release uses miv-rv32-ram-imc.ld
 
-There are several other settings that are required for a project. For complete project settings go to \<proect-name>->Properties->settings->Tool settings.
+There are several other settings that are required for a project. For complete project settings go to \<project-name>->Properties->settings->Tool settings.
 
 ### Settings via header files
 Apart from the SoftConsole project settings, each project needs a few more configurations. These configurations are categorized into hardware and software configurations.
@@ -96,7 +96,7 @@ The following two pre-configured debug launchers are provided with each project.
 |Configuration              | Description                                                                                                |
 |---------------------------|------------------------------------------------------------------------------------------------------------|
 |_\<project name> hw debug.launch_ | Intended to be used with *-Debug configurations. Resets soft processor.<br> Downloads the executable and the symbols to the memory. Sets up PC to start location. |
-|_\<project name> hw all-harts attach.launch_ | Intended to be used with *-Release configurations. Does not trigger reset. <br> Downloads only the symbol information and attaches to preocessor. Typically used to check the current state of harts. If the project is linked to RAM memory such as LSRAM, you will be able to put breakpoints and step debug further.                   |
+|_\<project name> hw attach.launch_ | Intended to be used with *-Release configurations. Does not trigger reset. <br> Downloads only the symbol information and attaches to processor. Typically used to check the current state of harts. If the project is linked to RAM memory such as LSRAM, you will be able to put breakpoints and step debug further.                   |
 
 Both launchers are configured to use the currently _active_ build configuration, hence the same launcher can be used with any of the build configurations. Make sure that an appropriate build configuration is set as _active_ to avoid issues. Trying to use <*> attach.launch_ while a *-Debug build is _active_ may not work.
 
@@ -106,8 +106,8 @@ You may change the existing debug launchers or create your own launcher to suit 
 Please refer README.md in each project for details.
 
 ### Further reading
-[Mi-V soft CPUs](https://github.com/RISCV-on-Microsemi-FPGA/CPUs).
+[Mi-V soft CPUs](https://mi-v-ecosystem.github.io/docs/mi-v-soft-cpu/#mi-v-soft-cpus)
 
-[Hardware platforms supported with Mi-V soft CPUs.](https://github.com/RISCV-on-Microsemi-FPGA/Hardware-Platforms)
+[Hardware platforms and boards](https://mi-v-ecosystem.github.io/docs/mi-v-soft-cpu/#hardware-platforms-and-boards)
 ___
 Libero&reg; and PolarFire&reg; are the property of Microchip Technology Inc. (MCHP).
