@@ -3,18 +3,18 @@ This repository provides bare metal embedded software example projects built wit
 
 ```
 <repo>
-|-- applications
-|       |- .
-|       |- .
-|
-|
-|-- driver-examples
-|       |- CoreGPIO
-|       |- CoreUARTapb
-|       |     .
-|       |     .
-|       |     .
-|       |- CorePWM
+  |-- applications
+  |       |- .
+  |       |- .
+  |
+  |
+  |-- driver-examples
+  |       |- CoreGPIO
+  |       |- CoreUARTapb
+  |       |     .
+  |       |     .
+  |       |     .
+  |       |- CorePWM
 
 
 ```
