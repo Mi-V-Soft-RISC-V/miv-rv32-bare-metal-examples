@@ -14,7 +14,7 @@ This repository provides bare metal embedded software example projects built wit
   |       |     .
   |       |     .
   |       |     .
-  |       |- CorePWM
+  |       |- CoreSysServices-PF
 
 
 ```
@@ -34,8 +34,6 @@ Below is the list of all the build configurations provided by default with each 
 |------------------------- | ----------------------------------------------------------------------------------------------------------   |
 |miv32i-Debug              | Targeted for the Mi-V soft processor configured with RV32I base ISA only. Not-optimized (-O0). Can be used with any Mi-V soft CPU |
 |miv32i-Release            | Targeted for the Mi-V soft processor configured with RV32I base ISA only. Optimized (-Os). Can be used with any Mi-V soft CPU |
-|miv32ima-Debug            | Targeted for the Mi-V soft processor configured with RV32I base ISA + M and A extesion. Not-optimized (-O0). Works with Mi-V Legacy cores |
-|miv32ima-Release          | Targeted for the Mi-V soft processor configured with RV32I base ISA + M and A extesion. Optimized (-Os). Works with Mi-V Legacy cores |
 |miv32imc-Debug            | Targeted for the Mi-V soft processor configured with RV32I base ISA + M and C extesion. Not-optimized (-O0). Works with MIV_RV32. |
 |miv32imc-Release          | Targeted for the Mi-V soft processor configured with RV32I base ISA + M and C extesion. Optimized (-Os). Works with MIV_RV32.|
 
@@ -65,31 +63,8 @@ The hardware configurations are located in the \<project-root>/src/boards/\<targ
 To choose a particular hardware configuration, include an appropriate \<project-root>/src/boards/\<target-board> folder path via the SoftConsole project settings.
 
 #### Software configurations
-Software configurations are required for the correct functioning of the MIV_RV32 HAL.
+There are no generic software configurations at the moment. Refer README.md in each project project specific cofigurations.
 
-##### MIV_LEGACY_RV32:
-
-    Define this macro in the project settings (assembler and compiler) when you
-    are using one of the legacy RV32 cores (any combination of the supported 
-    ISA  extension).
-
-    This macro must not be defined if you are using a MIV_RV32 core.
-
-##### MIV_LEGACY_RV32_VECTORED_INTERRUPTS:
-
-    Enable this macro only in the **assembler properties** when you
-    want to use vectored interrupts on legacy RV32 cores (any combination of the
-    supported ISA extension).
-
-##### Linker script changes
-    You must make sure that in addition to the reset vector, all other memory address
-    configurations in the Mi-V soft processor match with the memory layout defined
-    in the linker script.
-
-    The MIV_RV32 cores provide Tightly Coupled Memory (TCM), it's start address is
-    configurable (size = 256k). You can also download and execute code from the TCM.
-    In this case you must make sure that the linker script is updated according to
-    the TCM configurations in your IP core.
 ## Debug launchers
 The following two pre-configured debug launchers are provided with each project.
 
