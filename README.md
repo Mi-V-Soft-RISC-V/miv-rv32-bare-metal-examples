@@ -63,7 +63,7 @@ The hardware configurations are located in the \<project-root>/src/boards/\<targ
 To choose a particular hardware configuration, include an appropriate \<project-root>/src/boards/\<target-board> folder path via the SoftConsole project settings.
 
 #### Software configurations
-There are no generic software configurations at the moment. Refer README.md in each project project specific cofigurations.
+Software configurations may be required for the correct functioning of the MIV_RV32 HAL. The README.md in each example project describes the software configurations that are required for that project.
 
 ## Debug launchers
 The following two pre-configured debug launchers are provided with each project.
