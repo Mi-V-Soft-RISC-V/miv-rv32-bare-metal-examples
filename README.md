@@ -34,12 +34,10 @@ All projects provide a set of ready to use build configurations and debug launch
 The build configurations configure the projects to build in a specific way. For example, Optimization level -Os, linking to DDR memory address space etc..
 Below is the list of all the build configurations provided by default with each project. You may use these build configurations or create your own to suit your project.
 
-|Configuration             | Description                                                                                                  |
-|------------------------- | ----------------------------------------------------------------------------------------------------------   |
-|miv32i-Debug              | Targeted for the Mi-V soft processor configured with RV32I base ISA only. Not-optimized (-O0). Can be used with any Mi-V soft CPU |
-|miv32i-Release            | Targeted for the Mi-V soft processor configured with RV32I base ISA only. Optimized (-Os). Can be used with any Mi-V soft CPU |
-|miv32imc-Debug            | Targeted for the Mi-V soft processor configured with RV32I base ISA + M and C extesion. Not-optimized (-O0). Works with MIV_RV32. |
-|miv32imc-Release          | Targeted for the Mi-V soft processor configured with RV32I base ISA + M and C extesion. Optimized (-Os). Works with MIV_RV32.|
+|Configuration    | Description                                                                                                  |
+|-----------------| ----------------------------------------------------------------------------------------------------------   |
+|Debug            | Targeted for the Mi-V soft processor configured with RV32I base ISA + M and C extesion. Not-optimized (-O0). Works with MIV_RV32. |
+|Release          | Targeted for the Mi-V soft processor configured with RV32I base ISA + M and C extesion. Optimized (-Os). Works with MIV_RV32.|
 
 A build configuration is a particular combination of SoftConsole project settings.
 
@@ -49,10 +47,10 @@ The following sections describe the configurations provided by the default build
 Some of the important project settings are explained in following sections.
 
 #### Debug build configurations
-The build configurations post-fixed with '-Debug' are intended for the early development and debug phase of the project. By convention, the *-Debug configurations use optimization level -O0 and generate maximum debug symbol information.
+The Debug configuration is intended for the early development and debug phase of the project. By convention, the *-Debug configurations use optimization level -O0 and generate maximum debug symbol information.
 
 #### Release build configurations
-The build configurations post-fixed with '-Release' are intended for the final production release, where an executable stored in non-volatile memory runs after power-on-reset. By convention, the *-Release configurations use higher optimization level (-Os) and do not generate debug symbol information. It also defines a NDEBUG macro which is used to exclude any debug code from the build.
+The Release configuration is intended for the final production release, where an executable stored in non-volatile memory runs after power-on-reset. By convention, the *-Release configurations use higher optimization level (-Os) and do not generate debug symbol information. It also defines a NDEBUG macro which is used to exclude any debug code from the build.
 
 **Linker scripts:** Each build configuration needs a linker script. The linker script describes the memory layout of the executable. Each build configuration selects an appropriate linker scripts via project settings. For example, miv32imc-Release uses miv-rv32-ram-imc.ld
 
