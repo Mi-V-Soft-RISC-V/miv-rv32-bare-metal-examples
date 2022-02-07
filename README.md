@@ -15,8 +15,8 @@ This repository provides bare metal embedded software example projects built wit
   |       |     .
   |       |     .
   |       |- CoreSysServices-PF
-  |       |- MIV_I2C
-  |       |- MIV_Watchdog
+  |       |- miv-i2c
+  |       |- miv-watchdog
   |       |     .
   |       |     .
   |       |     .
