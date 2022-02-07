@@ -36,8 +36,8 @@ Below is the list of all the build configurations provided by default with each 
 
 |Configuration    | Description                                                                                                  |
 |-----------------| ----------------------------------------------------------------------------------------------------------   |
-|Debug            | Targeted for the Mi-V soft processor configured with RV32I base ISA + M and C extesion. Not-optimized (-O0). Works with MIV_RV32. |
-|Release          | Targeted for the Mi-V soft processor configured with RV32I base ISA + M and C extesion. Optimized (-Os). Works with MIV_RV32.|
+|Debug            | Targeted for the MIV_RV32 soft processor. Not-optimized (-O0). Links to MIV_RV32 default TCM address space (0x40000000). |
+|Release          | Targeted for the MIV_RV32 soft processor. Optimized (-Os). Links to LSRAM address space (0x80000000). Attach as LSRAM memory client in Libero design.|
 
 A build configuration is a particular combination of SoftConsole project settings.
 
