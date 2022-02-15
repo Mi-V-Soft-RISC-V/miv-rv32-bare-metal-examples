@@ -28,19 +28,20 @@ The *applications* directory contains applications that are ready for use with s
 The *driver-examples* directory contains example projects demonstrating the Soft-IP device drivers. These examples serve as an easy starting point for the users to start exploring FPGA devices.
 
 Each project provides a README.md explaining its functionality and usage instructions.
-All projects provide a set of ready to use build configurations and debug launch configurations. These are detailed in the following sections.
+All projects provide a set of ready to use build configurations and debug launch configurations. They are described in the following sections.
 
 ## Build configurations
-The build configurations configure the projects to build in a specific way. For example, Optimization level -Os, linking to DDR memory address space etc..
-Below is the list of all the build configurations provided by default with each project. You may use these build configurations or create your own to suit your project.
+The build configurations configure the projects to build in a specific way. For example, Optimization level -Os, linking to a specific memory address etc..
+Below is the list of the common build configurations provided by default with each bare metal driver example project. You may use these build configurations or create your own to suit your project.
 
-|Configuration    | Description                                                                                                  |
-|-----------------| ----------------------------------------------------------------------------------------------------------   |
-|Debug            | Targeted for the MIV_RV32 soft processor. Not-optimized (-O0). Links to MIV_RV32 default TCM address space (0x40000000). |
-|Release          | Targeted for the MIV_RV32 soft processor. Optimized (-Os). Links to LSRAM address space (0x80000000). Attach as LSRAM memory client in Libero design.|
+|Configuration     | Description    |
+|----------------- | -------------- |
+|miv32imc-Debug    | Targeted for the Mi-V soft processor configured with RV32I base ISA + M and C extension. </br> Links to MIV_RV32 default reset vector address (0x80000000). </br> Uses peripheral memory map as provided by MIV_ESS  </br> Not-optimized (-O0).|
+|miv32imc-Release  | Targeted for the Mi-V soft processor configured with RV32I base ISA + M and C extension. </br> Links to MIV_RV32 default reset vector address (0x80000000). </br> Uses peripheral memory map as provided by MIV_ESS  </br> Optimized (-Os).|
+
+Note that some of the example projects provided in the *miv-rv32-bare-metal-examples* repository may contain additional or different build configs to suit the functionality. Refer the example projects for details.
 
 A build configuration is a particular combination of SoftConsole project settings.
-
 The following sections describe the configurations provided by the default build configurations.
 
 ### SoftConsole project settings
