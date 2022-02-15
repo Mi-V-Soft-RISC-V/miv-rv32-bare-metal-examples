@@ -51,22 +51,29 @@ Some of the important project settings are explained in following sections.
 The Debug configuration is intended for the early development and debug phase of the project. By convention, the *-Debug configurations use optimization level -O0 and generate maximum debug symbol information.
 
 #### Release build configurations
-The Release configuration is intended for the final production release, where an executable stored in non-volatile memory runs after power-on-reset. By convention, the *-Release configurations use higher optimization level (-Os) and do not generate debug symbol information. It also defines a NDEBUG macro which is used to exclude any debug code from the build.
+The Release configuration is intended for the final production release, where an executable stored in non-volatile memory runs after power-on-reset. On Microchip FPGAs, this could also be achieved by attaching the
+executable as memory client to a memory in Liber&reg;o design flow. By convention, the *-Release configurations use higher optimization level (-Os) and do not generate debug symbol information. It also defines a NDEBUG macro which is used to exclude any debug code from the build.
 
-**Linker scripts:** Each build configuration needs a linker script. The linker script describes the memory layout of the executable. Each build configuration selects an appropriate linker scripts via project settings. For example, miv32imc-Release uses miv-rv32-ram-imc.ld
+**Linker scripts:** Each build configuration needs a linker script. The linker script describes the memory layout of the executable. Each build configuration selects an appropriate linker scripts via project settings.
 
-There are several other settings that are required for a project. For complete project settings go to \<project-name>->Properties->settings->Tool settings.
+There are several other settings that are required for a project. For complete project settings go to
+
+`
+ \<project-name>->Properties->settings->Tool settings.
+`
 
 ### Settings via header files
 Apart from the SoftConsole project settings, each project needs a few more configurations. These configurations are categorized into hardware and software configurations.
 
 #### Hardware configurations
-The hardware configurations are located in the \<project-root>/src/boards/\<target-board> folder. The include files in the \<project-root>/src/boards/\<target-board>/fpga_design_config folder define the hardware configurations such as clocks and base addressess. You must make sure that the configurations in this example project match the actual configurations of the Libero&reg; design that you are using to test this example project.
+The hardware configurations are located in the _\<project-root>/src/boards/\<target-board>_ folder. The include files in the _fpga_design_config_ folder define the hardware configurations such as clocks and base addresses. You must make sure that the configurations in this example project match the actual configurations of the Libero design that you are using to run the example project.
 
-To choose a particular hardware configuration, include an appropriate \<project-root>/src/boards/\<target-board> folder path via the SoftConsole project settings.
+To choose a particular hardware configuration, include an appropriate _\<project-root>/src/boards/\<target-board>_ folder path via the SoftConsole project settings.
 
 #### Software configurations
-Software configurations may be required for the correct functioning of the MIV_RV32 HAL. The README.md in each example project describes the software configurations that are required for that project.
+Software configurations may be required for the correct functioning of the MIV_RV32 HAL, which are described in the [README.md](https://github.com/Mi-V-Soft-RISC-V/miv-rv32-bare-metal-examples/tree/main/driver-examples/miv-rv32-hal/miv-rv32i-systick-blinky).
+
+Apart from that the README.md in each example project describes the software configurations that are required for that project.
 
 ## Debug launchers
 The following two pre-configured debug launchers are provided with each project.
