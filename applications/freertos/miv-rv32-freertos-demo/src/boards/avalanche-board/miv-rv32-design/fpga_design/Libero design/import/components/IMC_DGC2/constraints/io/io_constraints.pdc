@@ -1,0 +1,515 @@
+# Microsemi I/O Physical Design Constraints file
+
+# User I/O Constraints file 
+
+# Version: PolarFire v2.3 12.200.35.9
+
+# Family: PolarFire , Die: MPF300T(ES) , Package: FCG484
+
+# Date generated: Mon Jan 07 16:35:59 2019 
+
+
+# 
+# User Locked I/O Bank Settings
+# 
+
+
+# 
+# Unlocked I/O Bank Settings
+# The I/O Bank Settings can be locked by directly editing this file
+# or by making changes in the I/O Attribute Editor
+# 
+
+
+# 
+# User Locked I/O settings
+# 
+
+# -- User PushButtons I/O -- #
+    
+set_io -port_name {BOOTSTRAP_BYPASS}  \
+    -pin_name E13                     \
+    -fixed true                       \
+    -io_std LVCMOS33                  \
+    -DIRECTION INPUT    
+
+set_io -port_name {SYS_RESET_REQ}    \
+    -pin_name E14                    \
+    -io_std LVCMOS33                 \
+    -DIRECTION INPUT      
+	
+set_io -port_name USER_RST  \
+    -pin_name F5            \
+    -fixed true             \
+    -io_std LVCMOS33        \
+    -DIRECTION INPUT
+
+
+# -- LEDs I/O --#
+
+set_io -port_name {GPIO_OUT[0]}  \
+    -pin_name D7                 \
+    -io_std LVCMOS33 
+
+set_io -port_name {GPIO_OUT[1]}  \
+    -pin_name D8                 \
+    -io_std LVCMOS33 
+
+set_io -port_name {GPIO_OUT[2]}  \
+    -pin_name D9                 \
+    -io_std LVCMOS33 
+
+set_io -port_name {GPIO_OUT[3]}  \
+    -pin_name D6                 \
+    -io_std LVCMOS33 
+
+
+# -- UART RX/TX -- #
+
+set_io -port_name RX  \
+    -pin_name F16     \
+    -fixed true       \
+    -io_std LVCMOS33  \
+    -DIRECTION INPUT
+
+
+set_io -port_name TX   \
+    -pin_name F17      \
+    -fixed true        \
+    -io_std LVCMOS33   \
+    -DIRECTION OUTPUT
+
+
+# ----- I2C -----#
+set_io -port_name {SCL}   \
+    -pin_name C6          \
+    -fixed true           \
+    -RES_PULL Up          \
+    -io_std LVCMOS33      \
+	-DIRECTION Inout
+
+set_io -port_name {SDA}   \
+    -pin_name C7          \
+    -fixed true           \
+    -RES_PULL Up          \
+    -io_std LVCMOS33      \
+	-DIRECTION Inout
+
+# 
+# Dedicated Peripheral I/O Settings
+# 
+
+
+set_io -port_name TCK  \
+    -pin_name F8       \
+    -DIRECTION INPUT
+
+
+set_io -port_name TDI  \
+    -pin_name G8       \
+    -DIRECTION INPUT
+
+
+set_io -port_name TDO  \
+    -pin_name F6       \
+    -DIRECTION OUTPUT
+
+
+set_io -port_name TMS  \
+    -pin_name F7       \
+    -DIRECTION INPUT
+
+
+set_io -port_name TRSTB  \
+    -pin_name G7         \
+    -DIRECTION INPUT
+
+
+# Microsemi I/O Physical Design Constraints file
+
+# User I/O Constraints file 
+
+# Version: PolarFire v2.3 12.200.35.9
+
+# Family: PolarFire , Die: MPF300T_ES , Package: FCG484
+
+# Date generated: Sun Jan 13 21:06:20 2019 
+# 
+# Unlocked I/O settings
+# The I/Os in this section are unplaced or placed but are not locked
+# the other listed attributes have been applied
+# 
+
+#set_io -port_name CLK1_50M     \
+	-pin_name R1            \
+	-fixed true             \
+  -io_std LVCMOS25          	\
+	-DIRECTION INPUT
+#set_io -port_name REF_CLK_0  \
+    -io_std LVCMOS18          \
+    -DIRECTION INPUT
+
+# 
+# User Locked I/O settings
+# 
+
+#set_io -port_name AND1_Y  \
+    -pin_name A3           \
+    -fixed true            \
+    -DIRECTION OUTPUT
+
+
+#set_io -port_name {A[0]}  \
+    -pin_name U5           \
+    -fixed true            \
+    -DIRECTION OUTPUT
+
+
+#set_io -port_name {A[1]}  \
+    -pin_name U4           \
+    -fixed true            \
+    -DIRECTION OUTPUT
+
+
+#set_io -port_name {A[2]}  \
+    -pin_name V4           \
+    -fixed true            \
+    -DIRECTION OUTPUT
+
+
+#set_io -port_name {A[3]}  \
+    -pin_name W3           \
+    -fixed true            \
+    -DIRECTION OUTPUT
+
+
+#set_io -port_name {A[4]}  \
+    -pin_name V5           \
+    -fixed true            \
+    -DIRECTION OUTPUT
+
+
+#set_io -port_name {A[5]}  \
+    -pin_name W4           \
+    -fixed true            \
+    -DIRECTION OUTPUT
+
+
+#set_io -port_name {A[6]}  \
+    -pin_name Y3           \
+    -fixed true            \
+    -DIRECTION OUTPUT
+
+
+#set_io -port_name {A[7]}  \
+    -pin_name AA3          \
+    -fixed true            \
+    -DIRECTION OUTPUT
+
+
+#set_io -port_name {A[8]}  \
+    -pin_name Y4           \
+    -fixed true            \
+    -DIRECTION OUTPUT
+
+
+#set_io -port_name {A[9]}  \
+    -pin_name Y5           \
+    -fixed true            \
+    -DIRECTION OUTPUT
+
+
+#set_io -port_name {A[10]}  \
+    -pin_name AA2           \
+    -fixed true             \
+    -DIRECTION OUTPUT
+
+
+#set_io -port_name {A[11]}  \
+    -pin_name AB2           \
+    -fixed true             \
+    -DIRECTION OUTPUT
+
+
+#set_io -port_name {A[12]}  \
+    -pin_name V6            \
+    -fixed true             \
+    -DIRECTION OUTPUT
+
+
+#set_io -port_name {A[13]}  \
+    -pin_name W6            \
+    -fixed true             \
+    -DIRECTION OUTPUT
+
+
+#set_io -port_name {A[14]}  \
+    -pin_name AB3           \
+    -fixed true             \
+    -DIRECTION OUTPUT
+
+
+#set_io -port_name {BA[0]}  \
+    -pin_name V7           \
+    -fixed true            \
+    -DIRECTION OUTPUT
+
+
+#set_io -port_name {BA[1]}  \
+    -pin_name Y6           \
+    -fixed true            \
+    -DIRECTION OUTPUT
+
+
+#set_io -port_name {BA[2]}  \
+    -pin_name U7           \
+    -fixed true            \
+    -DIRECTION OUTPUT
+
+
+#set_io -port_name CAS_N  \
+    -pin_name AA5        \
+    -fixed true          \
+    -DIRECTION OUTPUT
+
+
+#set_io -port_name CK0  \
+    -pin_name V2       \
+    -fixed true        \
+    -DIRECTION OUTPUT
+
+
+#set_io -port_name CK0_N  \
+    -pin_name W2         \
+    -fixed true          \
+    -DIRECTION OUTPUT
+
+
+#set_io -port_name CKE  \
+    -pin_name W8       \
+    -fixed true        \
+    -DIRECTION OUTPUT
+
+
+#set_io -port_name CS_N  \
+    -pin_name W7        \
+    -fixed true         \
+    -DIRECTION OUTPUT
+
+
+#set_io -port_name CTRLR_READY  \
+    -pin_name D6               \
+    -fixed true                \
+    -DIRECTION OUTPUT
+
+
+#set_io -port_name DEVICE_INIT_DONE  \
+    -pin_name A13                   \
+    -fixed true                     \
+    -DIRECTION OUTPUT
+
+
+#set_io -port_name {DM[0]}  \
+    -pin_name Y9           \
+    -fixed true            \
+    -DIRECTION OUTPUT
+
+
+#set_io -port_name {DM[1]}  \
+    -pin_name R15          \
+    -fixed true            \
+    -DIRECTION OUTPUT
+
+
+#set_io -port_name {DQS[0]}  \
+    -pin_name T10           \
+    -fixed true             \
+    -DIRECTION INOUT
+
+
+#set_io -port_name {DQS[1]}  \
+    -pin_name R13           \
+    -fixed true             \
+    -DIRECTION INOUT
+
+
+#set_io -port_name {DQS_N[0]}  \
+    -pin_name U10             \
+    -fixed true               \
+    -DIRECTION INOUT
+
+
+#set_io -port_name {DQS_N[1]}  \
+    -pin_name T12             \
+    -fixed true               \
+    -DIRECTION INOUT
+
+
+#set_io -port_name {DQ[0]}  \
+    -pin_name T7           \
+    -fixed true            \
+    -DIRECTION INOUT
+
+
+#set_io -port_name {DQ[1]}  \
+    -pin_name T8           \
+    -fixed true            \
+    -DIRECTION INOUT
+
+
+#set_io -port_name {DQ[2]}  \
+    -pin_name U8           \
+    -fixed true            \
+    -DIRECTION INOUT
+
+
+#set_io -port_name {DQ[3]}  \
+    -pin_name U9           \
+    -fixed true            \
+    -DIRECTION INOUT
+
+
+#set_io -port_name {DQ[4]}  \
+    -pin_name R10          \
+    -fixed true            \
+    -DIRECTION INOUT
+
+
+#set_io -port_name {DQ[5]}  \
+    -pin_name V9           \
+    -fixed true            \
+    -DIRECTION INOUT
+
+
+#set_io -port_name {DQ[6]}  \
+    -pin_name V10          \
+    -fixed true            \
+    -DIRECTION INOUT
+
+
+#set_io -port_name {DQ[7]}  \
+    -pin_name W9           \
+    -fixed true            \
+    -DIRECTION INOUT
+
+
+#set_io -port_name {DQ[8]}  \
+    -pin_name V14          \
+    -fixed true            \
+    -DIRECTION INOUT
+
+
+#set_io -port_name {DQ[9]}  \
+    -pin_name U14          \
+    -fixed true            \
+    -DIRECTION INOUT
+
+
+#set_io -port_name {DQ[10]}  \
+    -pin_name R12           \
+    -fixed true             \
+    -DIRECTION INOUT
+
+
+#set_io -port_name {DQ[11]}  \
+    -pin_name T11           \
+    -fixed true             \
+    -DIRECTION INOUT
+
+
+#set_io -port_name {DQ[12]}  \
+    -pin_name U15           \
+    -fixed true             \
+    -DIRECTION INOUT
+
+
+#set_io -port_name {DQ[13]}  \
+    -pin_name T13           \
+    -fixed true             \
+    -DIRECTION INOUT
+
+
+#set_io -port_name {DQ[14]}  \
+    -pin_name U13           \
+    -fixed true             \
+    -DIRECTION INOUT
+
+
+#set_io -port_name {DQ[15]}  \
+    -pin_name T15           \
+    -fixed true             \
+    -DIRECTION INOUT
+
+
+#set_io -port_name ODT  \
+    -pin_name AA7      \
+    -fixed true        \
+    -DIRECTION OUTPUT
+
+
+#set_io -port_name PLL_LOCK_0  \
+    -pin_name A12             \
+    -fixed true               \
+    -DIRECTION OUTPUT
+
+
+#set_io -port_name RAS_N  \
+    -pin_name AA6        \
+    -fixed true          \
+    -DIRECTION OUTPUT
+
+
+#set_io -port_name RESET_N  \
+    -pin_name AB7          \
+    -fixed true            \
+    -DIRECTION OUTPUT
+
+
+#set_io -port_name SHIELD0  \
+    -pin_name R9           \
+    -fixed true            \
+    -DIRECTION OUTPUT
+
+
+#set_io -port_name SHIELD1  \
+    -pin_name V15          \
+    -fixed true            \
+    -DIRECTION OUTPUT
+
+
+#set_io -port_name WE_N  \
+    -pin_name AB5       \
+    -fixed true         \
+    -DIRECTION OUTPUT
+
+
+#set_io -port_name reset_sync_0  \
+    -pin_name A16               \
+    -fixed true                 \
+    -DIRECTION OUTPUT
+
+
+#set_io -port_name reset_sync_1  \
+    -pin_name A15               \
+    -fixed true                 \
+    -DIRECTION OUTPUT
+
+
+
+# 
+# Dedicated Peripheral I/O Settings
+# 
+
+
+# 
+# Unlocked I/O settings
+# The I/Os in this section are unplaced or placed but are not locked
+# the other listed attributes have been applied
+# 
+
+
+#
+#Ports using Dedicated Pins
+
+#
+
