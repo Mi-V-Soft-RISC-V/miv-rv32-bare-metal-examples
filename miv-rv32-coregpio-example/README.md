@@ -16,9 +16,8 @@ a terminal emulator such as TeraTerm or Putty configured as follows:
  - no flow control.
 
 ## Target hardware
-This example can be targeted at the latest Mi-V Soft Processor MIV_RV32 or at the
-legacy variants such as Mi-V_RV32IMA_L1_AXI etc. Choose the build configurations
-per the target processor in your design and the supported ISA extensions that you want to use. 
+This example can be targeted at the latest Mi-V Soft Processor MIV_RV32. Choose the build 
+configurations per the supported ISA extensions that you want to use.
 
 All the design specific definitions such as peripheral base addresses, system clock frequency 
 etc. are included in hw_platform.h. 

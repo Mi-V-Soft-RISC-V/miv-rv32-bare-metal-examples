@@ -6,6 +6,7 @@
  * Application demonstrating the use of CoreGPIO driver. Please see the
  * Readme.md for more details.
  */
+
 #include <drivers/fpga_ip/CoreGPIO/core_gpio.h>
 #include <drivers/fpga_ip/CoreUARTapb/core_uart_apb.h>
 #include "fpga_design_config/hw_platform.h"
@@ -29,9 +30,9 @@ uint8_t g_message[] =
 *******************  CoreGPIO Example Project ********************************\r\n\
 ******************************************************************************\r\n\
 This example project demonstrates the use of the CoreGPIO driver\r\n\
-with Mi-V soft processor on Future Electronics Polarfire Avalanche board\r\n\
-observe LED1 and LED2 on the Avalanche board. LED1 and LED2 will blink simultaneously\r\n\
-after some predefined delay \r\n\n";
+with Mi-V soft processor.\r\n\
+observe LED1 and LED2 on the board. LED1 and LED2 will blink simultaneously\r\n\
+after a predefined delay. \r\n\n";
 
 /* delay in ms */
 static void delay(uint8_t t_in_ms);
@@ -49,7 +50,7 @@ void main()
     UART_init( &g_uart, COREUARTAPB0_BASE_ADDR,\
             BAUD_VALUE_115200, (DATA_8_BITS | NO_PARITY) );
 
-    GPIO_init(&g_gpio, COREGPIO_OUT_BASE_ADDR,APB_BUS_WIDTH);
+    GPIO_init(&g_gpio, COREGPIO_OUT_BASE_ADDR, APB_BUS_WIDTH);
 
     /* Greeting message */
     UART_polled_tx_string(&g_uart,g_message);
@@ -62,7 +63,7 @@ void main()
     {
 
         /* Toggle LEDS indefinitely */
-        delay(25);
+        delay(5);
 
         LED1_state = (~LED1_state & 0b00000001) ;
         LED2_state = (~LED2_state & 0b00000001) ;
@@ -70,7 +71,7 @@ void main()
         GPIO_set_output(&g_gpio, GPIO_1, LED1_state );
         GPIO_set_output(&g_gpio, GPIO_0, LED2_state );
 
-        delay(25);
+        delay(5);
     }
 }
 
@@ -83,4 +84,3 @@ static void delay(uint8_t t_in_ms)
 
     }
 }
-

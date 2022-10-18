@@ -7,8 +7,6 @@
  * @author Microchip FPGA Embedded Systems Solutions
  * @brief Mi-V soft processor vectors, trap handling and startup code.
  *
- * SVN $Revision: 13158 $
- * SVN $Date: 2021-01-31 10:57:57 +0530 (Sun, 31 Jan 2021) $
  */
 #ifndef ENTRY_S
 #define ENTRY_S
@@ -126,6 +124,10 @@ MSYS_EI4_trap_entry:
 
 MSYS_EI5_trap_entry:
   j vector_MSYS_EI5_trap_handler
+#ifdef __riscv_compressed
+  .2byte 0
+#endif
+
 #ifdef __riscv_compressed
   .2byte 0
 #endif
