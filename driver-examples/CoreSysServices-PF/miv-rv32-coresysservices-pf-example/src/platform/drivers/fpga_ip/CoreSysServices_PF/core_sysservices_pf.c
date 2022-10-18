@@ -5,9 +5,17 @@
  * description of the functions implemented in this file.
  *
  */
+#ifndef LEGACY_DIR_STRUCTURE
 #include "hal/hal.h"
 #include "core_sysservices_pf.h"
 #include "coresysservicespf_regs.h"
+
+#else
+#include "hal.h"
+#include "core_sysservices_pf.h"
+#include "coresysservicespf_regs.h"
+#include "hal_assert.h"
+#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -329,7 +337,7 @@ uint8_t SYS_puf_emulation_service
 
     /* Frame the data required for mailbox */
     mb_format[index] = op_type;
- 
+
     for (index = 4u; index < 20u; index++)
     {
         mb_format[index] = p_challenge[index - 4u];
@@ -411,14 +419,14 @@ uint8_t SYS_secure_nvm_write
     HAL_ASSERT(!(NULL_BUFFER == p_user_key));
     HAL_ASSERT(!(snvm_module >= 221u));
 
-    if((p_data  == NULL_BUFFER) || (p_user_key == NULL_BUFFER) 
+    if((p_data  == NULL_BUFFER) || (p_user_key == NULL_BUFFER)
                                 || (snvm_module >= 221))
     {
         return status;
     }
 
-    if ((format != SNVM_NON_AUTHEN_TEXT_REQUEST_CMD) 
-       || (format != SNVM_AUTHEN_TEXT_REQUEST_CMD) 
+    if ((format != SNVM_NON_AUTHEN_TEXT_REQUEST_CMD)
+       || (format != SNVM_AUTHEN_TEXT_REQUEST_CMD)
        || (format != SNVM_AUTHEN_CIPHERTEXT_REQUEST_CMD))
     {
         return status;
@@ -721,7 +729,7 @@ static uint8_t execute_ss_command
     uint32_t* word_buf;
     uint16_t timeout_count = SS_TIMEOUT_COUNT;
 
-    /* making sure that the system controller is not executing any service i.e. 
+    /* making sure that the system controller is not executing any service i.e.
        SS_USER_BUSY is gone 0 */
 
     while (1u == HAL_get_32bit_reg_field(g_css_pf_base_addr, SS_USER_BUSY))
@@ -799,11 +807,11 @@ static uint8_t execute_ss_command
 
         for (idx = 0u; idx < (response_size/4u); idx++)
         {
-            while (0u == HAL_get_32bit_reg_field(g_css_pf_base_addr, 
+            while (0u == HAL_get_32bit_reg_field(g_css_pf_base_addr,
             SS_USER_RDVLD))
             {
                 --timeout_count;
-                
+
                 if (timeout_count == 0)
                 {
                     return SS_USER_RDVLD_TIMEOUT;

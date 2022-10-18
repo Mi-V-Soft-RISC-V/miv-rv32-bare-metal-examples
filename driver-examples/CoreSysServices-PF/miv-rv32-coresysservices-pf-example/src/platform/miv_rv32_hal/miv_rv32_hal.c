@@ -7,12 +7,9 @@
  * @author Microchip FPGA Embedded Systems Solutions
  * @brief Implementation of Hardware Abstraction Layer for Mi-V soft processors
  *
- * SVN $Revision: 13158 $
- * SVN $Date: 2021-01-31 10:57:57 +0530 (Sun, 31 Jan 2021) $
  */
 #include <unistd.h>
 #include "miv_rv32_hal.h"
-#include "hal/hal_assert.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -193,7 +190,6 @@ void handle_m_ext_interrupt(void)
     {
         disable = ext_irq_handler_table[int_num]();
 
-        MRV_PLIC_complete_irq(int_num);
         PLIC->TARGET[hart_id].CLAIM_COMPLETE = int_num;
 
         if(EXT_IRQ_DISABLE == disable)
@@ -201,8 +197,6 @@ void handle_m_ext_interrupt(void)
             MRV_PLIC_disable_irq((IRQn_Type)int_num);
         }
     }
-    else
-        HAL_ASSERT(0);
 }
 #endif
 

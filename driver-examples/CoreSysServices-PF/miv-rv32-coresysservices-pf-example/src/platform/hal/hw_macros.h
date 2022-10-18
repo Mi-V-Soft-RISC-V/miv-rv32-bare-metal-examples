@@ -1,23 +1,31 @@
-/***************************************************************************//**
+/*******************************************************************************
  * Copyright 2019-2021 Microchip FPGA Embedded Systems Solutions.
  *
  * SPDX-License-Identifier: MIT
  * 
- * Legacy interrupt control functions for the Microchip driver library hardware
- * abstraction layer.
+ * @file hw_macros.h
+ * @author Microchip FPGA Embedded Systems Solutions
+ * @brief Hardware registers access macros.
+ * 
+ *  THE MACROS DEFINED IN THIS FILE ARE DEPRECATED. DO NOT USE FOR NEW 
+ *  DEVELOPMENT.
  *
- * SVN $Revision: 13158 $
- * SVN $Date: 2021-01-31 10:57:57 +0530 (Sun, 31 Jan 2021) $
+ * These macros are used to access peripheral registers. They allow access to
+ * 8, 16 and 32 bit wide registers. All accesses to peripheral registers should
+ * be done through these macros in order to ease porting across different 
+ * processors/bus architectures.
+ * 
+ * Some of these macros also allow access to a specific register field.
+ * 
  */
-#include "hal.h"
-#include "miv_rv32_hal/miv_rv32_hal.h"
-
+#ifndef __HW_REGISTER_MACROS_H
+#define __HW_REGISTER_MACROS_H 1
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 /*------------------------------------------------------------------------------
- * 
+ * 32 bits registers access:
  */
 #define HW_get_uint32_reg(BASE_ADDR, REG_OFFSET) (*((uint32_t volatile *)(BASE_ADDR + REG_OFFSET##_REG_OFFSET)))
 

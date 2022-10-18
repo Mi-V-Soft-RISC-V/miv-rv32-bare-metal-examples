@@ -40,8 +40,8 @@
  * Format of define is:
  * <corename>_<instance>_BASE_ADDR
  */
-#define UART_BASE_ADDRESS               0x70011000UL
-#define CSS_PF_BASE_ADDRESS             0x70015000UL
+#define UART_BASE_ADDRESS               0x70000000UL
+#define CSS_PF_BASE_ADDRESS             0x70003000UL
 
 /***************************************************************************//**
  * Peripheral Interrupts are mapped to the corresponding Mi-V Soft processor

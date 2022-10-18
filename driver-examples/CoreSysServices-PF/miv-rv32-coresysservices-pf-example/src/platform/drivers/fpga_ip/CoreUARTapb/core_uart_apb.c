@@ -7,8 +7,7 @@
  * description of the functions implemented in this file.
  * 
  */
- 
-#include "hal/hal.h"
+
 #include "coreuartapb_regs.h"
 #include "core_uart_apb.h"
 

@@ -2,16 +2,20 @@
  * Copyright 2019-2021 Microchip FPGA Embedded Systems Solutions.
  *
  * SPDX-License-Identifier: MIT
- * 
- * SVN $Revision: 13158 $
- * SVN $Date: 2021-01-31 10:57:57 +0530 (Sun, 31 Jan 2021) $
+ *
+ * @file hal_assert.h
+ * @author Microchip FPGA Embedded Systems Solutions
+ * @brief HAL assert functions
  */
 #ifndef __HAL_ASSERT_HEADER
-#define __HAL_ASSERT_HEADER
+#define __HAL_ASSERT_HEADER 1
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+/* Disable assertions if we do not recognize the compiler. */
+#if defined ( __GNUC__ )
 #if defined(NDEBUG)
 /***************************************************************************//**
  * HAL_ASSERT() is defined out when the NDEBUG symbol is used.
@@ -34,6 +38,7 @@ extern "C" {
     } while(0);
 
 #endif  /* NDEBUG */
+#endif  /*__GNUC__*/
 
 #ifdef __cplusplus
 }
