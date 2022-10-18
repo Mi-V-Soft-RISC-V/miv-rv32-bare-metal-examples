@@ -21,10 +21,10 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  *
- * Hardware abstraction layer functions.
+ * @file hal.h
+ * @author Microchip FPGA Embedded Systems Solutions
+ * @brief Hardware abstraction layer functions for peripheral register accesses.
  * 
- * SVN $Revision: 13158 $
- * SVN $Date: 2021-01-31 10:57:57 +0530 (Sun, 31 Jan 2021) $
  */
 #ifndef __HAL_H
 #define __HAL_H 1
@@ -36,7 +36,6 @@ extern "C" {
 #include "cpu_types.h"
 #include "hw_reg_access.h"
 #include "hal_assert.h"
-
 /***************************************************************************//**
  * Enable all interrupts at the processor level.
  */

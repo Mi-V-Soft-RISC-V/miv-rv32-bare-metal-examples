@@ -3,11 +3,11 @@
  *
  * SPDX-License-Identifier: MIT
  * 
- * Legacy interrupt control functions for the Microchip driver library hardware
- * abstraction layer.
+ * @file hal_irq.c
+ * @author Microchip FPGA Embedded Systems Solutions
+ * @brief Legacy interrupt control functions for the Microchip driver library 
+ * hardware abstraction layer.
  *
- * SVN $Revision: 13158 $
- * SVN $Date: 2021-01-31 10:57:57 +0530 (Sun, 31 Jan 2021) $
  */
 #include "hal.h"
 #include "miv_rv32_hal/miv_rv32_hal.h"
@@ -43,3 +43,4 @@ void HAL_restore_interrupts(psr_t saved_psr) {
 #ifdef __cplusplus
 }
 #endif
+

@@ -102,7 +102,12 @@
 #ifndef __CORE_UART_APB_H
 #define __CORE_UART_APB_H 1
 
+#ifndef LEGACY_DIR_STRUCTURE
 #include "hal/hal.h"
+
+#else
+#include "hal.h"
+#endif
 
 #ifdef __cplusplus
 extern "C" {

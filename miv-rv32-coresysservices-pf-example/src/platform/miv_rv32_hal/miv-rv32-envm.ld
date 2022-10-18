@@ -3,7 +3,7 @@
  *
  * SPDX-License-Identifier: MIT 
  * 
- * file name : miv-rv32-nvm.ld
+ * file name : miv-rv32-envm.ld
  * Mi-V soft processor linker script for creating a SoftConsole downloadable
  * image executing from a ROM. The actual memory will depend on the FPGA 
  * platform. For exameple, it could be the eNVM on SmartFusion2, Igloo2 or 
@@ -12,8 +12,6 @@
  * Supports MIV_RV32 as well as the legacy RV32 cores with appropriate memory 
  * section addresses as per your design.
  *
- * SVN $Revision: 13158 $
- * SVN $Date: 2021-01-31 10:57:57 +0530 (Sun, 31 Jan 2021) $
  */
  
 OUTPUT_ARCH( "riscv" )

@@ -14,8 +14,6 @@
  * Supports MIV_RV32 as well as the legacy RV32 cores with appropriate memory 
  * section addresses as per your design.
  *
- * SVN $Revision: 13158 $
- * SVN $Date: 2021-01-31 10:57:57 +0530 (Sun, 31 Jan 2021) $
  */
  
 OUTPUT_ARCH( "riscv" )
@@ -28,8 +26,8 @@ MEMORY
 
 RAM_START_ADDRESS   = 0x80000000;       /* Must be the same value MEMORY region ram ORIGIN above. */
 RAM_SIZE            = 16k;              /* Must be the same value MEMORY region ram LENGTH above. */
-STACK_SIZE          = 2k;               /* needs to be calculated for your application */             
-HEAP_SIZE           = 2k;               /* needs to be calculated for your application */
+STACK_SIZE          = 1k;               /* needs to be calculated for your application */             
+HEAP_SIZE           = 0k;               /* needs to be calculated for your application */
 
 SECTIONS
 {

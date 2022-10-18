@@ -3,11 +3,9 @@
  *
  * SPDX-License-Identifier: MIT
  *
- * Helper function for PolarFire User Crypto cryptography service example.
+ * Helper function for PolarFire Core System service example.
  *
  */
-#include <stdio.h>
-#include <string.h>
 #include "drivers/fpga_ip/CoreUARTapb/core_uart_apb.h"
 #include "helper.h"
 
