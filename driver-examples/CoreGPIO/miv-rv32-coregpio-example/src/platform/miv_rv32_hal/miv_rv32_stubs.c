@@ -3,7 +3,7 @@
  *
  * SPDX-License-Identifier: MIT
  *
- * @file riscv_hal_stubs.c
+ * @file miv_rv32_stubs.c
  * @author Microchip FPGA Embedded Systems Solutions
  * @brief Mi-V soft processor Interrupt Function stubs.
  *
@@ -12,8 +12,6 @@
  * defined with weak linking so that they can be overridden by a function with
  * same prototype in the user's application code.
  *
- * SVN $Revision: 13158 $
- * SVN $Date: 2021-01-31 10:57:57 +0530 (Sun, 31 Jan 2021) $
  */
 #include <unistd.h>
 

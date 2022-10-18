@@ -5,8 +5,6 @@
  *
  * Platform definitions.
  *
- * SVN $Revision: 9861 $
- * SVN $Date: 2018-03-21 16:17:58 +0530 (Wed, 21 Mar 2018) $
  */
 
  /*========================================================================*//**
@@ -37,7 +35,7 @@
  * This is the only clock brought over from the Mi-V Libero design.
  */
 #ifndef SYS_CLK_FREQ
-#define SYS_CLK_FREQ                    30000000UL
+#define SYS_CLK_FREQ                    50000000UL
 #endif
 
 /***************************************************************************//**
@@ -52,8 +50,6 @@
 #define CORETIMER0_BASE_ADDR            0x70003000UL
 #define CORETIMER1_BASE_ADDR            0x70004000UL
 #define COREGPIO_OUT_BASE_ADDR          0x70005000UL
-#define FLASH_CORE_SPI_BASE             0x70006000UL
-#define CORE16550_BASE_ADDR             0x70007000UL
 
 /***************************************************************************//**
  * Peripheral Interrupts are mapped to the corresponding Mi-V Soft processor

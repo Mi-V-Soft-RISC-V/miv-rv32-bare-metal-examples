@@ -3,13 +3,14 @@
  *
  * SPDX-License-Identifier: MIT
  * 
- * Hardware registers access functions.
+ * @file hw_reg_access.S
+ * @author Microchip FPGA Embedded Systems Solutions
+ * @brief Hardware registers access functions.
  * The implementation of these function is platform and tool-chain specific.
  * The functions declared here are implemented using assembler as part of the 
- * processor/tool-chain specific HAL.
+ * processor/tool-chain specific HAL. This implementation is for the combination
+ * of the 32 bit RISC-V processors and GNU tool chain.
  * 
- * SVN $Revision: 13158 $
- * SVN $Date: 2021-01-31 10:57:57 +0530 (Sun, 31 Jan 2021) $
  */
 #ifndef __HW_REG_ACCESS
 #define __HW_REG_ACCESS

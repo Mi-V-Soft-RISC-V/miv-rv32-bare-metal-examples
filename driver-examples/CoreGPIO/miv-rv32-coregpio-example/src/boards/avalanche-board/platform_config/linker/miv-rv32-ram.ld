@@ -3,31 +3,33 @@
  *
  * SPDX-License-Identifier: MIT 
  * 
- * file name : miv-rv32-envm.ld
+ * file name : miv-rv32-ram.ld
  * Mi-V soft processor linker script for creating a SoftConsole downloadable
- * image executing from a ROM. The actual memory will depend on the FPGA 
- * platform. For exameple, it could be the eNVM on SmartFusion2, Igloo2 or 
- * on-board non-volatile memory which supports code execution.
+ * debug image executing in SRAM.
  * 
+ * This linker script assumes that a RAM is connected at on the Mi-V soft
+ * processor memory space. The start address and size of the memory space must
+ * be correct as per the Libero design.
+ *
  * Supports MIV_RV32 as well as the legacy RV32 cores with appropriate memory 
  * section addresses as per your design.
  *
+ * SVN $Revision: 13158 $
+ * SVN $Date: 2021-01-31 10:57:57 +0530 (Sun, 31 Jan 2021) $
  */
  
 OUTPUT_ARCH( "riscv" )
 ENTRY(_start)
 
-
 MEMORY
 {
-    rom (rx) : ORIGIN = 0x80000000, LENGTH =  64k
-    ram (rwx) : ORIGIN = 0x8001FFFF, LENGTH = 64k
+    ram (rwx) : ORIGIN = 0x80000000, LENGTH = 32k
 }
 
-RAM_START_ADDRESS   = 0x8001FFFF;       /* Must be the same value MEMORY region ram ORIGIN above. */
-RAM_SIZE            = 64k;              /* Must be the same value MEMORY region ram LENGTH above. */
+RAM_START_ADDRESS   = 0x80000000;       /* Must be the same value MEMORY region ram ORIGIN above. */
+RAM_SIZE            = 32k;              /* Must be the same value MEMORY region ram LENGTH above. */
 STACK_SIZE          = 2k;               /* needs to be calculated for your application */             
-HEAP_SIZE           = 2k;               /* needs to be calculated for your application */
+HEAP_SIZE           = 0k;               /* needs to be calculated for your application */
 
 SECTIONS
 {
@@ -35,12 +37,10 @@ SECTIONS
   {
     KEEP (*(SORT_NONE(.entry)))
     . = ALIGN(0x10);
-  } > rom
-  
+  } > ram
+
   .text : ALIGN(0x10)
   {
-    KEEP (*(SORT_NONE(.text.entry)))   
-    . = ALIGN(0x10);
     *(.text .text.* .gnu.linkonce.t.*)
     *(.plt)
     . = ALIGN(0x10);
@@ -75,7 +75,7 @@ SECTIONS
     PROVIDE_HIDDEN (__fini_array_end = .);
     . = ALIGN(0x10);
     
-  } >rom
+  } > ram
 
   /* short/global data section */
   .sdata : ALIGN(0x10)
@@ -88,7 +88,7 @@ SECTIONS
     *(.sdata .sdata.* .gnu.linkonce.s.*)
     . = ALIGN(0x10);
     __sdata_end = .;
-  } >ram AT>rom
+  } > ram
 
   /* data section */
   .data : ALIGN(0x10)
@@ -100,7 +100,7 @@ SECTIONS
     *(.data .data.* .gnu.linkonce.d.*)
     . = ALIGN(0x10);
     __data_end = .;
-  } >ram AT>rom
+  } > ram
 
   /* sbss section */
   .sbss : ALIGN(0x10)
@@ -141,5 +141,6 @@ SECTIONS
     . += STACK_SIZE;
     __stack_top = .;
   } > ram
+  
 }
 

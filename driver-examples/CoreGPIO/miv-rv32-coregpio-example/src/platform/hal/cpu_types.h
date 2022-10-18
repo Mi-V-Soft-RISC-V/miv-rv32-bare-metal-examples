@@ -3,37 +3,35 @@
  *
  * SPDX-License-Identifier: MIT
  *
- * Type definitions which can be  commonly used by the drivers.
+ * @file cpu_types.h
+ * @author Microchip FPGA Embedded Systems Solutions
+ * @brief Type definitions which can be  commonly used by the fabric-ip drivers.
  * 
- * SVN $Revision: 13158 $
- * SVN $Date: 2021-01-31 10:57:57 +0530 (Sun, 31 Jan 2021) $
  */
 #ifndef __CPU_TYPES_H
 #define __CPU_TYPES_H   1
+
+#include <stdint.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#include <stdint.h>
-
-/*------------------------------------------------------------------------------
- */
-typedef unsigned int size_t;
+typedef unsigned long size_t;
 
 /*------------------------------------------------------------------------------
  * addr_t: address type.
  * Used to specify the address of peripherals present in the processor's memory
  * map.
  */
-typedef unsigned int addr_t;
+typedef unsigned long addr_t;
 
 /*------------------------------------------------------------------------------
  * psr_t: processor state register.
  * Used by HAL_disable_interrupts() and HAL_restore_interrupts() to store the
  * processor's state between disabling and restoring interrupts.
  */
-typedef unsigned int psr_t;
+typedef unsigned long psr_t;
 
 #ifdef __cplusplus
 }

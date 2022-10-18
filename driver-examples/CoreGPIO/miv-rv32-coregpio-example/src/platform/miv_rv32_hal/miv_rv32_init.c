@@ -7,8 +7,6 @@
  * @author Microchip FPGA Embedded Systems Solutions
  * @brief Mi-V soft processor memory section initializations and start-up code.
  *
- * SVN $Revision: 13158 $
- * SVN $Date: 2021-01-31 10:57:57 +0530 (Sun, 31 Jan 2021) $
  */
 
 #include <unistd.h>

@@ -5,11 +5,8 @@
  *
  * @file sample_hw_platform.h
  * @author Microchip FPGA Embedded Systems Solutions
- * @brief Platform definitions 
+ * @brief Sample platform definitions 
  *
- *
- * SVN $Revision: 13158 $
- * SVN $Date: 2021-01-31 10:57:57 +0530 (Sun, 31 Jan 2021) $
  */
  /*========================================================================*//**
   @mainpage Example file detailing how hw_platform.h should be constructed for

@@ -8,9 +8,6 @@
  * @brief Mi-V legacy RV32 soft processor PLIC access data structures and
  *        functions.
  *
- * SVN $Revision: 13158 $
- * SVN $Date: 2021-01-31 10:57:57 +0530 (Sun, 31 Jan 2021) $
- *
  */
 #ifndef RISCV_PLIC_H
 #define RISCV_PLIC_H
@@ -74,7 +71,8 @@ typedef struct
     volatile uint32_t CLAIM_COMPLETE;
     volatile uint32_t reserved[1022];
 } IRQ_Target_Type;
-typedef struct
+
+typedef struct
 {
     volatile uint32_t ENABLES[32];
 } Target_Enables_Type;
@@ -180,28 +178,6 @@ static inline uint32_t MRV_PLIC_get_priority(IRQn_Type IRQn)
     return PLIC->SOURCE_PRIORITY[IRQn];
 }
 
-/*==============================================================================
- * The function MRV_PLIC_claim_irq() claims the interrupt from the PLIC
- * controller.
- */
-static inline uint32_t MRV_PLIC_claim_irq(void)
-{
-    unsigned long hart_id = read_csr(mhartid);
-
-    return PLIC->TARGET[hart_id].CLAIM_COMPLETE;
-}
-
-/*==============================================================================
- * The function MRV_PLIC_complete_irq() indicates to the PLIC controller the
- * interrupt is processed and claim is complete.
- */
-static inline void MRV_PLIC_complete_irq(uint32_t source)
-{
-    unsigned long hart_id = read_csr(mhartid);
-
-    PLIC->TARGET[hart_id].CLAIM_COMPLETE = source;
-}
-
 /***************************************************************************//**
  *  MRV_PLIC_clear_pending_irq(void)
  *  This is only called by the startup hart and only once
@@ -225,6 +201,7 @@ static inline void MRV_PLIC_clear_pending_irq(void)
         int_num  = PLIC->TARGET[hart_id].CLAIM_COMPLETE;
     }
 }
+
 #endif
 
 #ifdef __cplusplus

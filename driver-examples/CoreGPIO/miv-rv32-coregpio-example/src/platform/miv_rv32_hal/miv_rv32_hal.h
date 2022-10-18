@@ -25,8 +25,6 @@
  * @author Microchip FPGA Embedded Systems Solutions
  * @brief Hardware Abstraction Layer functions for Mi-V soft processors
  *
- * SVN $Revision: 13158 $
- * SVN $Date: 2021-01-31 10:57:57 +0530 (Sun, 31 Jan 2021) $
  */
 
 #ifndef RISCV_HAL_H
@@ -136,20 +134,20 @@ typedef struct
  * of the additional interrupts correspond to the names as used in the MIV_RV32
  * handbook. Please refer the MIV_RV32 handbook for more details.
  * */
-#define MIVRV32_SOFT_IRQn               MIE_3_IRQn
-#define MIVRV32_TIMER_IRQn              MIE_7_IRQn
-#define MIVRV32_EXT_IRQn                MIE_11_IRQn
+#define MRV32_SOFT_IRQn               MIE_3_IRQn
+#define MRV32_TIMER_IRQn              MIE_7_IRQn
+#define MRV32_EXT_IRQn                MIE_11_IRQn
 
 #ifndef MIV_LEGACY_RV32
-#define MIVRV32_MGEUIE_IRQn             MIE_16_IRQn
-#define MIVRV32_MGECIE_IRQn             MIE_17_IRQn
-#define MIVRV32_MSYS_EIE0_IRQn          MIE_24_IRQn
-#define MIVRV32_MSYS_EIE1_IRQn          MIE_25_IRQn
-#define MIVRV32_MSYS_EIE2_IRQn          MIE_26_IRQn
-#define MIVRV32_MSYS_EIE3_IRQn          MIE_27_IRQn
-#define MIVRV32_MSYS_EIE4_IRQn          MIE_28_IRQn
-#define MIVRV32_MSYS_EIE5_IRQn          MIE_29_IRQn
-#define MIVRV32_MSYS_OPSRV_IRQn         MIE_30_IRQn
+#define MRV32_MGEUIE_IRQn             MIE_16_IRQn
+#define MRV32_MGECIE_IRQn             MIE_17_IRQn
+#define MRV32_MSYS_EIE0_IRQn          MIE_24_IRQn
+#define MRV32_MSYS_EIE1_IRQn          MIE_25_IRQn
+#define MRV32_MSYS_EIE2_IRQn          MIE_26_IRQn
+#define MRV32_MSYS_EIE3_IRQn          MIE_27_IRQn
+#define MRV32_MSYS_EIE4_IRQn          MIE_28_IRQn
+#define MRV32_MSYS_EIE5_IRQn          MIE_29_IRQn
+#define MRV32_MSYS_OPSRV_IRQn         MIE_30_IRQn
 
 /***************************************************************************//**
     Enable OPSRV interrupt. Parameter takes logical OR of following values
@@ -157,7 +155,7 @@ typedef struct
     #define OPSRV_TCM_ECC_UCE_IRQ                   0x02u
     #define OPSRV_AXI_WR_RESP_IRQ                   0x10u
  */
-static inline void MRV_enable_opsrv_irq(uint32_t irq_mask)
+static inline void MRV32_opsrv_enable_irq(uint32_t irq_mask)
 {
     OPSRV->irq_en = irq_mask;
 }
@@ -168,7 +166,7 @@ static inline void MRV_enable_opsrv_irq(uint32_t irq_mask)
     #define OPSRV_TCM_ECC_UCE_IRQ                   0x02u
     #define OPSRV_AXI_WR_RESP_IRQ                   0x10u
  */
-static inline void MRV_disable_opsrv_irq(uint32_t irq_mask)
+static inline void MRV32_opsrv_disable_irq(uint32_t irq_mask)
 {
     OPSRV->cfg &= ~irq_mask;
 }
@@ -179,7 +177,7 @@ static inline void MRV_disable_opsrv_irq(uint32_t irq_mask)
     #define OPSRV_TCM_ECC_UCE_IRQ                   0x02u
     #define OPSRV_AXI_WR_RESP_IRQ                   0x10u
  */
-static inline void MRV_OPSRV_clear_irq(uint32_t irq_mask)
+static inline void MRV32_opsrv_clear_irq(uint32_t irq_mask)
 {
     OPSRV->irq_pend |= irq_mask;
 }

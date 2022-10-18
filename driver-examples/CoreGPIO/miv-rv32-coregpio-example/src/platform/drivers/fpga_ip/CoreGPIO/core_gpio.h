@@ -89,8 +89,12 @@
 #ifndef CORE_GPIO_H_
 #define CORE_GPIO_H_
 
-#include <stdint.h>
+#ifndef LEGACY_DIR_STRUCTURE
 #include "hal/hal.h"
+
+#else
+#include "hal.h"
+#endif
 
 /*-------------------------------------------------------------------------*//**
   The gpio_id_t enumeration is used to identify GPIOs as part of the
