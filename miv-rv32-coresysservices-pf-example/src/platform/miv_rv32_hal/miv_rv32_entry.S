@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2019-2021 Microchip FPGA Embedded Systems Solutions.
+ * Copyright 2019-2022 Microchip FPGA Embedded Systems Solutions.
  *
  * SPDX-License-Identifier: MIT
  *
@@ -14,6 +14,8 @@
 #define A_EXTENSION_MASK                0x00000001u
 #define MTVEC_MODE_BIT_MASK             0x00000003u
 #define MTVEC_VECTORED_MODE_VAL         0x00000001u
+
+#define MTIMEH_ADDR                     0x200BFFCu
 
 #if __riscv_xlen == 64
 # define LREG ld
@@ -35,7 +37,7 @@ _start:
    core in your design doesn't support 'C' extension and you enable 'C' extension
    in firmware project compiler options, then it would result in a trap. For this
    case, we are avoiding compressed instruction here so you can put a breakpoint
-   at the jump so that yo can at least look at mcause, mepc and get some hints
+   at the jump and you can at least look at mcause, mepc and get some hints
    about the crash. */
 trap_entry:
 .option push
@@ -684,6 +686,12 @@ handle_reset:
   csrwi mstatus, 0
   csrwi mie, 0
   la ra, _start
+
+/* Clearnig this to be on safer side as RTL doesnt seem to clear it on reset. */
+#ifndef MIV_LEGACY_RV32
+  li t0, MTIMEH_ADDR
+  sw x0, 0(t0)
+#endif
 
   csrr t0, misa
   andi t0, t0, A_EXTENSION_MASK

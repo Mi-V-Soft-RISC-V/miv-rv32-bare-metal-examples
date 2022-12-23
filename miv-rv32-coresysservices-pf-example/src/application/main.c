@@ -100,12 +100,12 @@ e. Digest check service\r\n\
 f. IAP service\r\n";
 
 const uint8_t iap_msg[] =
-"Select IAP service option \n\r \
-1.IAP Program by Index\r\n   \
-2.IAP Verify by index\r\n    \
-3.IAP Program by address\r\n \
-4.IAP Verify by address\r\n  \
-5.IAP Auto-Update";
+"\n\r\t Select IAP service option \n\r\
+1.IAP Program by Index\n\r\
+2.IAP Verify by index\n\r\
+3.IAP Program by address\n\r\
+4.IAP Verify by address\n\r\
+5.IAP Auto-Update\n\r";
 
 const uint8_t g_separator[] =
 "\r\n----------------------------------------------------------------------\r\n";
@@ -166,34 +166,42 @@ void execute_iap(void)
     {
         case 1:
             cmd = IAP_PROGRAM_BY_SPIIDX_CMD;
+            UART_polled_tx_string(&g_uart,(const uint8_t*)
+                    "\n\rEnter Index number in decimal\n\r");
+            spiaddr = get_value_from_uart(10);
+
             break;
         case 2:
             cmd = IAP_VERIFY_BY_SPIIDX_CMD;
+            UART_polled_tx_string(&g_uart,(const uint8_t*)
+                    "\n\rEnter Index number in decimal\n\r");
+            spiaddr = get_value_from_uart(10);
+
             break;
         case 3:
             cmd = IAP_PROGRAM_BY_SPIADDR_CMD;
+            UART_polled_tx_string(&g_uart,(const uint8_t*)
+                    "\n\rEnter 32 bit Address in hex without 0x prefix \n\r");
+            spiaddr = get_value_from_uart(16);
+
             break;
         case 4:
             cmd = IAP_VERIFY_BY_SPIADDR_CMD;
+            UART_polled_tx_string(&g_uart,(const uint8_t*)
+                    "\n\rEnter 32 bit Address in hex without 0x prefix \n\r");
+            spiaddr = get_value_from_uart(16);
+
             break;
         case 5:
             cmd = IAP_AUTOUPDATE_CMD;
+            /* SPI Directory index 1 is used for auto update image */
+
         break;
         default: UART_polled_tx_string(&g_uart,(const uint8_t*)
                 "Invalid input.\r\n");
     }
 
-    get_input_data(uart_input,
-                   (sizeof(spiaddr)),
-                   (const uint8_t*)"Enter Index for option 1,2.\r\n Enter address for options \
-                    3,4\r\n Press 'Enter' for option 5 ",
-					sizeof("Enter Index for option 1,2.\r\n Enter address for options \
-		                    3,4\r\n Press 'Enter' for option 5 "));
-
-    ptr = ((uint32_t*)&uart_input);
-    spiaddr = *ptr;
-
-    SYS_iap_service(cmd, spiaddr);
+    SYS_iap_service(cmd, spiaddr, 0);
 }
 
 void execute_bitstream_authenticate(void)

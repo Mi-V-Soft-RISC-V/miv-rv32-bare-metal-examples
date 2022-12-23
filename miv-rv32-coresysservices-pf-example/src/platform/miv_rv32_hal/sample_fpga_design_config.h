@@ -1,66 +1,93 @@
 /*******************************************************************************
- * Copyright 2019-2021 Microchip FPGA Embedded Systems Solutions.
+ * Copyright 2022 Microchip FPGA Embedded Systems Solutions.
  *
  * SPDX-License-Identifier: MIT
  *
- * @file sample_hw_platform.h
+ * @file sample_fpga_design_config.h
  * @author Microchip FPGA Embedded Systems Solutions
- * @brief Sample platform definitions 
+ * @brief Sample design configuration settings
  *
  */
  /*========================================================================*//**
-  @mainpage Example file detailing how hw_platform.h should be constructed for
-    the Mi-V processors.
+  @mainpage
+    Example file detailing how the fpga_design_config.h should be constructed
+    for the SoftConsole project targeted for Mi-V processors.
 
     @section intro_sec Introduction
-    The hw_platform.h is to be located in the project root directory.
-    Currently this file must be hand crafted when using the Mi-V Soft Processor.
-    
-    You can use this file as an example.
-    Rename this file from sample_hw_platform.h to hw_platform.h and store it in
-    the root folder of your project. Then customize it per your HW design.
+    The SoftConsole project targeted for Mi-V processors now have an improved
+    folder structure. Detailed description of the folder structure is available
+    at https://github.com/Mi-V-Soft-RISC-V/miv-rv32-documentation.
 
-    @section driver_configuration Project configuration Instructions
+    The fpga_design_config.h must be stored as shown below
+    <project-root>/boards/<board-name>/fpga_design_config.h
+
+    Currently this file must be hand crafted when using the Mi-V Soft Processor.
+    In future, all the design and soft IP configurations will be automatically
+    generated from the Libero design description data.
+    
+    You can use this sample file as an example.
+    Rename this file from sample_fpga_design_config.h to fpga_design_config.h
+    and then customize it per your hardware design.
+
+    @section Project configuration Instructions
     1. Change SYS_CLK_FREQ define to frequency of Mi-V Soft processor clock
-    2  Add all other core BASE addresses
-    3. Add peripheral Core Interrupt to Mi-V Soft processor interrupt mappings
+    2  Add all the soft IP core BASE addresses
+    3. Add the peripheral Core Interrupts to Mi-V Soft processor IRQ number
+       mappings
     4. Define MSCC_STDIO_UART_BASE_ADDR if you want a CoreUARTapb mapped to
        STDIO
+
+    **NOTE**
+    In the legacy folder structures, the file hw_config.h as was used at the
+    root of the project folder. This file is now depricated.
+
 *//*=========================================================================*/
 
-#ifndef HW_PLATFORM_H
-#define HW_PLATFORM_H
+#ifndef FPGA_DESIGN_CONFIG_H_
+#define FPGA_DESIGN_CONFIG_H_
 
 /***************************************************************************//**
  * Soft-processor clock definition
  * This is the only clock brought over from the Mi-V Libero design.
  */
 #ifndef SYS_CLK_FREQ
-#define SYS_CLK_FREQ                    83000000UL
+#define SYS_CLK_FREQ                    50000000UL
 #endif
 
 /***************************************************************************//**
- * Non-memory Peripheral base addresses
+ * Peripheral base addresses.
  * Format of define is:
  * <corename>_<instance>_BASE_ADDR
  * The <instance> field is optional if there is only one instance of the core
  * in the design
+ * MIV_ESS is an extended peripheral subsystem IP core with peripherals 
+ * connections as defined below.
+ * The system can be further extended by attaching APB peripherals to the 
+ * empty APB slots.
  */
-#define COREUARTAPB0_BASE_ADDR          0x70001000UL
-#define COREGPIO_IN_BASE_ADDR           0x70002000UL
-#define CORETIMER0_BASE_ADDR            0x70003000UL
-#define CORETIMER1_BASE_ADDR            0x70004000UL
-#define COREGPIO_OUT_BASE_ADDR          0x70005000UL
-#define FLASH_CORE_SPI_BASE             0x70006000UL
-#define CORE16550_BASE_ADDR             0x70007000UL
+#define MIV_ESS_PLIC_BASE_ADDR          0x70000000UL
+#define COREUARTAPB0_BASE_ADDR          0x71000000UL
+#define MIV_MTIMER_BASE_ADDR            0x72000000UL
+#define MIV_ESS_APBSLOT3_BASE_ADDR      0x73000000UL
+#define MIV_ESS_APBSLOT4_BASE_ADDR      0x74000000UL
+#define COREGPIO_OUT_BASE_ADDR          0x75000000UL
+#define CORESPI_BASE_ADDR               0x76000000UL
+#define MIV_ESS_uDMA_BASE_ADDR          0x78000000UL
+#define MIV_ESS_WDOG_BASE_ADDR          0x79000000UL
+#define MIV_ESS_I2C_BASE_ADDR           0x7A000000UL
+#define MIV_ESS_APBSLOTB_BASE_ADDR      0x7B000000UL
+#define MIV_ESS_APBSLOTC_BASE_ADDR      0x7C000000UL
+#define MIV_ESS_APBSLOTD_BASE_ADDR      0x7D000000UL
+#define MIV_ESS_APBSLOTE_BASE_ADDR      0x7E000000UL
+#define MIV_ESS_APBSLOTF_BASE_ADDR      0x7F000000UL
 
 /***************************************************************************//**
  * Peripheral Interrupts are mapped to the corresponding Mi-V Soft processor
- * interrupt from the Libero design.
+ * interrupt in the Libero design.
  *
  * On the legacy RV32 cores, there can be up to 31 external interrupts (IRQ[30:0]
  * pins). The legacy RV32 Soft processor external interrupts are defined in the
-   riscv_plic.h
+   miv_rv32_plic.h
  * 
  * These are of the form
  * typedef enum
@@ -75,7 +102,7 @@
 } IRQn_Type;
  
  On the legacy RV32 processors, the PLIC identifies the interrupt and passes it
- on to the processor core. The interrupt 0  is not used. The pin IRQ[0] should
+ on to the processor core. The interrupt 0 is not used. The pin IRQ[0] should
  map to External_1_IRQn likewise IRQ[30] should map to External_31_IRQn
 
 e.g
@@ -83,10 +110,11 @@ e.g
 #define TIMER0_IRQn                     External_30_IRQn
 #define TIMER1_IRQn                     External_31_IRQn
 
- On the MIV_RV32 core, there is one external interrupts and it can also have
- up to six optional external system interrupts. On these cores there is no PLIC
- and these interrupts are directly delivered to the processor core, hence unlike
- legacy RV32 core no interrupt number mapping is necessary on MIV_RV32 core.
+ The MIV_RV32 soft processor has up to six optional system interrupts, MSYS_EI[n] 
+ in addition to one EXT_IRQ.
+ The MIV_RV32 does not have an inbuilt PLIC and all the interrupts are directly
+ delivered to the processor core, hence unlike legacy RV32 cores, no interrupt
+ number mapping is necessary on MIV_RV32 core.
  */
 
 /****************************************************************************
@@ -136,4 +164,4 @@ e.g
 /*******************************************************************************
  * End of user edit section
  */
-#endif /* HW_PLATFORM_H */
+#endif /* FPGA_DESIGN_CONFIG_H_ */

@@ -8,6 +8,7 @@
  */
 #include "drivers/fpga_ip/CoreUARTapb/core_uart_apb.h"
 #include "helper.h"
+#include <stdlib.h>
 
 static const uint8_t g_separator[] =
 "\r\n\
@@ -272,3 +273,70 @@ uint16_t get_data_from_uart
     return ret_size;
 }
 
+/*==============================================================================
+  Function is used to input decimal and hexadecimal values from UART.
+ */
+uint32_t get_value_from_uart
+(
+    uint16_t base
+)
+{
+    uint8_t complete = 0u;
+    uint8_t rx_buff[1];
+    uint8_t stack_buff[10] = {0};
+    uint8_t rx_size = 0u;
+    uint16_t src_ind = 0u;
+    uint32_t value = 0u;
+    uint8_t i = 0u;
+
+    /* Read the valid ASCII character by character into stack_buffer until
+     * user press enter*/
+    while(!complete)
+    {
+        rx_size = UART_get_rx(&g_uart, rx_buff, sizeof(rx_buff));
+        if(rx_size > 0u)
+        {
+            /* Is it to terminate from the loop */
+            if(ENTER == rx_buff[0])
+            {
+                complete = 1u;
+            }
+            /* Is entered key valid */
+            else if(validate_input(rx_buff[0]) != 1u)
+            {
+                UART_send(&g_uart, rx_buff, sizeof(rx_buff));
+                UART_send(&g_uart, (const uint8_t *)"\r\n Invalid input.",
+                          sizeof("\r\n Invalid input."));
+                complete = 0u;
+
+                /* empty the stack_buff */
+                src_ind = 0u;
+                stack_buff[src_ind]= '\0';
+            }
+            else
+            {
+                stack_buff[src_ind] = rx_buff[0];
+                src_ind++;
+
+                UART_send(&g_uart, rx_buff, sizeof(rx_buff));
+            }
+        }
+    }
+    /* Terminate the string with null character */
+    stack_buff[src_ind]= '\0';
+
+    /* Convert input string into value based on base type required*/
+    switch(base)
+    {
+    case 10:
+        value = atoi(stack_buff);
+        break;
+    case 16:
+        value = (uint32_t)strtol(stack_buff, NULL, 16);
+        break;
+    default:
+        break;
+    }
+
+    return value;
+}

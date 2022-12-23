@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2019-2021 Microchip FPGA Embedded Systems Solutions.
+ * Copyright 2019-2022 Microchip FPGA Embedded Systems Solutions.
  *
  * SPDX-License-Identifier: MIT
  *
@@ -74,7 +74,8 @@ extern "C" {
 #define MSYS_EI5IP              (1u << MSYS_EI5)
 #define MSYS_EXTERNAL_INT       (0x3Fu << MSYS_EI0)
 #define MIP_OPSRV_REG           (1u << OPSRV_REG)
-#endif
+
+#endif /* MIV_LEGACY_RV32 */
 
 #define PRV_M                   3U
 
@@ -126,22 +127,22 @@ extern "C" {
 #ifdef __GNUC__
 
 #define read_csr(reg) ({ unsigned long __tmp; \
-  asm volatile ("csrr %0, " #reg : "=r"(__tmp)); \
+  __asm__ volatile ("csrr %0, " #reg : "=r"(__tmp)); \
   __tmp; })
 
 #define write_csr(reg, val) ({ \
-  asm volatile ("csrw " #reg ", %0" :: "rK"(val)); })
+  __asm__ volatile ("csrw " #reg ", %0" :: "rK"(val)); })
 
 #define swap_csr(reg, val) ({ unsigned long __tmp; \
-  asm volatile ("csrrw %0, " #reg ", %1" : "=r"(__tmp) : "rK"(val)); \
+  __asm__ volatile ("csrrw %0, " #reg ", %1" : "=r"(__tmp) : "rK"(val)); \
   __tmp; })
 
 #define set_csr(reg, bit) ({ unsigned long __tmp; \
-  asm volatile ("csrrs %0, " #reg ", %1" : "=r"(__tmp) : "rK"(bit)); \
+  __asm__ volatile ("csrrs %0, " #reg ", %1" : "=r"(__tmp) : "rK"(bit)); \
   __tmp; })
 
 #define clear_csr(reg, bit) ({ unsigned long __tmp; \
-  asm volatile ("csrrc %0, " #reg ", %1" : "=r"(__tmp) : "rK"(bit)); \
+  __asm__ volatile ("csrrc %0, " #reg ", %1" : "=r"(__tmp) : "rK"(bit)); \
   __tmp; })
 
 #ifdef __riscv_atomic
