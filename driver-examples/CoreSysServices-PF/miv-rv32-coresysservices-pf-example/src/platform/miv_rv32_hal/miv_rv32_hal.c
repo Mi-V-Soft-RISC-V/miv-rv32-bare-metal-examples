@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2019-2021 Microchip FPGA Embedded Systems Solutions.
+ * Copyright 2019-2022 Microchip FPGA Embedded Systems Solutions.
  *
  * SPDX-License-Identifier: MIT
  *
@@ -15,8 +15,34 @@
 extern "C" {
 #endif
 
-#define SUCCESS                         0U
-#define ERROR                           1U
+#define SUCCESS                       0U
+#define ERROR                         1U
+#define MASK_32BIT                    0xFFFFFFFFu
+
+/*------------------------------------------------------------------------------
+ *  Write in a sequence recommended by privileged spec to avoid spurious
+ * interrupts
+
+   # New comparand is in a1:a0.
+    li t0, -1
+    sw t0, mtimecmp # No smaller than old value.
+    sw a1, mtimecmp+4 # No smaller than new value.
+    sw a0, mtimecmp # New value.
+ */
+#ifndef MIV_RV32_EXT_TIMECMP
+#define WRITE_MTIMECMP(value)         MTIMECMPH = MASK_32BIT; \
+                                      MTIMECMP  = value & MASK_32BIT;\
+                                      MTIMECMPH =  (value >> 32u) & MASK_32BIT;
+#else
+#define WRITE_MTIMECMP(value)
+#endif
+
+#ifndef MIV_RV32_EXT_TIMER
+#define WRITE_MTIME(value)            MTIME  = value & MASK_32BIT;\
+                                      MTIMEH = (value >> 32u) & MASK_32BIT;
+#else
+#define WRITE_MTIME(value)
+#endif
 
 extern void Software_IRQHandler(void);
 
@@ -101,8 +127,9 @@ uint8_t (* const ext_irq_handler_table[32])(void) =
 
 #else
 /*------------------------------------------------------------------------------
- *
+ * Interrupt handlers as mapped into the MIE register of the MIV_RV32
  */
+extern void External_IRQHandler(void);
 extern void MGEUI_IRQHandler(void);
 extern void MGECI_IRQHandler(void);
 extern void MSYS_EI0_IRQHandler(void);
@@ -112,49 +139,31 @@ extern void MSYS_EI3_IRQHandler(void);
 extern void MSYS_EI4_IRQHandler(void);
 extern void MSYS_EI5_IRQHandler(void);
 extern void OPSRV_IRQHandler(void);
-extern void External_IRQHandler(void);
-#endif
+
+#endif  /* MIV_LEGACY_RV32 */
 
 /*------------------------------------------------------------------------------
  * Increment value for the mtimecmp register in order to achieve a system tick
  * interrupt as specified through the MRV_systick_config() function.
  */
 static uint64_t g_systick_increment = 0U;
-
-/*------------------------------------------------------------------------------
- * Disable all interrupts.
- */
-void MRV_disable_interrupts(void)
-{
-    clear_csr(mstatus, MSTATUS_MPIE);
-    clear_csr(mstatus, MSTATUS_MIE);
-}
-
-/*------------------------------------------------------------------------------
- * Enable all interrupts.
- */
-void MRV_enable_interrupts(void)
-{
-    set_csr(mstatus, MSTATUS_MIE);
-}
+static uint64_t g_systick_cmp_value = 0U;
 
 /*------------------------------------------------------------------------------
  * Configure the machine timer to generate an interrupt.
  */
-uint32_t MRV_systick_config(uint32_t ticks)
+uint32_t MRV_systick_config(uint64_t ticks)
 {
     uint32_t ret_val = ERROR;
 
     g_systick_increment = (uint64_t)(ticks) / MTIME_PRESCALER;
+    g_systick_cmp_value = g_systick_increment + MTIME;
 
     if (g_systick_increment > 0U)
     {
-#ifndef MIV_RV32_EXT_TIMECMP
-        MTIMECMP = MTIME + g_systick_increment;
-#endif
+        WRITE_MTIMECMP(g_systick_cmp_value);
         set_csr(mie, MIP_MTIP);
         MRV_enable_interrupts();
-
         ret_val = SUCCESS;
     }
 
@@ -167,17 +176,45 @@ uint32_t MRV_systick_config(uint32_t ticks)
 void handle_m_timer_interrupt(void)
 {
     clear_csr(mie, MIP_MTIP);
-    SysTick_Handler();
 
-#ifndef MIV_RV32_EXT_TIMECMP
-    MTIMECMP = MTIME + g_systick_increment;
+    uint64_t mtime_at_irq = MTIME;
+
+#ifndef NDEBUG
+    static volatile uint32_t d_tick = 0u;
 #endif
+
+    while(g_systick_cmp_value < (mtime_at_irq + MTIME_DELTA)) {
+        g_systick_cmp_value = g_systick_cmp_value + g_systick_increment;
+
+#ifndef NDEBUG
+        d_tick += 1;
+#endif
+    }
+
+    /*
+     * Note: If d_tick > 1 it means, that a system timer interrupt has been missed.
+     *
+     * Please ensure that interrupt handlers are as short as possible to prevent
+     * them stopping other interrupts from being handled. For example, if a
+     * system timer interrupt occurs during a software interrupt, the system
+     * timer interrupt will not be handled until the software interrupt handling
+     * is complete. If the software interrupt handling time is more than one systick
+     * interval, it will result in d_tick > 1.
+     *
+     * If you are running the program using the debugger and halt the CPU at a breakpoint,
+     * MTIME will continue to increment and interrupts will be missed; resulting
+     * in d_tick > 1.
+     */
+
+    WRITE_MTIMECMP(g_systick_cmp_value);
+
+    SysTick_Handler();
 
     set_csr(mie, MIP_MTIP);
 }
 
 /*------------------------------------------------------------------------------
- *
+ * RISC-V interrupt handler for software interrupts.
  */
 #ifdef MIV_LEGACY_RV32
 void handle_m_ext_interrupt(void)
@@ -186,7 +223,7 @@ void handle_m_ext_interrupt(void)
     uint32_t int_num  = PLIC->TARGET[hart_id].CLAIM_COMPLETE;
     uint8_t disable = EXT_IRQ_KEEP_ENABLED;
 
-    if (0 !=int_num)
+    if (0u !=int_num)
     {
         disable = ext_irq_handler_table[int_num]();
 
@@ -198,30 +235,20 @@ void handle_m_ext_interrupt(void)
         }
     }
 }
-#endif
+#endif /* MIV_LEGACY_RV32 */
 
 void handle_m_soft_interrupt(void)
 {
     Software_IRQHandler();
-
-    /* Clear software interrupt */
     MRV_clear_soft_irq();
 }
 
 /*------------------------------------------------------------------------------
- * Trap handler
+ * Trap handler. This function is invoked in the non-vectored mode.
  */
 void handle_trap(uintptr_t mcause, uintptr_t mepc)
 {
-    if ((mcause & MCAUSE_INT) && ((mcause & MCAUSE_CAUSE) == IRQ_M_EXT))
-    {
-#ifdef MIV_LEGACY_RV32
-        handle_m_ext_interrupt();
-#else
-        External_IRQHandler();
-#endif
-    }
-    else if ((mcause & MCAUSE_INT) && ((mcause & MCAUSE_CAUSE) == IRQ_M_SOFT))
+    if ((mcause & MCAUSE_INT) && ((mcause & MCAUSE_CAUSE) == IRQ_M_SOFT))
     {
         handle_m_soft_interrupt();
     }
@@ -229,7 +256,14 @@ void handle_trap(uintptr_t mcause, uintptr_t mepc)
     {
         handle_m_timer_interrupt();
     }
-
+    else if ((mcause & MCAUSE_INT) && ((mcause & MCAUSE_CAUSE) == IRQ_M_EXT))
+    {
+#ifdef MIV_LEGACY_RV32
+        handle_m_ext_interrupt();
+#else
+        External_IRQHandler();
+#endif
+    }
 #ifndef MIV_LEGACY_RV32
     else if ((mcause & MCAUSE_INT) && ((mcause & MCAUSE_CAUSE) == MSYS_EI0))
     {
@@ -267,7 +301,7 @@ void handle_trap(uintptr_t mcause, uintptr_t mepc)
     {
         MGECI_IRQHandler();
     }
-#endif
+#endif /* MIV_LEGACY_RV32 */
 
     else
     {
@@ -319,13 +353,14 @@ void handle_trap(uintptr_t mcause, uintptr_t mepc)
          uintptr_t mmepc  = read_csr(mepc);
 
         /* breakpoint */
-        __asm("ebreak");
+        __asm__("ebreak");
 #else
         _exit(1 + mcause);
-#endif
+#endif  /* NDEBUG */
     }
 }
 
 #ifdef __cplusplus
 }
 #endif
+

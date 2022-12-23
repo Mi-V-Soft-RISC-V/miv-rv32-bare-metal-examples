@@ -1,17 +1,28 @@
 /*******************************************************************************
- * Copyright 2019-2021 Microchip FPGA Embedded Systems Solutions.
+ * Copyright 2019-2022 Microchip FPGA Embedded Systems Solutions.
  *
  * SPDX-License-Identifier: MIT 
  * 
- * file name : miv-rv32-envm.ld
+ * file name : miv-rv32-execute-in-place.ld
  * Mi-V soft processor linker script for creating a SoftConsole downloadable
- * image executing from a ROM. The actual memory will depend on the FPGA 
- * platform. For exameple, it could be the eNVM on SmartFusion2, Igloo2 or 
- * on-board non-volatile memory which supports code execution.
+ * image executing from a one address space whereas the data, sdata and stack 
+ * sections are placed in another address space. This could be used in cases such
+ * as:
+ * 1) When using MIV_RV32, the reset vector points to the LSRAM at address 
+ *    0x80000000 and the data, sdata, bss and stack sections are placed in the 
+ *    TCM region.
+ *  
+ * 2) Executing from a Non Volatile memory. The actual memory will depend on 
+ *    the FPGA platform. For exameple, it could be the eNVM on SmartFusion2, 
+ *    Igloo2 or on-board non-volatile memory which supports code execution.
  * 
- * Supports MIV_RV32 as well as the legacy RV32 cores with appropriate memory 
- * section addresses as per your design.
- *
+ * NOTE: Modify the memory section addresses and the sizes according to your
+ * Libero design.
+ * 
+ * To know more about the memory map of the MIV_RV32 based Libero design, open 
+ * the MIV_RV32 IP configurator and look for "Reset Vector Address" and the
+ * "Memory Map" tab.
+ * 
  */
  
 OUTPUT_ARCH( "riscv" )
@@ -20,14 +31,12 @@ ENTRY(_start)
 
 MEMORY
 {
-    rom (rx) : ORIGIN = 0x80000000, LENGTH =  64k
-    ram (rwx) : ORIGIN = 0x8001FFFF, LENGTH = 64k
+    rom (rx)  : ORIGIN = 0x80000000, LENGTH = 16k
+    ram (rwx) : ORIGIN = 0x80004000, LENGTH = 16k
 }
 
-RAM_START_ADDRESS   = 0x8001FFFF;       /* Must be the same value MEMORY region ram ORIGIN above. */
-RAM_SIZE            = 64k;              /* Must be the same value MEMORY region ram LENGTH above. */
-STACK_SIZE          = 2k;               /* needs to be calculated for your application */             
-HEAP_SIZE           = 2k;               /* needs to be calculated for your application */
+STACK_SIZE          = 1k;               /* needs to be calculated for your application */
+HEAP_SIZE           = 1k;                /* needs to be calculated for your application */
 
 SECTIONS
 {

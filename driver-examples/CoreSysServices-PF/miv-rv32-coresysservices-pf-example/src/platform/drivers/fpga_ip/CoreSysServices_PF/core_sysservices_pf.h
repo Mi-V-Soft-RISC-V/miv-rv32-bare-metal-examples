@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2019-2021 Microchip FPGA Embedded Systems Solutions.
+ * Copyright 2019-2022 Microchip FPGA Embedded Systems Solutions.
  *
  * SPDX-License-Identifier: MIT
  *
@@ -139,6 +139,14 @@
   *//*=========================================================================*/
 #ifndef __CORE_SYSSERV_PF_H
 #define __CORE_SYSSERV_PF_H 1
+
+#ifndef LEGACY_DIR_STRUCTURE
+#include "hal/hal.h"
+
+#else
+#include "hal.h"
+#include "hal_assert.h"
+#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -1197,6 +1205,13 @@ uint8_t SYS_digest_check_service
  *              IAP_AUTOUPDATE_CMD              spiaddr is ignored as No index/address
  *                                              required for this command.
  *
+ * @param mb_offset    The mb_offset parameter specifies the offset from
+ *                     the start of Mailbox where the data related to this service
+ *                     will be available. Note that all accesses to the mailbox
+ *                     are of word length(4 bytes). A Value '10' of this parameter
+ *                     would mean that the data access area for this service
+ *                     starts from 11th word (offset 10) in the Mailbox.
+ *
  *  Note: For the IAP services with command IAP_PROGRAM_BY_SPIIDX_CMD and
  *        IAP_VERIFY_BY_SPIIDX_CMD To support recovery SPI_IDX=1 should be an
  *        empty slot and the recovery image should be located in SPI_IDX=0.
@@ -1212,7 +1227,8 @@ uint8_t SYS_digest_check_service
 uint8_t SYS_iap_service
 (
     uint8_t iap_cmd,
-    uint32_t spiaddr
+    uint32_t spiaddr,
+    uint16_t mb_offset
 );
 
 #ifdef __cplusplus

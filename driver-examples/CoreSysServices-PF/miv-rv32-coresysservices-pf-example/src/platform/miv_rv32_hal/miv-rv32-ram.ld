@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2019-2021 Microchip FPGA Embedded Systems Solutions.
+ * Copyright 2019-2022 Microchip FPGA Embedded Systems Solutions.
  *
  * SPDX-License-Identifier: MIT 
  * 
@@ -7,12 +7,21 @@
  * Mi-V soft processor linker script for creating a SoftConsole downloadable
  * debug image executing in SRAM.
  * 
- * This linker script assumes that a RAM is connected at on the Mi-V soft
- * processor memory space. The start address and size of the memory space must
- * be correct as per the Libero design.
+ * This linker script assumes that a RAM is connected at on Mi-V soft processor 
+ * memory space pointed by the reset vector address.
  *
- * Supports MIV_RV32 as well as the legacy RV32 cores with appropriate memory 
- * section addresses as per your design.
+ * NOTE : Modify the memory section address and the size according to your
+ * Libero design. 
+ * For example:
+ * 1) If you want to download and step debug at a different RAM memory address in
+ *    your design (For example TCM base address) than the one provided in this file.
+ * 2) The MIV_RV32, when used with MIV_ESS IP, provides ways to copy the executable 
+ *    HEX file from external Non-Volatile memory into the TCM at reset. In this 
+ *    case your executable must be linked to the TCM address. 
+ *
+ * To know more about the memory map of the MIV_RV32 based Libero design, open 
+ * the MIV_RV32 IP configurator and look for "Reset Vector Address" and the
+ * "Memory Map" tab.
  *
  */
  
@@ -21,13 +30,11 @@ ENTRY(_start)
 
 MEMORY
 {
-    ram (rwx) : ORIGIN = 0x80000000, LENGTH = 16k
+    ram (rwx) : ORIGIN = 0x80000000, LENGTH = 32k
 }
 
-RAM_START_ADDRESS   = 0x80000000;       /* Must be the same value MEMORY region ram ORIGIN above. */
-RAM_SIZE            = 16k;              /* Must be the same value MEMORY region ram LENGTH above. */
-STACK_SIZE          = 1k;               /* needs to be calculated for your application */             
-HEAP_SIZE           = 0k;               /* needs to be calculated for your application */
+STACK_SIZE          = 2k;               /* needs to be calculated for your application */
+HEAP_SIZE           = 1k;               /* needs to be calculated for your application */
 
 SECTIONS
 {

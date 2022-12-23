@@ -55,4 +55,9 @@ void display_output
     uint8_t* in_buffer,
     uint32_t byte_length
 );
+
+uint32_t get_value_from_uart
+(
+    uint16_t base
+);
 #endif /* __HELPER_H_ */
