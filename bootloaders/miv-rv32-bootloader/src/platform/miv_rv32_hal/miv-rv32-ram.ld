@@ -34,7 +34,7 @@ MEMORY
 }
 
 STACK_SIZE          = 2k;               /* needs to be calculated for your application */
-HEAP_SIZE           = 0k;               /* needs to be calculated for your application */
+HEAP_SIZE           = 1k;               /* needs to be calculated for your application */
 
 SECTIONS
 {

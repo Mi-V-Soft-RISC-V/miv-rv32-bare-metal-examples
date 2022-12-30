@@ -32,12 +32,13 @@
 
 #include "miv_rv32_regs.h"
 #include "miv_rv32_plic.h"
+#include "miv_rv32_assert.h"
 
 #ifndef LEGACY_DIR_STRUCTURE
 #include "fpga_design_config/fpga_design_config.h"
 #else
 #include "hw_platform.h"
-#endif
+#endif  /*LEGACY_DIR_STRUCTURE*/
 
 #ifdef __cplusplus
 extern "C" {
@@ -66,21 +67,28 @@ void SysTick_Handler(void);
  * intervals.
  * Takes the number of system clock ticks between interrupts.
  *
+ * Though this function can take any valid ticks value as parameter, we expect
+ * that, for all practical purposes, a small tick value (to generate periodic 
+ * interrupts every few miliseconds) will be passed. If you need to generate
+ * periodic events in the range of seconds or more, you may use the SysTick_Handler()
+ * to further count the number of interrupts and hence the larger time intervals.
+ *
  * Returns 0 if successful.
  * Returns 1 if the interrupt interval cannot be achieved.
  */
 uint32_t MRV_systick_config(uint64_t ticks);
 
+#define MTIME_DELTA                     5
 
 #ifdef MIV_LEGACY_RV32
-#define MSIP                                    (*(uint32_t*)0x44000000UL)
-#define MTIMECMP                                (*(uint32_t*)0x44004000UL)
-#define MTIMECMPH                               (*(uint32_t*)0x44004004UL)
-#define MTIME                                   (*(uint32_t*)0x4400BFF8UL)
-#define MTIMEH                                  (*(uint32_t*)0x4400BFFCUL)
+#define MSIP                            (*(uint32_t*)0x44000000UL)
+#define MTIMECMP                        (*(uint32_t*)0x44004000UL)
+#define MTIMECMPH                       (*(uint32_t*)0x44004004UL)
+#define MTIME                           (*(uint32_t*)0x4400BFF8UL)
+#define MTIMEH                          (*(uint32_t*)0x4400BFFCUL)
 
 /* To maintain backward compatibility with FreeRTOS config code */
-#define PRCI_BASE                               0x44000000UL
+#define PRCI_BASE                       0x44000000UL
 
 #else
 
@@ -113,10 +121,13 @@ typedef struct
 
 #define OPSRV                           ((OPSRV_Type *)OPSRV_BASE_ADDR)
 
-#define EXT_INTR_SOURCES                1
-
+#ifndef MIV_RV32_EXT_TIMECMP
 #define MTIMECMP                        (*(volatile uint32_t*)0x02004000UL)
 #define MTIMECMPH                       (*(volatile uint32_t*)0x02004004UL)
+#else
+#define MTIMECMP                        (0u)
+#define MTIMECMPH                       (0u)
+#endif
 
 /* On MIV_RV32IMC v2.0 and v2.1 MTIME_PRESCALER is not defined and using this
  * definition will result in crash. For those core use the definition as below
@@ -128,8 +139,9 @@ typedef struct
 #define MTIME                           (*(volatile uint32_t*)0x0200BFF8UL)
 #define MTIMEH                          (*(volatile uint32_t*)0x0200BFFCUL)
 #else
-#define MTIME                           HAL_ASSERT(0);
-#endif
+#define MTIME                           (0u)
+#define MTIMEH                          (0u)
+#endif  /*MIV_RV32_EXT_TIMER*/
 
 /* These definitions are provided for convenient identification of the interrupts
  * in the MIE/MIP registers.
@@ -181,7 +193,7 @@ enum
 
 } MRV_LOCAL_IRQn_Type;
 
-#ifndef MIV_LEGACY_RV32
+
 #define MRV32_MGEUIE_IRQn               MIE_16_IRQn
 #define MRV32_MGECIE_IRQn               MIE_17_IRQn
 #define MRV32_MSYS_EIE0_IRQn            MIE_24_IRQn
@@ -243,52 +255,7 @@ static inline uint32_t MRV32_is_gpr_ded(void)
 static inline void MRV32_clear_gpr_ded(void)
 {
     OPSRV->soft_reg &= ~0x04u;
-}
 
-/***************************************************************************//**
- * The function MRV32_enable_parity_check() is used to enable parity check on
- * the TCM and it's interface transactions. This feature is not available on
- * MIV_RV32 v3.0.100 soft processor core.
- */
-static inline void MRV32_enable_parity_check(void)
-{
-    OPSRV->cfg |= 0x01u;
-}
-
-/***************************************************************************//**
- * The function MRV32_disable_parity_check() is used to disable parity check on
- * the TCM and it's interface transactions.
- */
-static inline void MRV32_disable_parity_check(void)
-{
-    OPSRV->cfg &= ~0x01u;
-}
-
-/***************************************************************************//**
- * The function MRV32_cpu_soft_reset() is used to cause a soft cpu reset on
- * the MIV_RV32 soft processor core.
- */
-static inline void MRV32_cpu_soft_reset(void)
-{
-    OPSRV->soft_reg &= ~0x01u;
-}
-
-/***************************************************************************//**
-    Clear GPR ECC Uncorrectable interrupt. MGEUI interrupt is available only when
-    ECC is enabled in MIV_RV32 IP configurator.
- */
-static inline void MRV32_mgeui_clear_irq(uint32_t irq_mask)
-{
-    clear_csr(mip, MRV32_MGEUIE_IRQn);
-}
-
-/***************************************************************************//**
-    Clear GPR ECC correctable interrupt. MGECI interrupt is available only when
-    ECC is enabled in MIV_RV32 IP configurator.
- */
-static inline void MRV32_mgeci_clear_irq(uint32_t irq_mask)
-{
-    clear_csr(mip, MRV32_MGECIE_IRQn);
 }
 
 /***************************************************************************//**
@@ -408,7 +375,51 @@ static inline void MRV32_clear_gpr_ecc_errors(void)
             :"m" (temp));
 }
 
-#endif
+/***************************************************************************//**
+ * The function MRV32_enable_parity_check() is used to enable parity check on
+ * the TCM and it's interface transactions. This feature is not available on
+ * MIV_RV32 v3.0.100 soft processor core.
+ */
+static inline void MRV32_enable_parity_check(void)
+{
+    OPSRV->cfg |= 0x01u;
+}
+
+/***************************************************************************//**
+ * The function MRV32_disable_parity_check() is used to disable parity check on
+ * the TCM and it's interface transactions.
+ */
+static inline void MRV32_disable_parity_check(void)
+{
+    OPSRV->cfg &= ~0x01u;
+}
+
+/***************************************************************************//**
+ * The function MRV32_cpu_soft_reset() is used to cause a soft cpu reset on
+ * the MIV_RV32 soft processor core.
+ */
+static inline void MRV32_cpu_soft_reset(void)
+{
+    OPSRV->soft_reg &= ~0x01u;
+}
+
+/***************************************************************************//**
+    Clear GPR ECC Uncorrectable interrupt. MGEUI interrupt is available only when
+    ECC is enabled in MIV_RV32 IP configurator.
+ */
+static inline void MRV32_mgeui_clear_irq(uint32_t irq_mask)
+{
+    clear_csr(mip, MRV32_MGEUIE_IRQn);
+}
+
+/***************************************************************************//**
+    Clear GPR ECC correctable interrupt. MGECI interrupt is available only when
+    ECC is enabled in MIV_RV32 IP configurator.
+ */
+static inline void MRV32_mgeci_clear_irq(uint32_t irq_mask)
+{
+    clear_csr(mip, MRV32_MGECIE_IRQn);
+}
 
 /***************************************************************************//**
  * Enable interrupts.
@@ -441,7 +452,8 @@ static inline void MRV_disable_local_irq(uint32_t mask)
 {
     clear_csr(mie, mask);
 }
-#endif
+
+#endif /* MIV_LEGACY_RV32 */
 
 /***************************************************************************//**
  * The function MRV_raise_soft_irq() raises a synchronous software interrupt
@@ -501,7 +513,6 @@ static inline uint64_t MRV_read_mtime(void)
     volatile uint32_t hi = 0u;
     volatile uint32_t lo = 0u;
 
-#ifndef MIV_RV32_EXT_TIMER
     /* when mtime lower word is 0xFFFFFFFF, there will be rollover and
      * returned value could be wrong. */
     do {
@@ -510,7 +521,6 @@ static inline uint64_t MRV_read_mtime(void)
     } while(hi != MTIMEH);
 
     return((((uint64_t)MTIMEH) << 32u) | lo);
-#endif
 }
 
 #ifdef __cplusplus

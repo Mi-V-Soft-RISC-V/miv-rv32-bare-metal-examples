@@ -29,12 +29,20 @@ extern "C" {
     sw a1, mtimecmp+4 # No smaller than new value.
     sw a0, mtimecmp # New value.
  */
+#ifndef MIV_RV32_EXT_TIMECMP
 #define WRITE_MTIMECMP(value)         MTIMECMPH = MASK_32BIT; \
                                       MTIMECMP  = value & MASK_32BIT;\
                                       MTIMECMPH =  (value >> 32u) & MASK_32BIT;
+#else
+#define WRITE_MTIMECMP(value)
+#endif
 
+#ifndef MIV_RV32_EXT_TIMER
 #define WRITE_MTIME(value)            MTIME  = value & MASK_32BIT;\
                                       MTIMEH = (value >> 32u) & MASK_32BIT;
+#else
+#define WRITE_MTIME(value)
+#endif
 
 extern void Software_IRQHandler(void);
 
@@ -132,13 +140,14 @@ extern void MSYS_EI4_IRQHandler(void);
 extern void MSYS_EI5_IRQHandler(void);
 extern void OPSRV_IRQHandler(void);
 
-#endif
+#endif  /* MIV_LEGACY_RV32 */
 
 /*------------------------------------------------------------------------------
  * Increment value for the mtimecmp register in order to achieve a system tick
  * interrupt as specified through the MRV_systick_config() function.
  */
 static uint64_t g_systick_increment = 0U;
+static uint64_t g_systick_cmp_value = 0U;
 
 /*------------------------------------------------------------------------------
  * Configure the machine timer to generate an interrupt.
@@ -146,15 +155,19 @@ static uint64_t g_systick_increment = 0U;
 uint32_t MRV_systick_config(uint64_t ticks)
 {
     uint32_t ret_val = ERROR;
+    uint64_t remainder = ticks;
 
-    g_systick_increment = (uint64_t)(ticks) / MTIME_PRESCALER;
+    while (remainder >= MTIME_PRESCALER)
+    {
+        remainder -= MTIME_PRESCALER;
+        g_systick_increment++;
+    }
+
+    g_systick_cmp_value = g_systick_increment + MTIME;
 
     if (g_systick_increment > 0U)
     {
-
-#ifndef MIV_RV32_EXT_TIMECMP
-        WRITE_MTIMECMP(MRV_read_mtime() + g_systick_increment)
-#endif
+        WRITE_MTIMECMP(g_systick_cmp_value);
         set_csr(mie, MIP_MTIP);
         MRV_enable_interrupts();
 
@@ -169,10 +182,42 @@ uint32_t MRV_systick_config(uint64_t ticks)
  */
 void handle_m_timer_interrupt(void)
 {
-#ifndef MIV_RV32_EXT_TIMECMP
-    WRITE_MTIMECMP(MRV_read_mtime() + g_systick_increment)
+    clear_csr(mie, MIP_MTIP);
+
+    uint64_t mtime_at_irq = MTIME;
+
+#ifndef NDEBUG
+    static volatile uint32_t d_tick = 0u;
 #endif
+
+    while(g_systick_cmp_value < (mtime_at_irq + MTIME_DELTA)) {
+        g_systick_cmp_value = g_systick_cmp_value + g_systick_increment;
+
+#ifndef NDEBUG
+        d_tick += 1;
+#endif
+    }
+
+    /*
+     * Note: If d_tick > 1 it means, that a system timer interrupt has been missed.
+     *
+     * Please ensure that interrupt handlers are as short as possible to prevent
+     * them stopping other interrupts from being handled. For example, if a
+     * system timer interrupt occurs during a software interrupt, the system
+     * timer interrupt will not be handled until the software interrupt handling
+     * is complete. If the software interrupt handling time is more than one systick
+     * interval, it will result in d_tick > 1.
+     *
+     * If you are running the program using the debugger and halt the CPU at a breakpoint,
+     * MTIME will continue to increment and interrupts will be missed; resulting
+     * in d_tick > 1.
+     */
+
+    WRITE_MTIMECMP(g_systick_cmp_value);
+
     SysTick_Handler();
+
+    set_csr(mie, MIP_MTIP);
 }
 
 /*------------------------------------------------------------------------------
@@ -197,7 +242,7 @@ void handle_m_ext_interrupt(void)
         }
     }
 }
-#endif
+#endif /* MIV_LEGACY_RV32 */
 
 void handle_m_soft_interrupt(void)
 {
@@ -263,7 +308,7 @@ void handle_trap(uintptr_t mcause, uintptr_t mepc)
     {
         MGECI_IRQHandler();
     }
-#endif
+#endif /* MIV_LEGACY_RV32 */
 
     else
     {
@@ -318,7 +363,7 @@ void handle_trap(uintptr_t mcause, uintptr_t mepc)
         __asm__("ebreak");
 #else
         _exit(1 + mcause);
-#endif
+#endif  /* NDEBUG */
     }
 }
 

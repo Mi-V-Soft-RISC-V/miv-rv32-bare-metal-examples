@@ -232,7 +232,7 @@ __attribute__((weak)) void MSYS_EI0_IRQHandler(void)
 {
 }
 
-#endif
+#endif  /* MIV_LEGACY_RV32 */
 
 #ifdef __cplusplus
 }
