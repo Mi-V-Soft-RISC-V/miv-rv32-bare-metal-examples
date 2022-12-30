@@ -74,7 +74,8 @@ extern "C" {
 #define MSYS_EI5IP              (1u << MSYS_EI5)
 #define MSYS_EXTERNAL_INT       (0x3Fu << MSYS_EI0)
 #define MIP_OPSRV_REG           (1u << OPSRV_REG)
-#endif
+
+#endif /* MIV_LEGACY_RV32 */
 
 #define PRV_M                   3U
 

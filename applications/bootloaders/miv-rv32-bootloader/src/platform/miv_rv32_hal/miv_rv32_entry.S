@@ -15,6 +15,8 @@
 #define MTVEC_MODE_BIT_MASK             0x00000003u
 #define MTVEC_VECTORED_MODE_VAL         0x00000001u
 
+#define MTIMEH_ADDR                     0x200BFFCu
+
 #if __riscv_xlen == 64
 # define LREG ld
 # define SREG sd
@@ -684,6 +686,12 @@ handle_reset:
   csrwi mstatus, 0
   csrwi mie, 0
   la ra, _start
+
+/* Clearnig this to be on safer side as RTL doesnt seem to clear it on reset. */
+#ifndef MIV_LEGACY_RV32
+  li t0, MTIMEH_ADDR
+  sw x0, 0(t0)
+#endif
 
   csrr t0, misa
   andi t0, t0, A_EXTENSION_MASK

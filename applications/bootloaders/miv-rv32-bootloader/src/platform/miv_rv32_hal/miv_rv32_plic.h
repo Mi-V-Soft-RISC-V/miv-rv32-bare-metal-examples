@@ -15,6 +15,7 @@
 #define RISCV_PLIC_H
 
 #include <stdint.h>
+#include "miv_rv32_regs.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -204,7 +205,7 @@ static inline void MRV_PLIC_clear_pending_irq(void)
     }
 }
 
-#endif
+#endif /* MIV_LEGACY_RV32 */
 
 #ifdef __cplusplus
 }

@@ -15,6 +15,7 @@
 #include "miv_rv32_hal.h"
 
 #ifdef MSCC_STDIO_THRU_CORE_UART_APB
+#include <string.h>
 
 #ifndef LEGACY_DIR_STRUCTURE
 #include "drivers/fabric_ip/CoreUARTapb/core_uart_apb.h"
@@ -119,17 +120,14 @@ char **environ = __env;
 
 void write_hex(int fd, uint32_t hex)
 {
-    uint8_t ii;
-    uint8_t jj;
     char towrite;
-    uint8_t digit;
 
     write( fd , "0x", 2U );
 
-    for (ii = 8U ; ii > 0U; ii--)
+    for (uint32_t ii = 8U ; ii > 0U; ii--)
     {
-        jj = ii-1U;
-        digit = ((hex & (0xFU << (jj*4U))) >> (jj*4U));
+        uint32_t jj = ii-1U;
+		uint8_t digit = ((hex & (0xFU << (jj*4U))) >> (jj*4U));
         towrite = digit < 0xAU ? (0x48U + digit) : (0x65U +  (digit - 0xAU));
         write( fd, &towrite, 1U);
     }
@@ -154,13 +152,23 @@ void _exit(int code)
 
 void *_sbrk(ptrdiff_t incr)
 {
-    extern char _end[];
-    extern char _heap_end[];
-    static char *curbrk = _end;
+    extern char _end;
+    extern char _heap_end;
+    extern char __heap_start;
+    extern char __heap_end;
+    static char *curbrk = &_end;
     void * ret = NULL;
 
-    if (((curbrk + incr) < _end) || ((curbrk + incr) > _heap_end))
+    /*
+     * Did we allocated memory for the heap in the linker script?
+     * You need to set HEAP_SIZE to a non-zero value in your linker script if
+     * the following assertion fires.
+     */
+    ASSERT(&__heap_end > &__heap_start);
+
+    if (((curbrk + incr) < &_end) || ((curbrk + incr) > &_heap_end))
     {
+        errno = ENOMEM;
         ret = ((char *) - 1);
     }
     else
@@ -168,6 +176,13 @@ void *_sbrk(ptrdiff_t incr)
         curbrk += incr;
         ret = curbrk - incr;
     }
+
+    /*
+     * Did we run out of heap?
+     * You need to increase the heap size in the linker script if the following
+     * assertion fires.
+     * */
+    ASSERT(curbrk <= &__heap_end);
 
     return(ret);
 }
