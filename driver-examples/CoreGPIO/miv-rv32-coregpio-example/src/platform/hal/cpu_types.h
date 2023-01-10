@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2019-2021 Microchip FPGA Embedded Systems Solutions.
+ * Copyright 2019-2023 Microchip FPGA Embedded Systems Solutions.
  *
  * SPDX-License-Identifier: MIT
  *
@@ -17,21 +17,21 @@
 extern "C" {
 #endif
 
-typedef unsigned long size_t;
+typedef unsigned int size_t;
 
 /*------------------------------------------------------------------------------
  * addr_t: address type.
  * Used to specify the address of peripherals present in the processor's memory
  * map.
  */
-typedef unsigned long addr_t;
+typedef unsigned int addr_t;
 
 /*------------------------------------------------------------------------------
  * psr_t: processor state register.
  * Used by HAL_disable_interrupts() and HAL_restore_interrupts() to store the
  * processor's state between disabling and restoring interrupts.
  */
-typedef unsigned long psr_t;
+typedef unsigned int psr_t;
 
 #ifdef __cplusplus
 }
