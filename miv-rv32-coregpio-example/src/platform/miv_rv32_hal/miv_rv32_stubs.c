@@ -1,11 +1,11 @@
 /*******************************************************************************
- * Copyright 2019-2021 Microchip FPGA Embedded Systems Solutions.
+ * Copyright 2019-2022 Microchip FPGA Embedded Systems Solutions.
  *
  * SPDX-License-Identifier: MIT
  *
  * @file miv_rv32_stubs.c
  * @author Microchip FPGA Embedded Systems Solutions
- * @brief Mi-V soft processor Interrupt Function stubs.
+ * @brief Stubs for the Mi-V soft processor Interrupt handler.
  *
  * The functions below will only be linked with the application code if the user
  * does not provide an implementation for these functions. These functions are
@@ -232,7 +232,7 @@ __attribute__((weak)) void MSYS_EI0_IRQHandler(void)
 {
 }
 
-#endif
+#endif  /* MIV_LEGACY_RV32 */
 
 #ifdef __cplusplus
 }

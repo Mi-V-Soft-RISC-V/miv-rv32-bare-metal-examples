@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2019-2021 Microchip FPGA Embedded Systems Solutions.
+ * Copyright 2019-2022 Microchip FPGA Embedded Systems Solutions.
  *
  * SPDX-License-Identifier: MIT
  *
@@ -32,6 +32,13 @@
 
 #include "miv_rv32_regs.h"
 #include "miv_rv32_plic.h"
+#include "miv_rv32_assert.h"
+
+#ifndef LEGACY_DIR_STRUCTURE
+#include "fpga_design_config/fpga_design_config.h"
+#else
+#include "hw_platform.h"
+#endif  /*LEGACY_DIR_STRUCTURE*/
 
 #ifdef __cplusplus
 extern "C" {
@@ -45,13 +52,7 @@ extern "C" {
 #define EXT_IRQ_DISABLE                     1U
 
 /***************************************************************************//**
- * Interrupt enable/disable.
- */
-void MRV_enable_interrupts(void);
-void MRV_disable_interrupts(void);
 
-
-/***************************************************************************//**
  * System tick handler. This handler function gets called when the Machine
  * timer interrupt asserts. An implementation of this function should be
  * provided by the application to implement the application specific machine
@@ -67,66 +68,81 @@ void SysTick_Handler(void);
  * intervals.
  * Takes the number of system clock ticks between interrupts.
  *
+ * Though this function can take any valid ticks value as parameter, we expect
+ * that, for all practical purposes, a small tick value (to generate periodic 
+ * interrupts every few miliseconds) will be passed. If you need to generate
+ * periodic events in the range of seconds or more, you may use the SysTick_Handler()
+ * to further count the number of interrupts and hence the larger time intervals.
+ *
  * Returns 0 if successful.
  * Returns 1 if the interrupt interval cannot be achieved.
  */
-uint32_t MRV_systick_config(uint32_t ticks);
+uint32_t MRV_systick_config(uint64_t ticks);
 
+#define MTIME_DELTA                     5
 
 #ifdef MIV_LEGACY_RV32
-#define MSIP                                    (*(uint32_t*)0x44000000UL)
-#define MTIMECMP                                (*(uint64_t*)0x44004000UL)
-#define MTIME                                   (*(uint64_t*)0x4400BFF8UL)
+#define MSIP                            (*(uint32_t*)0x44000000UL)
+#define MTIMECMP                        (*(uint32_t*)0x44004000UL)
+#define MTIMECMPH                       (*(uint32_t*)0x44004004UL)
+#define MTIME                           (*(uint32_t*)0x4400BFF8UL)
+#define MTIMEH                          (*(uint32_t*)0x4400BFFCUL)
 
 /* To maintain backward compatibility with FreeRTOS config code */
-#define PRCI_BASE                               0x44000000UL
+#define PRCI_BASE                       0x44000000UL
 
 #else
 
 /* To maintain backward compatibility with FreeRTOS config code */
-#define PRCI_BASE                               0x02000000UL
+#define PRCI_BASE                       0x02000000UL
 
 /* OPSRV stands for "Offload Processor Subsystem for RISC-V" (OPSRV) on the
  * MIV_RV32 IP core. Please see the handbook for more details. */
 
-/* TCM ECC correctable err irq en mask value */
-#define OPSRV_TCM_ECC_CE_IRQ                    0x01u
+/* TCM ECC correctable error irq enable mask value */
+#define OPSRV_TCM_ECC_CE_IRQ            0x01u
 
-/* TCMECC uncorrectable err irq en */
-#define OPSRV_TCM_ECC_UCE_IRQ                   0x02u
+/* TCMECC uncorrectable error irq enable */
+#define OPSRV_TCM_ECC_UCE_IRQ           0x02u
 
-/* AXI write response err irq en */
-#define OPSRV_AXI_WR_RESP_IRQ                   0x10u
+/* AXI write response error irq enable */
+#define OPSRV_AXI_WR_RESP_IRQ           0x10u
 
-#define OPSRV_BASE_ADDR                         0x00006000UL
+#define OPSRV_BASE_ADDR                 0x00006000UL
 
 typedef struct
 {
-    volatile uint32_t cfg;
+    volatile uint32_t cfg;          	/*Parity is not being supported by MIV_RV32 v3.0*/
     volatile uint32_t reserved0[3];
-    volatile uint32_t irq_en;
+    volatile uint32_t irq_en;           /*offset 0x10*/
     volatile uint32_t irq_pend;
     volatile uint32_t reserved1[2];
-    volatile uint32_t soft_reg;
+    volatile uint32_t soft_reg;         /*offset 0x20*/
 } OPSRV_Type;
 
 #define OPSRV                           ((OPSRV_Type *)OPSRV_BASE_ADDR)
 
-#define EXT_INTR_SOURCES                1
-
-#define MTIMECMP                        (*(uint64_t*)0x02004000UL)
+#ifndef MIV_RV32_EXT_TIMECMP
+#define MTIMECMP                        (*(volatile uint32_t*)0x02004000UL)
+#define MTIMECMPH                       (*(volatile uint32_t*)0x02004004UL)
+#else
+#define MTIMECMP                        (0u)
+#define MTIMECMPH                       (0u)
+#endif
 
 /* On MIV_RV32IMC v2.0 and v2.1 MTIME_PRESCALER is not defined and using this
  * definition will result in crash. For those core use the definition as below
  * #define MTIME_PRESCALER              100u
  */
-#define MTIME_PRESCALER                 (*(uint32_t*)0x02005000UL)
+#define MTIME_PRESCALER                 (*(volatile uint32_t*)0x02005000UL)
 
 #ifndef MIV_RV32_EXT_TIMER
-#define MTIME                           (*(uint64_t*)0x0200BFF8UL)
+#define MTIME                           (*(volatile uint32_t*)0x0200BFF8UL)
+#define MTIMEH                          (*(volatile uint32_t*)0x0200BFFCUL)
 #else
-#define MTIME                           HAL_ASSERT(0);
-#endif
+#define MTIME                           (0u)
+#define MTIMEH                          (0u)
+#endif  /*MIV_RV32_EXT_TIMER*/
 
 /* These definitions are provided for convenient identification of the interrupts
  * in the MIE/MIP registers.
@@ -134,61 +150,17 @@ typedef struct
  * of the additional interrupts correspond to the names as used in the MIV_RV32
  * handbook. Please refer the MIV_RV32 handbook for more details.
  * */
-#define MRV32_SOFT_IRQn               MIE_3_IRQn
-#define MRV32_TIMER_IRQn              MIE_7_IRQn
-#define MRV32_EXT_IRQn                MIE_11_IRQn
+#define MRV32_SOFT_IRQn                 MIE_3_IRQn
+#define MRV32_TIMER_IRQn                MIE_7_IRQn
+#define MRV32_EXT_IRQn                  MIE_11_IRQn
 
-#ifndef MIV_LEGACY_RV32
-#define MRV32_MGEUIE_IRQn             MIE_16_IRQn
-#define MRV32_MGECIE_IRQn             MIE_17_IRQn
-#define MRV32_MSYS_EIE0_IRQn          MIE_24_IRQn
-#define MRV32_MSYS_EIE1_IRQn          MIE_25_IRQn
-#define MRV32_MSYS_EIE2_IRQn          MIE_26_IRQn
-#define MRV32_MSYS_EIE3_IRQn          MIE_27_IRQn
-#define MRV32_MSYS_EIE4_IRQn          MIE_28_IRQn
-#define MRV32_MSYS_EIE5_IRQn          MIE_29_IRQn
-#define MRV32_MSYS_OPSRV_IRQn         MIE_30_IRQn
 
-/***************************************************************************//**
-    Enable OPSRV interrupt. Parameter takes logical OR of following values
-    #define OPSRV_TCM_ECC_CE_IRQ                    0x01u
-    #define OPSRV_TCM_ECC_UCE_IRQ                   0x02u
-    #define OPSRV_AXI_WR_RESP_IRQ                   0x10u
- */
-static inline void MRV32_opsrv_enable_irq(uint32_t irq_mask)
-{
-    OPSRV->irq_en = irq_mask;
-}
-
-/***************************************************************************//**
-    Disable OPSRV interrupt. Parameter takes logical OR of following values
-    #define OPSRV_TCM_ECC_CE_IRQ                    0x01u
-    #define OPSRV_TCM_ECC_UCE_IRQ                   0x02u
-    #define OPSRV_AXI_WR_RESP_IRQ                   0x10u
- */
-static inline void MRV32_opsrv_disable_irq(uint32_t irq_mask)
-{
-    OPSRV->cfg &= ~irq_mask;
-}
-
-/***************************************************************************//**
-    Clear OPSRV interrupt. Parameter takes logical OR of following values
-    #define OPSRV_TCM_ECC_CE_IRQ                    0x01u
-    #define OPSRV_TCM_ECC_UCE_IRQ                   0x02u
-    #define OPSRV_AXI_WR_RESP_IRQ                   0x10u
- */
-static inline void MRV32_opsrv_clear_irq(uint32_t irq_mask)
-{
-    OPSRV->irq_pend |= irq_mask;
-}
-
-#endif
 
 /*==============================================================================
  * Interrupt numbers:
  * This enum represents the interrupt enable bits in the MIE register.
  */
-typedef enum
+enum
 {
     MIE_0_IRQn  =  (0x01u),
     MIE_1_IRQn  =  (0x01u<<1u),
@@ -224,30 +196,266 @@ typedef enum
 
 } MRV_LOCAL_IRQn_Type;
 
+
+#define MRV32_MGEUIE_IRQn               MIE_16_IRQn
+#define MRV32_MGECIE_IRQn               MIE_17_IRQn
+#define MRV32_MSYS_EIE0_IRQn            MIE_24_IRQn
+#define MRV32_MSYS_EIE1_IRQn            MIE_25_IRQn
+#define MRV32_MSYS_EIE2_IRQn            MIE_26_IRQn
+#define MRV32_MSYS_EIE3_IRQn            MIE_27_IRQn
+#define MRV32_MSYS_EIE4_IRQn            MIE_28_IRQn
+#define MRV32_MSYS_EIE5_IRQn            MIE_29_IRQn
+#define MRV32_MSYS_OPSRV_IRQn           MIE_30_IRQn
+
 /***************************************************************************//**
- * Enable interrupts.
- This function takes a mask value as input. All interrupts in the MIE register
- are enabled as per the set bits in the provided mask value.
+    Enable OPSRV interrupt. Parameter takes logical OR of following values
+    #define OPSRV_TCM_ECC_CE_IRQ                    0x01u
+    #define OPSRV_TCM_ECC_UCE_IRQ                   0x02u
+    #define OPSRV_AXI_WR_RESP_IRQ                   0x10u
  */
-static inline void MRV_enable_local_irq(uint32_t mask)
+static inline void MRV32_opsrv_enable_irq(uint32_t irq_mask)
 {
-    uint32_t reg = read_csr(mie);
-    reg |= mask;
-    set_csr(mie, reg);
+    OPSRV->irq_en = irq_mask;
 }
 
 /***************************************************************************//**
- * disable interrupts.
- This function takes a mask value as input. All interrupts in the MIE register
- are disabled as per the set bits in the provided mask value.
+    Disable OPSRV interrupt. Parameter takes logical OR of following values
+    #define OPSRV_TCM_ECC_CE_IRQ                    0x01u
+    #define OPSRV_TCM_ECC_UCE_IRQ                   0x02u
+    #define OPSRV_AXI_WR_RESP_IRQ                   0x10u
+ */
+static inline void MRV32_opsrv_disable_irq(uint32_t irq_mask)
+{
+    OPSRV->irq_en &= ~irq_mask;
+}
+
+/***************************************************************************//**
+    Clear OPSRV interrupt. Parameter takes logical OR of following values
+    #define OPSRV_TCM_ECC_CE_IRQ                    0x01u
+    #define OPSRV_TCM_ECC_UCE_IRQ                   0x02u
+    #define OPSRV_AXI_WR_RESP_IRQ                   0x10u
+ */
+static inline void MRV32_opsrv_clear_irq(uint32_t irq_mask)
+{
+    OPSRV->irq_pend |= irq_mask;
+}
+
+/***************************************************************************//**
+ * The function MRV32_is_gpr_ded() returns the core_gpr_ded_reset_reg bit value.
+ * When ECC is enabled, the core_gpr_ded_reset_reg is set when the core was
+ * reset due to GPR DED error.
+ */
+static inline uint32_t MRV32_is_gpr_ded(void)
+{
+    return((OPSRV->soft_reg & 0x04u) >> 0x02u);
+}
+
+/***************************************************************************//**
+ * The function MRV32_clear_gpr_ded() can be used to clear the
+ * core_gpr_ded_reset_reg bit. When ECC is enabled, the core_gpr_ded_reset_reg
+ * is set when the core was previously reset due to GPR DED error.
+ */
+static inline void MRV32_clear_gpr_ded(void)
+{
+    OPSRV->soft_reg &= ~0x04u;
+}
+
+/***************************************************************************//**
+  When ECC is enabled for the GPRs and if that data has a single bit error then
+  the data coming out of the ECC block will be corrected and will not have the
+  error but the data source will still have the error.
+  The ECC block does not write back corrected data to memory.
+  Therefore, if data has a single bit error, then the corrected data should be 
+  written back to prevent the single bit error from becoming a double bit error.
+  The MRV32_clear_gpr_ecc_errors() can be used for that.
+
+  Clear the pending interrupt bit after this using MRV32_mgeci_clear_irq()
+  function to complete the ECC error handling.
+ */
+static inline void MRV32_clear_gpr_ecc_errors(void)
+{
+    uint32_t temp;
+
+    __asm__ __volatile__ (
+            "sw x31, %0"
+            :"=m" (temp));
+
+    __asm__ volatile (
+            "mv x31, x1;"
+            "mv x1, x31;"
+
+            "mv x31, x2;"
+            "mv x2, x31;"
+
+            "mv x31, x3;"
+            "mv x3, x31;"
+
+            "mv x31, x4;"
+            "mv x4, x31;"
+
+            "mv x31, x5;"
+            "mv x5, x31;"
+
+            "mv x31, x6;"
+            "mv x6, x31;"
+
+            "mv x31, x7;"
+            "mv x7, x31;"
+
+            "mv x31, x8;"
+            "mv x8, x31;"
+
+            "mv x31, x9;"
+            "mv x9, x31;"
+
+            "mv x31, x10;"
+            "mv x10, x31;"
+
+            "mv x31, x11;"
+            "mv x11, x31;"
+
+            "mv x31, x12;"
+            "mv x12, x31;"
+
+            "mv x31, x13;"
+            "mv x13, x31;"
+
+            "mv x31, x14;"
+            "mv x14, x31;"
+
+            "mv x31, x15;"
+            "mv x15, x31;"
+
+            "mv x31, x16;"
+            "mv x16, x31;"
+
+            "mv x31, x17;"
+            "mv x17, x31;"
+
+            "mv x31, x18;"
+            "mv x18, x31;"
+
+            "mv x31, x19;"
+            "mv x19, x31;"
+
+            "mv x31, x20;"
+            "mv x20, x31;"
+
+            "mv x31, x21;"
+            "mv x21, x31;"
+
+            "mv x31, x22;"
+            "mv x22, x31;"
+
+            "mv x31, x23;"
+            "mv x23, x31;"
+
+            "mv x31, x24;"
+            "mv x24, x31;"
+
+            "mv x31, x25;"
+            "mv x25, x31;"
+
+            "mv x31, x26;"
+            "mv x26, x31;"
+
+            "mv x31, x27;"
+            "mv x27, x31;"
+
+            "mv x31, x28;"
+            "mv x28, x31;"
+
+            "mv x31, x29;"
+            "mv x29, x31;"
+
+            "mv x31, x30;"
+            "mv x30, x31;");
+
+    __asm__ __volatile__ (
+            "lw x31, %0;"
+            :
+            :"m" (temp));
+}
+
+/***************************************************************************//**
+ * The function MRV32_enable_parity_check() is used to enable parity check on
+ * the TCM and it's interface transactions. This feature is not available on
+ * MIV_RV32 v3.0.100 soft processor core.
+ */
+static inline void MRV32_enable_parity_check(void)
+{
+    OPSRV->cfg |= 0x01u;
+}
+
+/***************************************************************************//**
+ * The function MRV32_disable_parity_check() is used to disable parity check on
+ * the TCM and it's interface transactions.
+ */
+static inline void MRV32_disable_parity_check(void)
+{
+    OPSRV->cfg &= ~0x01u;
+}
+
+/***************************************************************************//**
+ * The function MRV32_cpu_soft_reset() is used to cause a soft cpu reset on
+ * the MIV_RV32 soft processor core.
+ */
+static inline void MRV32_cpu_soft_reset(void)
+{
+    OPSRV->soft_reg &= ~0x01u;
+}
+
+/***************************************************************************//**
+    Clear GPR ECC Uncorrectable interrupt. MGEUI interrupt is available only when
+    ECC is enabled in MIV_RV32 IP configurator.
+ */
+static inline void MRV32_mgeui_clear_irq(uint32_t irq_mask)
+{
+    clear_csr(mip, MRV32_MGEUIE_IRQn);
+}
+
+/***************************************************************************//**
+    Clear GPR ECC correctable interrupt. MGECI interrupt is available only when
+    ECC is enabled in MIV_RV32 IP configurator.
+ */
+static inline void MRV32_mgeci_clear_irq(uint32_t irq_mask)
+{
+    clear_csr(mip, MRV32_MGECIE_IRQn);
+}
+
+/***************************************************************************//**
+ * Enable interrupts.
+ This function takes a mask value as input. For each set bit in the mask value,
+ corresponding interrupt bit in the MIE register is enabled.
+
+ MRV_enable_local_irq(MRV32_SOFT_IRQn  |
+                      MRV32_TIMER_IRQn |
+                      MRV32_EXT_IRQn   |
+                      MRV32_MSYS_EIE0_IRQn |
+                      MRV32_MSYS_OPSRV_IRQn);
+ */
+static inline void MRV_enable_local_irq(uint32_t mask)
+{
+    set_csr(mie, mask);
+}
+
+/***************************************************************************//**
+ * Disable interrupts.
+ This function takes a mask value as input. For each set bit in the mask value,
+ corresponding interrupt bit in the MIE register is disabled.
+
+  MRV_disable_local_irq(MRV32_SOFT_IRQn  |
+                        MRV32_TIMER_IRQn |
+                        MRV32_EXT_IRQn   |
+                        MRV32_MSYS_EIE0_IRQn |
+                        MRV32_MSYS_OPSRV_IRQn);
  */
 static inline void MRV_disable_local_irq(uint32_t mask)
 {
-    uint32_t reg = read_csr(mie);
-    reg |= mask;
-    clear_csr(mie, reg);
+    clear_csr(mie, mask);
 }
-#endif
+
+#endif /* MIV_LEGACY_RV32 */
 
 /***************************************************************************//**
  * The function MRV_raise_soft_irq() raises a synchronous software interrupt
@@ -282,13 +490,40 @@ static inline void MRV_clear_soft_irq(void)
 }
 
 /***************************************************************************//**
+ * The function MRV_enable_interrupts() enables all interrupts setting the
+ * machine mode interrupt enable bit in MSTATUS register.
+ */
+static inline void MRV_enable_interrupts(void)
+{
+    set_csr(mstatus, MSTATUS_MIE);
+}
+
+/***************************************************************************//**
+ * The function MRV_disable_interrupts() disables all interrupts clearing the
+ * machine mode interrupt enable bit in MSTATUS register.
+ */
+static inline void MRV_disable_interrupts(void)
+{
+    clear_csr(mstatus, MSTATUS_MPIE);
+    clear_csr(mstatus, MSTATUS_MIE);
+}
+
+/***************************************************************************//**
  * The function MRV_read_mtime() returns the current MTIME register value.
  */
 static inline uint64_t MRV_read_mtime(void)
 {
-#ifndef MIV_RV32_EXT_TIMER
-    return(MTIME);
-#endif
+    volatile uint32_t hi = 0u;
+    volatile uint32_t lo = 0u;
+
+    /* when mtime lower word is 0xFFFFFFFF, there will be rollover and
+     * returned value could be wrong. */
+    do {
+        hi = MTIMEH;
+        lo = MTIME;
+    } while(hi != MTIMEH);
+
+    return((((uint64_t)MTIMEH) << 32u) | lo);
 }
 
 #ifdef __cplusplus

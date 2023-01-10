@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2019-2021 Microchip FPGA Embedded Systems Solutions.
+ * Copyright 2019-2022 Microchip FPGA Embedded Systems Solutions.
  *
  * SPDX-License-Identifier: MIT
  *
@@ -7,12 +7,15 @@
  * @author Microchip FPGA Embedded Systems Solutions
  * @brief Mi-V legacy RV32 soft processor PLIC access data structures and
  *        functions.
+ *        Legacy RV32 soft processors are DEPRICATED.
+ *        Migrate to MIV_RV32 v3.0 or later.
  *
  */
 #ifndef RISCV_PLIC_H
 #define RISCV_PLIC_H
 
 #include <stdint.h>
+#include "miv_rv32_regs.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -202,7 +205,7 @@ static inline void MRV_PLIC_clear_pending_irq(void)
     }
 }
 
-#endif
+#endif /* MIV_LEGACY_RV32 */
 
 #ifdef __cplusplus
 }

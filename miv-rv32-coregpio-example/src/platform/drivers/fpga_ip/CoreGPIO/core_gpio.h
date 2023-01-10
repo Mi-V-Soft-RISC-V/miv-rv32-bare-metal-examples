@@ -96,6 +96,10 @@
 #include "hal.h"
 #endif
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*-------------------------------------------------------------------------*//**
   The gpio_id_t enumeration is used to identify GPIOs as part of the
   parameter to functions:
@@ -651,4 +655,9 @@ void GPIO_clear_all_irq_sources
     gpio_instance_t *   this_gpio,
     uint32_t            bitmask
 );
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif /* CORE_GPIO_H_ */
