@@ -67,10 +67,17 @@ void SysTick_Handler(void);
  * intervals.
  * Takes the number of system clock ticks between interrupts.
  *
+ * Though this function can take any valid ticks value as parameter, we expect
+ * that, for all practical purposes, a small tick value (to generate periodic 
+ * interrupts every few miliseconds) will be passed. If you need to generate
+ * periodic events in the range of seconds or more, you may use the SysTick_Handler()
+ * to further count the number of interrupts and hence the larger time intervals.
+ *
  * Returns 0 if successful.
  * Returns 1 if the interrupt interval cannot be achieved.
  */
 uint32_t MRV_systick_config(uint64_t ticks);
+
 #define MTIME_DELTA                     5
 
 #ifdef MIV_LEGACY_RV32

@@ -15,6 +15,7 @@
 #define RISCV_PLIC_H
 
 #include <stdint.h>
+#include "miv_rv32_regs.h"
 
 #ifdef __cplusplus
 extern "C" {

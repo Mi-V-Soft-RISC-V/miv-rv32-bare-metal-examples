@@ -1,5 +1,7 @@
 /*******************************************************************************
- * (c) Copyright 2019-2021 Microchip SoC Products Group. All rights reserved.
+ * Copyright 2019-2023 Microchip FPGA Embedded Systems Solutions.
+ *
+ * SPDX-License-Identifier: MIT
  *
  * PF_System_Services driver Device and design info services example.
  *
@@ -16,10 +18,11 @@
  * Please refer README.md in the root folder of this project for more details.
  */
 
+
 #include <stdio.h>
+#include "fpga_design_config/fpga_design_config.h"
 #include "drivers/fpga_ip/CoreSysServices_PF/core_sysservices_pf.h"
 #include "drivers/fpga_ip/CoreUARTapb/core_uart_apb.h"
-#include "fpga_design_config/hw_platform.h"
 #include "miv_rv32_hal/miv_rv32_hal.h"
 #include "helper.h"
 

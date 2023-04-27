@@ -37,7 +37,7 @@ configuration. This can be achieved by overwriting the content of this example
 project's "hw_platform.h" file with the correct data from your Libero design.
 
 This project was tested on PolarFire Eval Kit with CFG4 configuration of the
-MIV_RV32 design available [here](https://github.com/Mi-V-Soft-RISC-V/PolarFire-Eval-Kit/tree/main/Libero_Projects)
+MIV_RV32 design available [here](https://mi-v-ecosystem.github.io/redirects/repo-polarfire-evaluation-kit-mi-v-sample-fpga-designs)
 
 **Booting the system:**
 

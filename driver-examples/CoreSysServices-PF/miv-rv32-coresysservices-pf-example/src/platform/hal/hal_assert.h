@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2019-2021 Microchip FPGA Embedded Systems Solutions.
+ * Copyright 2019-2022 Microchip FPGA Embedded Systems Solutions.
  *
  * SPDX-License-Identifier: MIT
  *
@@ -33,7 +33,7 @@ extern "C" {
     do { \
         if (!(CHECK)) \
         { \
-            __asm volatile ("ebreak"); \
+            __asm__ volatile ("ebreak"); \
         }\
     } while(0);
 
