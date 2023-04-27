@@ -15,6 +15,7 @@
 #include "miv_rv32_hal.h"
 
 #ifdef MSCC_STDIO_THRU_CORE_UART_APB
+#include <string.h>
 
 #ifndef LEGACY_DIR_STRUCTURE
 #include "drivers/fabric_ip/CoreUARTapb/core_uart_apb.h"
@@ -119,17 +120,14 @@ char **environ = __env;
 
 void write_hex(int fd, uint32_t hex)
 {
-    uint8_t ii;
-    uint8_t jj;
     char towrite;
-    uint8_t digit;
 
     write( fd , "0x", 2U );
 
-    for (ii = 8U ; ii > 0U; ii--)
+    for (uint32_t ii = 8U ; ii > 0U; ii--)
     {
-        jj = ii-1U;
-        digit = ((hex & (0xFU << (jj*4U))) >> (jj*4U));
+        uint32_t jj = ii-1U;
+		uint8_t digit = ((hex & (0xFU << (jj*4U))) >> (jj*4U));
         towrite = digit < 0xAU ? (0x48U + digit) : (0x65U +  (digit - 0xAU));
         write( fd, &towrite, 1U);
     }

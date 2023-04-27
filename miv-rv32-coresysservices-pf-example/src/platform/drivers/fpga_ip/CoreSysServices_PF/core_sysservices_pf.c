@@ -1,5 +1,7 @@
 /*******************************************************************************
- * (c) Copyright 2019-2022 Microchip FPGA Embedded Systems Solutions.
+ * Copyright 2019-2023 Microchip FPGA Embedded Systems Solutions.
+ *
+ * SPDX-License-Identifier: MIT
  *
  * PF_System_Services driver implementation. See file "core_syservices_pf.h" for
  * description of the functions implemented in this file.

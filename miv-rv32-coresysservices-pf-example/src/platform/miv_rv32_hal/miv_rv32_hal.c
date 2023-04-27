@@ -155,8 +155,14 @@ static uint64_t g_systick_cmp_value = 0U;
 uint32_t MRV_systick_config(uint64_t ticks)
 {
     uint32_t ret_val = ERROR;
+    uint64_t remainder = ticks;
 
-    g_systick_increment = (uint64_t)(ticks) / MTIME_PRESCALER;
+    while (remainder >= MTIME_PRESCALER)
+    {
+        remainder -= MTIME_PRESCALER;
+        g_systick_increment++;
+    }
+
     g_systick_cmp_value = g_systick_increment + MTIME;
 
     if (g_systick_increment > 0U)
