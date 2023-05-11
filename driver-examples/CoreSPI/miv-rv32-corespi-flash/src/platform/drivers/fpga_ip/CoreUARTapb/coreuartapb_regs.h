@@ -1,5 +1,7 @@
 /*******************************************************************************
- * (c) Copyright 2007-2021 Microchip FPGA Embedded Systems Solutions.
+ * (c) Copyright 2007-2023 Microchip FPGA Embedded Systems Solutions.
+ *
+ * SPDX-License-Identifier: MIT
  * 
   * @file coreuartapb_regs.h
  * @author Microchip FPGA Embedded Systems Solutions

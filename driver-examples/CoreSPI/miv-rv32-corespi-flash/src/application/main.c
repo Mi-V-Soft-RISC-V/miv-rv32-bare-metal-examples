@@ -10,10 +10,10 @@
  *
  */
 #include "miv_rv32_hal/miv_rv32_hal.h"
-#include "fpga_design_config.h"
-#include "drivers/Corespi/core_spi.h"
-#include "drivers/mt25ql01gbbb/mt25ql01gbbb.h"
-#include "drivers/CoreUARTapb/core_uart_apb.h"
+#include "fpga_design_config/fpga_design_config.h"
+#include "drivers/fpga_ip/CoreSPI/core_spi.h"
+#include "drivers/fpga_ip/mt25ql01gbbb/mt25ql01gbbb.h"
+#include "drivers/fpga_ip/CoreUARTapb/core_uart_apb.h"
   
 #define BUFFER_A_SIZE   3000
 
@@ -54,7 +54,7 @@ static uint8_t verify_write(uint8_t* write_buff, uint8_t* read_buff, uint16_t si
 /***************************************************************************//**
  * main function.
  */
-int main()
+int main(void)
 {
     volatile uint32_t errors = 0;
     uint32_t address = 0;
