@@ -7,8 +7,8 @@
  */
 
 #include "mt25ql01gbbb.h"
-#include "drivers/CoreSPI/core_spi.h"
-#include "fpga_design_config.h"
+#include "drivers/fpga_ip/CoreSPI/core_spi.h"
+#include "fpga_design_config/fpga_design_config.h"
 
 
 #define DEVICE_ID_READ          0x9F
