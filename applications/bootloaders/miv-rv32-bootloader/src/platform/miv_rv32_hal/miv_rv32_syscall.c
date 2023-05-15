@@ -18,7 +18,7 @@
 #include <string.h>
 
 #ifndef LEGACY_DIR_STRUCTURE
-#include "drivers/fabric_ip/CoreUARTapb/core_uart_apb.h"
+#include "drivers/fpga_ip/CoreUARTapb/core_uart_apb.h"
 #else
 #include "core_uart_apb.h"
 #endif

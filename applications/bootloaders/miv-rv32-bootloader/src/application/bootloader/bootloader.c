@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2019-2022 Microchip FPGA Embedded Systems Solutions.
+ * Copyright 2019-2023 Microchip FPGA Embedded Systems Solutions.
  *
  * SPDX-License-Identifier: MIT
  *
@@ -11,14 +11,14 @@
  */
 #include <string.h>
 #include "miv_rv32_hal/miv_rv32_hal.h"
-#include "drivers/fabric_ip/CoreUARTapb/core_uart_apb.h"
-#include "drivers/fabric_ip/miv_i2c/miv_i2c.h"
+#include "drivers/fpga_ip/CoreUARTapb/core_uart_apb.h"
+#include "drivers/fpga_ip/miv_i2c/miv_i2c.h"
 #include "drivers/off_chip/spi_flash/spi_flash.h"
 #include "ymodem/ymodem.h"
 
 #define FLASH_SECTOR_SIZE               65536   /* flash memory size */
-#define FLASH_SECTORS                   128    // There are 126 sectors of 64kB size, using 124
-#define FLASH_BLOCK_SIZE                4096   //Sectors compose of 4kB eraseable blocks
+#define FLASH_SECTORS                   128    // There are 126 sectors of 64KB size, using 124
+#define FLASH_BLOCK_SIZE                4096   //Sectors compose of 4KB eraseable blocks
 #define FLASH_SEGMENT_SIZE              256    // Write segment size is 256
 
 #define FLASH_BLOCK_SEGMENTS            (FLASH_BLOCK_SIZE / FLASH_SEGMENT_SIZE)
@@ -30,6 +30,7 @@ static int write_program_to_flash(uint8_t *write_buf, uint32_t file_size);
 static void copy_hex_to_i2ceeprom(void);
 static void copy_hex_to_spiflash(void);
 static uint32_t rx_app_file(uint8_t *dest_address);
+static void Bootloader_JumpToApplication(uint32_t reset_vector);
 
 static uint8_t file_name[FILE_NAME_LENGTH + 1]; /* +1 for nul */
 
@@ -51,14 +52,16 @@ const uint8_t g_bootstrap_choice[] =
 ================================================================================\r\n\
 \r\n\
 \r\n\
-This program supports writing HEX data from Source LSRAM (@ Address 0x800000000) into a Non-Volatile memory\r\n\
+This program supports writing Raw binary from Source LSRAM (@ Address 0x80000000) into a \
+Non-Volatile memory\r\n\
 \r\n\
 \r\n\
 Choose the destination Non-Volatile memory: \r\n\
  Type 0 to show this menu\r\n\
- Type 1 copy .hex from LSRAM to SPI Flash \r\n\
- Type 2 copy .hex from LSRAM to MikroBus EEPROM \r\n\
- Type 3 Download .hex from the host PC over UART terminal using YMODEM\r\n\
+ Type 1 to copy raw binary from LSRAM to SPI Flash \r\n\
+ Type 2 to copy raw binary from LSRAM to MikroBus EEPROM \r\n\
+ Type 3 to download a raw binary over UART YMODEM to LSRAM\r\n\
+ Type 4 to jump and run loaded application from LSRAM start address\r\n\
  ";
 
 /*
@@ -84,13 +87,10 @@ UART_instance_t g_uart;
  * I2C instance data.
  *****************************************************************************/
 #define I2C_XFR_DATA_LEN                258u       // 2 byte address + 256 bytes data
-//#define I2C_XFR_DATA_LEN                16u
+
 uint8_t target_slave_addr = 0x50;
 uint8_t i2c_tx_buffer[I2C_XFR_DATA_LEN];
 miv_i2c_instance_t g_miv_i2c_inst;
-
-//uint8_t  i2c_tx_buffer[7] = {0x0A,0x0B,0x0C,0x0A,0x0B,0x0C,0x0A};
-//uint16_t  write_length;//DATA_LENGTH;
 
 volatile uint32_t g_10ms_count;
 
@@ -107,18 +107,17 @@ const char * g_greeting_msg_i2c =
 
 /*
  * Used for bootstrap from SPI FLASH
- * The LSRAM max size is 64K.
- * Assuming the executable 32k byte.
- * Copy the whole 32k chunk from LSRAM to flash.
+ * The Libero Design specifies a LSRAM size of 128KB and a flash size of 32KB
+ * The 32KB chunk from LSRAM is copied to flash
  */
 #define FLASH_EXECUTABLE_SIZE    32768u
+#define LSRAM_SIZE              131072u
 
 /* MIV I2C interrupt handler */
 void MSYS_EI2_IRQHandler(void)
 {
     MIV_I2C_isr (&g_miv_i2c_inst);
 }
-
 
 void SysTick_Handler(void)
 {
@@ -140,6 +139,7 @@ int main()
     uint8_t rx_data[UART_RX_BUF_SIZE];
     size_t rx_size;
     static uint32_t file_size = 0;
+
     /**************************************************************************
      * Initialize CoreUARTapb with its base address, baud value, and line
      * configuration.
@@ -181,10 +181,14 @@ int main()
             case '3':
                 file_size = rx_app_file((uint8_t *)LSRAM_BASE_ADDRESS_LOAD);
                 break;
+            case '4':
+                Bootloader_JumpToApplication((uint32_t)LSRAM_BASE_ADDRESS_LOAD);
+                break;
             default:
                 UART_polled_tx_string( &g_uart, "Invalid selection. Try again...\r\n");
                 break;
             }
+
         }
     }
 
@@ -200,16 +204,33 @@ static uint32_t rx_app_file(uint8_t *dest_address)
     uint8_t *g_bin_base = (uint8_t *)dest_address;
     uint32_t g_rx_size = 1024 * 1024 * 8;
 
-    MRV_systick_config(SYS_CLK_FREQ);
+    /* Configure systick timer for interrupt at 10msec intervals */
+    MRV_systick_config(SYS_CLK_FREQ/100);
 
-    UART_polled_tx_string( &g_uart, "\r\n------------------------ Starting YModem file transfer ------------------------\r\n" );
-    UART_polled_tx_string( &g_uart, "Please select file and initiate transfer on host computer.\r\n" );
+    UART_polled_tx_string( &g_uart,
+        "\r\n------------------------ Starting YModem file transfer ------------------------\r\n" );
+    UART_polled_tx_string( &g_uart,
+        "Please select file and initiate transfer on host computer.\r\n" );
 
-    received = ymodem_receive(g_bin_base, g_rx_size, file_name);
+    /* data copied to LSRAM */
+    received = ymodem_receive(g_bin_base, g_rx_size, file_name, LSRAM_SIZE);
+
+    if(received)
+    {
+        UART_polled_tx_string( &g_uart,
+            "\r\n----------------------- YModem file transfer Completed -------------------\r\n");
+
+    }
+    else
+    {
+        UART_polled_tx_string( &g_uart,
+            "\r\n---  YModem file transfer Failed- Aborted/File size exceeds limit  --------\r\n");
+    }
+
+    UART_polled_tx_string( &g_uart, g_bootstrap_choice);
 
     return received;
 }
-
 
 void copy_hex_to_i2ceeprom(void)
 {
@@ -236,12 +257,16 @@ void copy_hex_to_i2ceeprom(void)
 #endif
 
     MRV_systick_config(SYS_CLK_FREQ);
+
+    /* Copy 32KB from LSRAM which has the size of 128KB */
     write_program_to_i2ceeprom((uint8_t *)LSRAM_BASE_ADDRESS_LOAD, FLASH_EXECUTABLE_SIZE);
 }
 
 void copy_hex_to_spiflash(void)
 {
     spi_flash_init(FLASH_CORE_SPI_BASE);
+
+    /* Copy 32KB from LSRAM which has the size of 128KB */
     write_program_to_flash((uint8_t *)LSRAM_BASE_ADDRESS_LOAD, FLASH_EXECUTABLE_SIZE);
 }
 
@@ -252,12 +277,12 @@ static int write_program_to_i2ceeprom(uint8_t *write_buf, uint32_t file_size)
 {
     uint32_t mem_addr = 0x80000000; // source address
     uint32_t mem_val;               // read data word from source
-    uint8_t page_no;                // I2C device page no. Each page is 256 Bytes. 256 x 64 = 16 Kb
+    uint8_t page_no;                // I2C device page no. Each page is 256 Bytes. 256 x 64 = 16 KB
     miv_i2c_status_t   status;
     volatile uint8_t miv_i2c_status = 0u;
     UART_polled_tx_string(&g_uart,
                          (const uint8_t *)"\r\nWriting Data into EEPROM using MIV_I2C\n\r");
-    for (page_no = 0; page_no <= 127 ; page_no++) //32kb = 128 pages of 256 bytes
+    for (page_no = 0; page_no <= 127 ; page_no++) //32KB = 128 pages of 256 Bytes
     {
         uint16_t n = 0;
         i2c_tx_buffer[0] = page_no; // 1st word address byte (needs to increment for pages)
@@ -289,6 +314,7 @@ static int write_program_to_i2ceeprom(uint8_t *write_buf, uint32_t file_size)
     UART_polled_tx_string(&g_uart, (const uint8_t *)"\r\nMIV_I2C Write Complete!\n\r");
     return 0u;
 }
+
 /*
  *  Write to flash memory
  */
@@ -302,8 +328,10 @@ static int write_program_to_flash(uint8_t *write_buf, uint32_t file_size)
     spi_flash_status_t result;
     struct device_Info DevInfo;
 
-    UART_polled_tx_string( &g_uart, "\r\n---------------------- Writing SPI flash from DDR memory ----------------------\r\n" );
-    UART_polled_tx_string( &g_uart, "This may take several minutes to complete if writing a large file.\r\n" );
+    UART_polled_tx_string( &g_uart,
+        "\r\n---------------------- Writing SPI flash from DDR memory ----------------------\r\n" );
+    UART_polled_tx_string( &g_uart,
+        "This may take several minutes to complete if writing a large file.\r\n" );
 
     spi_flash_control_hw( SPI_FLASH_RESET, 0, &status );
 
@@ -582,4 +610,17 @@ static int write_program_to_flash(uint8_t *write_buf, uint32_t file_size)
     UART_polled_tx_string( &g_uart, "Flash write success\r\n" );
 
     return(0);
+}
+
+/*------------------------------------------------------------------------------
+ * Call this function if you want to switch to another program.
+ */
+static void Bootloader_JumpToApplication(uint32_t reset_vector)
+{
+    __asm__ volatile ("fence.i");
+    __asm__ volatile("mv ra, a0");
+    __asm__ volatile("ret");
+
+    /*User application execution should now start and never return here.... */
+    __builtin_unreachable();
 }

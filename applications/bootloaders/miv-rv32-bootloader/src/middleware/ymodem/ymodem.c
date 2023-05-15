@@ -1,9 +1,11 @@
-/*
- * copyright (c) 2015 Microsemi Inc
+/*******************************************************************************
+ * Copyright 2015-2023 Microchip FPGA Embedded Systems Solutions.
  *
  * based on ymodem.c for rtdsr,   copyright (c) 2011 Pete B.
  * based on ymodem.c for bootldr, copyright (c) 2001 John G Dorsey
  * baded on ymodem.c for reimage, copyright (c) 2009 Rich M Legrand
+ *
+ * SPDX-License-Identifier: MIT
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -30,13 +32,16 @@
 #include "sf2_bl_options.h"
 #include "sf2_bl_defs.h"
 #else
-#include "drivers/fabric_ip/CoreUARTapb/core_uart_apb.h"
+#include "drivers/fpga_ip/CoreUARTapb/core_uart_apb.h"
 #endif
 #include "ymodem.h"
 
 
 extern UART_instance_t g_uart;
 extern volatile uint32_t g_10ms_count;
+
+static uint8_t packet_data[PACKET_1K_SIZE + PACKET_OVERHEAD];
+static int32_t  packet_length;
 
 /***************************************************************************//**
  * Calculate CRC for block of data.
@@ -48,13 +53,13 @@ uint16_t sf2bl_crc16(const uint8_t *buf, uint32_t count)
 
     while(count--)
     {
-        crc = crc ^ *buf++ << 8;
+        crc = crc ^ (*buf++ << 8);
 
         for (i=0; i<8; i++)
         {
             if (crc & 0x8000)
             {
-                crc = crc << 1 ^ 0x1021;
+                crc = (crc << 1) ^ 0x1021;
             }
             else
             {
@@ -62,10 +67,8 @@ uint16_t sf2bl_crc16(const uint8_t *buf, uint32_t count)
             }
         }
     }
-
     return crc;
 }
-
 
 /***************************************************************************//**
  * The rest of this is only needed for YMODEM builds.
@@ -173,7 +176,6 @@ void sf2bl_ymodem_deinit(void)
  * o void _putchar(int c): A serial putchar() call
  */
 
-
 /***************************************************************************//**
  *
  */
@@ -188,8 +190,6 @@ static void _sleep(uint32_t seconds_delay)
     while((g_10ms_count - start_time) < seconds_delay)
         ;
 }
-
-
 
 /***************************************************************************//**
  *
@@ -275,7 +275,6 @@ static int32_t _getchar(int32_t timeout)
     return(ret_value);
 }
 
-
 /***************************************************************************//**
  *
  */
@@ -307,7 +306,6 @@ void _putchar(int32_t data)
 #endif
 }
 
-
 /***************************************************************************//**
  *
  */
@@ -320,7 +318,6 @@ void _putstring(uint8_t *string)
     UART_send( &g_uart, string, strlen((const char *)string) );
 #endif
 }
-
 
 /***************************************************************************//**
  *
@@ -346,7 +343,6 @@ static uint32_t str_to_u32(uint8_t *str)
 
     return acc;
 }
-
 
 /***************************************************************************//**
  * Returns 0 on success, 1 on corrupt packet, -1 on error (timeout):
@@ -414,7 +410,8 @@ static int32_t receive_packet(uint8_t *data, int32_t *length)
         {
             *data = (uint8_t)rx_char; /* Store first character of packet */
 
-            for(index = 1; (index < (int32_t)(packet_size + PACKET_OVERHEAD)) && (0 == return_val); ++index)
+            for(index = 1; (index < (int32_t)(packet_size + PACKET_OVERHEAD)) && (0 == return_val);
+                ++index)
             {
                 rx_char = _getchar(PACKET_TIMEOUT);
                 if (rx_char < 0)
@@ -439,7 +436,8 @@ static int32_t receive_packet(uint8_t *data, int32_t *length)
                 return_val = 1;
             }
 
-            if((0 == return_val) && (sf2bl_crc16(data + PACKET_HEADER, packet_size + PACKET_TRAILER) != 0))
+            if((0 == return_val) &&
+               (sf2bl_crc16(data + PACKET_HEADER, packet_size + PACKET_TRAILER) != 0))
             {
                 return_val = 1;
             }
@@ -459,17 +457,15 @@ static int32_t receive_packet(uint8_t *data, int32_t *length)
     return(return_val);
 }
 
-
 /***************************************************************************//**
  *
  */
 /* Returns the length of the file received, or 0 on error: */
-uint32_t ymodem_receive(uint8_t *buf, uint32_t length, uint8_t *file_name)
+uint32_t ymodem_receive(uint8_t *buf, uint32_t length, uint8_t *file_name, uint32_t memory_size)
 {
-    static uint8_t packet_data[PACKET_1K_SIZE + PACKET_OVERHEAD]; /* Declare as static as 1K is a lot to put on our stack */
+
     uint8_t file_size[FILE_SIZE_LENGTH + 1];
     uint8_t *file_ptr;
-    int32_t  packet_length;
     int32_t  index;
     int32_t  file_done;
     int32_t  session_done;
@@ -505,10 +501,24 @@ uint32_t ymodem_receive(uint8_t *buf, uint32_t length, uint8_t *file_name)
         while(0 == file_done)
         {
             rx_status = receive_packet(packet_data, &packet_length);
+
             switch(rx_status)
             {
             case 0: /* Success */
                 errors = 0;
+
+                if (packets_received > (memory_size/packet_length))
+                {
+                    _putchar(CAN);
+                    _putchar(CAN);
+                    _sleep(1);
+
+                    /* Terminate transfer immediately */
+                    file_done    = 1;
+                    session_done = 1;
+                    break;
+                }
+
                 switch(packet_length)
                 {
                 case -1:  /* abort */
@@ -537,13 +547,14 @@ uint32_t ymodem_receive(uint8_t *buf, uint32_t length, uint8_t *file_name)
                          * with just C seems to work. Only try this if we get a
                          * repeat of packet 0...
                          */
-                        if((1 == packets_received) && (0 == (packet_data[PACKET_SEQNO_INDEX] & 0xff)))
+                        if((1 == packets_received) &&
+                           (0 == (packet_data[PACKET_SEQNO_INDEX] & 0xff)))
                         {
-                        _putchar(CRC); /* Repeated packet 0 error */
+                            _putchar(CRC); /* Repeated packet 0 error */
                         }
                         else
                         {
-                        _putchar(NAK); /* Normal out of sequence packet error */
+                            _putchar(NAK); /* Normal out of sequence packet error */
                         }
                     }
                     else
@@ -572,14 +583,15 @@ uint32_t ymodem_receive(uint8_t *buf, uint32_t length, uint8_t *file_name)
 
                                 file_name[index] = '\0';
 
-                                while(*file_ptr != 0) /* Search for nul terminator if not there already */
+                                while(*file_ptr != 0) /* Check for null terminator if not present */
                                 {
                                     ++file_ptr;
                                 }
 
                                 ++file_ptr; /* Step over nul */
 
-                                for(index = 0; *file_ptr && (*file_ptr != ' ') && (index < FILE_SIZE_LENGTH);)
+                                for(index = 0; *file_ptr && (*file_ptr != ' ') &&
+                                               (index < FILE_SIZE_LENGTH);)
                                 {
                                     file_size[index++] = *file_ptr++;
                                 }

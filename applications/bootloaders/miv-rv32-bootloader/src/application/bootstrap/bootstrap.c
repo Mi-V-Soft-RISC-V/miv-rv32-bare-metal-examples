@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2019-2022 Microchip FPGA Embedded Systems Solutions.
+ * Copyright 2019-2023 Microchip FPGA Embedded Systems Solutions.
  *
  * SPDX-License-Identifier: MIT
  *
@@ -11,13 +11,13 @@
  */
 #include <string.h>
 #include "miv_rv32_hal/miv_rv32_hal.h"
-#include "drivers/fabric_ip/CoreUARTapb/core_uart_apb.h"
-#include "drivers/fabric_ip/miv_i2c/miv_i2c.h"
+#include "drivers/fpga_ip/CoreUARTapb/core_uart_apb.h"
+#include "drivers/fpga_ip/miv_i2c/miv_i2c.h"
 #include "drivers/off_chip/spi_flash/spi_flash.h"
 
 #define FLASH_SECTOR_SIZE               65536   /* flash memory size */
-#define FLASH_SECTORS                   128    // There are 126 sectors of 64kB size, using 124
-#define FLASH_BLOCK_SIZE                4096   //Sectors compose of 4kB eraseable blocks
+#define FLASH_SECTORS                   128    // There are 126 sectors of 64KB size, using 124
+#define FLASH_BLOCK_SIZE                4096   //Sectors compose of 4KB eraseable blocks
 #define FLASH_SEGMENT_SIZE              256    // Write segment size is 256
 
 #define FLASH_BLOCK_SEGMENTS            (FLASH_BLOCK_SIZE / FLASH_SEGMENT_SIZE)
@@ -50,11 +50,13 @@ static void copy_hex_to_spiflash(void);
 const uint8_t g_bootstrap_choice[] =
 "\r\n\r\n\
 ======================================================================================\r\n\
-  MIV_ESS Bootstrap support utility to load binary executable from LSRRAM to Non-Volatile memory  \r\n\
+  MIV_ESS Bootstrap support utility to load binary executable from LSRRAM to \
+  Non-Volatile memory  \r\n\
 ======================================================================================\r\n\
 \r\n\
 \r\n\
-This program supports writing HEX data from Source LSRAM (@ Address 0x800000000) into a Non-Volatile memory\r\n\
+This program supports writing HEX data from Source LSRAM (@ Address 0x800000000) into \
+a Non-Volatile memory\r\n\
 \r\n\
 \r\n\
 Choose the destination Non-Volatile memory: \r\n\
@@ -216,12 +218,22 @@ void copy_hex_to_i2ceeprom(void)
 #endif
 
     MRV_systick_config(SYS_CLK_FREQ);
+
+    /* The LSRAM used in the Libero Design has a size of 64KB. However,
+     * it is important to note that the maximum size of the I2C eeprom
+     * when copying from the LSRAM is 32KB
+     */
     write_program_to_i2ceeprom((uint8_t *)LSRAM_BASE_ADDRESS_LOAD, FLASH_EXECUTABLE_SIZE);
 }
 
 void copy_hex_to_spiflash(void)
 {
     spi_flash_init(FLASH_CORE_SPI_BASE);
+
+    /* The LSRAM used in the Libero Design has a size of 64KB. However,
+     * it is important to note that the maximum size of the SPI flash
+     * when copying from the LSRAM is 32KB
+     */
     write_program_to_flash((uint8_t *)LSRAM_BASE_ADDRESS_LOAD, FLASH_EXECUTABLE_SIZE);
 }
 
@@ -232,12 +244,12 @@ static int write_program_to_i2ceeprom(uint8_t *write_buf, uint32_t file_size)
 {
     uint32_t mem_addr = 0x80000000; // source address
     uint32_t mem_val;               // read data word from source
-    uint8_t page_no;                // I2C device page no. Each page is 256 Bytes. 256 x 64 = 16 Kb
+    uint8_t page_no;                // I2C device page no. Each page is 256 Bytes. 256 x 64 = 16 KB
     miv_i2c_status_t   status;
     volatile uint8_t miv_i2c_status = 0u;
     UART_polled_tx_string(&g_uart,
                          (const uint8_t *)"\r\nWriting Data into EEPROM using MIV_I2C\n\r");
-    for (page_no = 0; page_no <= 127 ; page_no++) //32kb = 128 pages of 256 bytes
+    for (page_no = 0; page_no <= 127 ; page_no++) //32KB = 128 pages of 256 Bytes
     {
         uint16_t n = 0;
         i2c_tx_buffer[0] = page_no; // 1st word address byte (needs to increment for pages)
@@ -282,8 +294,10 @@ static int write_program_to_flash(uint8_t *write_buf, uint32_t file_size)
     spi_flash_status_t result;
     struct device_Info DevInfo;
 
-    UART_polled_tx_string( &g_uart, "\r\n---------------------- Writing SPI flash from DDR memory ----------------------\r\n" );
-    UART_polled_tx_string( &g_uart, "This may take several minutes to complete if writing a large file.\r\n" );
+    UART_polled_tx_string( &g_uart,
+        "\r\n---------------------- Writing SPI flash from DDR memory ----------------------\r\n" );
+    UART_polled_tx_string( &g_uart,
+        "This may take several minutes to complete if writing a large file.\r\n" );
 
     spi_flash_control_hw( SPI_FLASH_RESET, 0, &status );
 
@@ -800,8 +814,11 @@ static int read_program_from_flash(uint8_t *read_buf, uint32_t read_byte_length)
     struct device_Info DevInfo;
     flash_content_t flash_content;
 
-    UART_polled_tx_string( &g_uart, "\r\n------------------- Reading from SPI flash into DDR memory --------------------\r\n" );
-    UART_polled_tx_string( &g_uart, "This will take several minutes to complete in order to read the full SPI flash \r\ncontent.\r\n" );
+    UART_polled_tx_string( &g_uart,
+        "\r\n------------------- Reading from SPI flash into TCM memory --------------------\r\n" );
+    UART_polled_tx_string( &g_uart,
+        "This will take several minutes to complete in order to read the full SPI \
+        flash \r\ncontent.\r\n" );
 
     spi_flash_control_hw( SPI_FLASH_RESET, 0, &status );
 

@@ -23,7 +23,7 @@
 #else
 #include "hal.h"
 #endif
-#include "drivers/fabric_ip/CoreSPI/core_spi.h"
+#include "drivers/fpga_ip/CoreSPI/core_spi.h"
 #include "spi_flash.h"
 
 #define READ_ARRAY_OPCODE         0x1B
