@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2019-2022 Microchip FPGA Embedded Systems Solutions.
+ * Copyright 2019-2023 Microchip FPGA Embedded Systems Solutions.
  *
  * SPDX-License-Identifier: MIT
  *
@@ -88,7 +88,7 @@ uint8_t External_31_IRQHandler(void);
 /*------------------------------------------------------------------------------
  * RISC-V interrupt handler for external interrupts.
  */
-uint8_t (* const ext_irq_handler_table[32])(void) =
+uint8_t (* const mrv_ext_irq_handler_table[32])(void) =
 {
 
     Invalid_IRQHandler,
@@ -129,6 +129,7 @@ uint8_t (* const ext_irq_handler_table[32])(void) =
 /*------------------------------------------------------------------------------
  * Interrupt handlers as mapped into the MIE register of the MIV_RV32
  */
+extern void Reserved_IRQHandler(void);
 extern void External_IRQHandler(void);
 extern void MGEUI_IRQHandler(void);
 extern void MGECI_IRQHandler(void);
@@ -138,7 +139,13 @@ extern void MSYS_EI2_IRQHandler(void);
 extern void MSYS_EI3_IRQHandler(void);
 extern void MSYS_EI4_IRQHandler(void);
 extern void MSYS_EI5_IRQHandler(void);
-extern void OPSRV_IRQHandler(void);
+extern void SUBSYS_IRQHandler(void);
+
+#ifndef MIV_RV32_V3_0 /*For MIV_RV32 v3.1*/
+extern void MSYS_EI6_IRQHandler(void);
+extern void MSYS_EI7_IRQHandler(void);
+extern void SUBSYSR_IRQHandler(void); // @suppress("Unused function declaration")
+#endif /*MIV_RV32_V3_0*/
 
 #endif  /* MIV_LEGACY_RV32 */
 
@@ -156,6 +163,8 @@ uint32_t MRV_systick_config(uint64_t ticks)
 {
     uint32_t ret_val = ERROR;
     uint64_t remainder = ticks;
+    g_systick_increment = 0U;
+    g_systick_cmp_value = 0U;
 
     while (remainder >= MTIME_PRESCALER)
     {
@@ -170,7 +179,6 @@ uint32_t MRV_systick_config(uint64_t ticks)
         WRITE_MTIMECMP(g_systick_cmp_value);
         set_csr(mie, MIP_MTIP);
         MRV_enable_interrupts();
-
         ret_val = SUCCESS;
     }
 
@@ -197,20 +205,19 @@ void handle_m_timer_interrupt(void)
         d_tick += 1;
 #endif
     }
-
+/***************************************************************************//**
     /*
-     * Note: If d_tick > 1 it means, that a system timer interrupt has been missed.
-     *
+     * Note: If d_tick > 1 it means, that a system timer interrupt has been 
+     * missed.
      * Please ensure that interrupt handlers are as short as possible to prevent
      * them stopping other interrupts from being handled. For example, if a
      * system timer interrupt occurs during a software interrupt, the system
      * timer interrupt will not be handled until the software interrupt handling
-     * is complete. If the software interrupt handling time is more than one systick
-     * interval, it will result in d_tick > 1.
-     *
-     * If you are running the program using the debugger and halt the CPU at a breakpoint,
-     * MTIME will continue to increment and interrupts will be missed; resulting
-     * in d_tick > 1.
+     * is complete. If the software interrupt handling time is more than one 
+     * systick interval, it will result in d_tick > 1.
+     * If you are running the program using the debugger and halt the CPU at a 
+     * breakpoint, MTIME will continue to increment and interrupts will be 
+     * missed; resulting in d_tick > 1.
      */
 
     WRITE_MTIMECMP(g_systick_cmp_value);
@@ -220,6 +227,11 @@ void handle_m_timer_interrupt(void)
     set_csr(mie, MIP_MTIP);
 }
 
+void handle_m_soft_interrupt(void)
+{
+    Software_IRQHandler();
+    MRV_clear_soft_irq();
+}
 /*------------------------------------------------------------------------------
  * RISC-V interrupt handler for software interrupts.
  */
@@ -232,7 +244,7 @@ void handle_m_ext_interrupt(void)
 
     if (0u !=int_num)
     {
-        disable = ext_irq_handler_table[int_num]();
+        disable = mrv_ext_irq_handler_table[int_num]();
 
         PLIC->TARGET[hart_id].CLAIM_COMPLETE = int_num;
 
@@ -242,74 +254,99 @@ void handle_m_ext_interrupt(void)
         }
     }
 }
+#else
+
+/*------------------------------------------------------------------------------
+ * MSYS local interrupts table
+ */
+void (* const local_irq_handler_table[16])(void) =
+{
+#ifndef MIV_RV32_V3_0
+    MGEUI_IRQHandler,
+    MGECI_IRQHandler,
+    SUBSYS_IRQHandler,
+    Reserved_IRQHandler,    
+    Reserved_IRQHandler,
+    Reserved_IRQHandler,
+    Reserved_IRQHandler,    
+    MSYS_EI0_IRQHandler,
+    MSYS_EI1_IRQHandler,
+    MSYS_EI2_IRQHandler,
+    MSYS_EI3_IRQHandler,
+    MSYS_EI4_IRQHandler,
+    MSYS_EI5_IRQHandler,
+    SUBSYSR_IRQHandler,
+    MSYS_EI6_IRQHandler,
+    MSYS_EI7_IRQHandler
+#else
+    MGEUI_IRQHandler,
+    MGECI_IRQHandler,
+    Reserved_IRQHandler,    
+    Reserved_IRQHandler,    
+    Reserved_IRQHandler,
+    Reserved_IRQHandler,
+    Reserved_IRQHandler,
+    Reserved_IRQHandler,
+    MSYS_EI0_IRQHandler,
+    MSYS_EI1_IRQHandler,
+    MSYS_EI2_IRQHandler,
+    MSYS_EI3_IRQHandler,
+    MSYS_EI4_IRQHandler,
+    MSYS_EI5_IRQHandler,
+    SUBSYS_IRQHandler,
+    Reserved_IRQHandler,
+#endif
+};
+
+/*------------------------------------------------------------------------------
+ * Jump to interrupt table containing local interrupts
+ */
+void handle_local_ei_interrupts(uint8_t irq_no)
+{
+    uint64_t mhart_id = read_csr(mhartid);
+    ASSERT(irq_no <= MIV_LOCAL_IRQ_MAX)
+    ASSERT(irq_no >= MIV_LOCAL_IRQ_MIN)
+
+    uint8_t ei_no = (uint8_t)(irq_no - MIV_LOCAL_IRQ_MIN);
+    (*local_irq_handler_table[ei_no])();
+}
 #endif /* MIV_LEGACY_RV32 */
 
-void handle_m_soft_interrupt(void)
-{
-    Software_IRQHandler();
-    MRV_clear_soft_irq();
-}
 
 /*------------------------------------------------------------------------------
  * Trap handler. This function is invoked in the non-vectored mode.
  */
 void handle_trap(uintptr_t mcause, uintptr_t mepc)
-{
-    if ((mcause & MCAUSE_INT) && ((mcause & MCAUSE_CAUSE) == IRQ_M_SOFT))
-    {
-        handle_m_soft_interrupt();
-    }
-    else if ((mcause & MCAUSE_INT) && ((mcause & MCAUSE_CAUSE) == IRQ_M_TIMER))
-    {
-        handle_m_timer_interrupt();
-    }
-    else if ((mcause & MCAUSE_INT) && ((mcause & MCAUSE_CAUSE) == IRQ_M_EXT))
-    {
-#ifdef MIV_LEGACY_RV32
-        handle_m_ext_interrupt();
-#else
-        External_IRQHandler();
-#endif
-    }
-#ifndef MIV_LEGACY_RV32
-    else if ((mcause & MCAUSE_INT) && ((mcause & MCAUSE_CAUSE) == MSYS_EI0))
-    {
-        MSYS_EI0_IRQHandler();
-    }
-    else if ((mcause & MCAUSE_INT) && ((mcause & MCAUSE_CAUSE) == MSYS_EI1))
-    {
-        MSYS_EI1_IRQHandler();
-    }
-    else if ((mcause & MCAUSE_INT) && ((mcause & MCAUSE_CAUSE) == MSYS_EI2))
-    {
-        MSYS_EI2_IRQHandler();
-    }
-    else if ((mcause & MCAUSE_INT) && ((mcause & MCAUSE_CAUSE) == MSYS_EI3))
-    {
-        MSYS_EI3_IRQHandler();
-    }
-    else if ((mcause & MCAUSE_INT) && ((mcause & MCAUSE_CAUSE) == MSYS_EI4))
-    {
-        MSYS_EI4_IRQHandler();
-    }
-    else if ((mcause & MCAUSE_INT) && ((mcause & MCAUSE_CAUSE) == MSYS_EI5))
-    {
-        MSYS_EI5_IRQHandler();
-    }
-    else if ((mcause & MCAUSE_INT) && ((mcause & MCAUSE_CAUSE) == OPSRV_REG))
-    {
-        OPSRV_IRQHandler();
-    }
-    else if ((mcause & MCAUSE_INT) && ((mcause & MCAUSE_CAUSE) == MGEUI))
-    {
-        MGEUI_IRQHandler();
-    }
-    else if ((mcause & MCAUSE_INT) && ((mcause & MCAUSE_CAUSE) == MGECI))
-    {
-        MGECI_IRQHandler();
-    }
-#endif /* MIV_LEGACY_RV32 */
+{   
+    uint64_t is_interrupt = mcause & MCAUSE_INT;
 
+    if (is_interrupt)
+    {
+#ifndef MIV_LEGACY_RV32
+        if (((mcause & MCAUSE_CAUSE) >= MIV_LOCAL_IRQ_MIN) && ((mcause & MCAUSE_CAUSE) <= MIV_LOCAL_IRQ_MAX))
+        {
+            handle_local_ei_interrupts((uint8_t)(mcause & MCAUSE_CAUSE));
+        }
+        else if ((mcause & MCAUSE_CAUSE) == IRQ_M_EXT)
+#else
+        if ((mcause & MCAUSE_CAUSE) == IRQ_M_EXT)
+#endif
+        {
+#ifndef MIV_LEGACY_RV32
+            External_IRQHandler();
+#else
+            handle_m_ext_interrupt();
+#endif
+        }
+        else if ((mcause & MCAUSE_CAUSE) == IRQ_M_SOFT)
+        {
+            handle_m_soft_interrupt();
+        }
+        else if ((mcause & MCAUSE_CAUSE) == IRQ_M_TIMER)
+        {
+            handle_m_timer_interrupt();
+        }
+    }
     else
     {
 #ifndef NDEBUG
@@ -341,7 +378,7 @@ void handle_trap(uintptr_t mcause, uintptr_t mepc)
          # See: https://github.com/riscv/riscv-gcc/issues/133
         */
 
-        /* interrupt pending */
+         /* interrupt pending */
          uintptr_t mip      = read_csr(mip);
 
          /* additional info and meaning depends on mcause */
@@ -370,3 +407,4 @@ void handle_trap(uintptr_t mcause, uintptr_t mepc)
 #ifdef __cplusplus
 }
 #endif
+
