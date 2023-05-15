@@ -15,6 +15,7 @@
 #define RISCV_PLIC_H
 
 #include <stdint.h>
+#include "miv_rv32_regs.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -26,7 +27,7 @@ extern "C" {
 #ifdef MIV_LEGACY_RV32
 typedef enum
 {
-    NoInterrupt_IRQn = 0,
+    MRV_NoInterrupt_IRQn = 0,
     External_1_IRQn  = 1,
     External_2_IRQn  = 2,
     External_3_IRQn  = 3,
@@ -72,12 +73,12 @@ typedef struct
     volatile uint32_t PRIORITY_THRESHOLD;
     volatile uint32_t CLAIM_COMPLETE;
     volatile uint32_t reserved[1022];
-} IRQ_Target_Type;
+} MRV_IRQ_Target_Type;
 
 typedef struct
 {
     volatile uint32_t ENABLES[32];
-} Target_Enables_Type;
+} MRV_Target_Enables_Type;
 
 typedef struct
 {
@@ -89,12 +90,12 @@ typedef struct
     volatile uint32_t RESERVED1[992];
     
     /*-------------------- Target enables --------------------*/
-    volatile Target_Enables_Type TARGET_ENABLES[15808];
+    volatile MRV_Target_Enables_Type TARGET_ENABLES[15808];
 
     volatile uint32_t RESERVED2[16384];
     
     /*--- Target Priority threshold and claim/complete---------*/
-    IRQ_Target_Type TARGET[15872];
+    MRV_IRQ_Target_Type TARGET[15872];
     
 } PLIC_Type;
 
@@ -191,7 +192,7 @@ static inline void MRV_PLIC_clear_pending_irq(void)
     volatile uint32_t int_num  = PLIC->TARGET[hart_id].CLAIM_COMPLETE;
     volatile int32_t wait_possible_int;
 
-    while (NoInterrupt_IRQn != int_num)
+    while (MRV_NoInterrupt_IRQn != int_num)
     {
         PLIC->TARGET[hart_id].CLAIM_COMPLETE = int_num;
         wait_possible_int = 0xFU;

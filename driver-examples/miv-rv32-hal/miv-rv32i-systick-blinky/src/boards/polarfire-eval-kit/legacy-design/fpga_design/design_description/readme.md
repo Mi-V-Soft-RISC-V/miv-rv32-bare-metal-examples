@@ -1,3 +1,3 @@
-# Desgin desctription
+# Design description
 
- The Libero generated design desctription will be stored here.
+ The Libero generated design description will be stored here.

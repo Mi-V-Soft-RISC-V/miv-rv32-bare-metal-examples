@@ -33,7 +33,7 @@ that you are using are compatible with each other.
  - miv32imc-Debug
  - miv32imc-Release
 
-## fpga_design_config (formerly known as hw_config.h)
+## fpga_design_config (formerly known as hw_platform.h)
 The SoftConsole project targeted for Mi-V processors now use an improved
 directory structure. Detailed description of the folder structure is available
 at https://github.com/Mi-V-Soft-RISC-V/miv-rv32-documentation.
@@ -55,7 +55,7 @@ you want a CoreUARTapb mapped to STDIO, etc.
 
 ```
  **NOTE:**
- In the legacy folder structures, the hw_config.h  at the root of the project
+ In the legacy folder structures, the hw_platform.h  at the root of the project
  folder was used to store these configurations. This file is now **DEPRECATED**.
 
  The MIV_RV32 HAL still supports the legacy folder structure with hw_platform.h.
