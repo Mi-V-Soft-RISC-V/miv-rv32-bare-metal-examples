@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2019-2021 Microchip FPGA Embedded Systems Solutions.
+ * Copyright 2019-2022 Microchip FPGA Embedded Systems Solutions.
  *
  * SPDX-License-Identifier: MIT
  *
@@ -9,7 +9,6 @@
  */
 #ifndef __HAL_ASSERT_HEADER
 #define __HAL_ASSERT_HEADER 1
-#define NDEBUG 1
 
 #ifdef __cplusplus
 extern "C" {

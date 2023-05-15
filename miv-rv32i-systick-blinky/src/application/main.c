@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2019-2022 Microchip FPGA Embedded Systems Solutions.
+ * Copyright 2019-2023 Microchip FPGA Embedded Systems Solutions.
  *
  * SPDX-License-Identifier: MIT
  *
@@ -10,8 +10,8 @@
 #include <stdio.h>
 #include "hal/hal.h"
 #include "miv_rv32_hal/miv_rv32_hal.h"
-#include "drivers/fabric_ip/CoreGPIO/core_gpio.h"
-#include "drivers/fabric_ip/CoreUARTapb/core_uart_apb.h"
+#include "drivers/fpga_ip/CoreGPIO/core_gpio.h"
+#include "drivers/fpga_ip/CoreUARTapb/core_uart_apb.h"
 
 const char * g_hello_msg =
 "\r\n******************************************************************************\r\n\n\
@@ -49,8 +49,7 @@ void SysTick_Handler(void)
     static volatile uint32_t val = 0u;
     val ^= 0xFu;
     GPIO_set_outputs(&g_gpio_out, val);
-    UART_polled_tx_string(&g_uart,
-                        (const uint8_t *)"\r\nInternal System Timer Interrupt");
+    printf("\r\nInternal System Timer Interrupt");
 }
 
 /*-------------------------------------------------------------------------//**
@@ -67,7 +66,7 @@ int main(void)
               BAUD_VALUE_115200,
               (DATA_8_BITS | NO_PARITY));
 
-    UART_polled_tx_string(&g_uart, (const uint8_t *)g_hello_msg);
+    printf(g_hello_msg);
 
     /* Initializing GPIOs */
     GPIO_init(&g_gpio_out, COREGPIO_OUT_BASE_ADDR, GPIO_APB_32_BITS_BUS);
@@ -77,7 +76,15 @@ int main(void)
      * This configuration can not be changed by the firmware since it is fixed in
      * the CoreGPIO IP instance. In your Libero design if you do not make
      * the GPIO configurations 'fixed', then you will need to configure them
-     * using GPIO_config() function*/
+     * using GPIO_config() function
+	 * 
+	 * However, the Renode currently doesn't support 'fixed' configurations on 
+	 * CoreGPIO and therefore the GPIO's have to be configured at runtime. 
+	 * Hence, uncomment following lines when targeting Renode:
+     * 
+	 * GPIO_config(&g_gpio_out, 0, GPIO_OUTPUT_MODE);
+     * GPIO_config(&g_gpio_out, 1, GPIO_OUTPUT_MODE);
+	 */
 
     /* set the output value */
     GPIO_set_outputs(&g_gpio_out, 0x0u);
