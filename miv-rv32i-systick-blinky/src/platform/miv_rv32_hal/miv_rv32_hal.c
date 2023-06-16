@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2019-2023 Microchip FPGA Embedded Systems Solutions.
+ * Copyright 2019 Microchip FPGA Embedded Systems Solutions.
  *
  * SPDX-License-Identifier: MIT
  *
@@ -265,6 +265,7 @@ void (* const local_irq_handler_table[16])(void) =
     MGEUI_IRQHandler,
     MGECI_IRQHandler,
     SUBSYS_IRQHandler,
+    SUBSYSR_IRQHandler,
     Reserved_IRQHandler,    
     Reserved_IRQHandler,
     Reserved_IRQHandler,
@@ -275,7 +276,6 @@ void (* const local_irq_handler_table[16])(void) =
     MSYS_EI3_IRQHandler,
     MSYS_EI4_IRQHandler,
     MSYS_EI5_IRQHandler,
-    SUBSYSR_IRQHandler,
     MSYS_EI6_IRQHandler,
     MSYS_EI7_IRQHandler
 #else
