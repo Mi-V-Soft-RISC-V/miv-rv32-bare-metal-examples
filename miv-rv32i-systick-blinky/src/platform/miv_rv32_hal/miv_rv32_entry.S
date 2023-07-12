@@ -37,6 +37,7 @@
 .macro STORE_CONTEXT
   addi sp, sp, -SP_SHIFT_OFFSET*REGBYTES
   SREG x1, 0 * REGBYTES(sp)
+  SREG x1, 0 * REGBYTES(sp)
   SREG x2, 1 * REGBYTES(sp)
   SREG x3, 2 * REGBYTES(sp)
   SREG x4, 3 * REGBYTES(sp)
