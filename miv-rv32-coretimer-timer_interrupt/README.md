@@ -1,4 +1,5 @@
-﻿# CoreTimer interrupt mode example
+﻿
+# CoreTimer interrupt mode example
 
 This example program demonstrates the use of the CoreTimer driver used in
 continuous interrupt mode. It toggles a LED on and off every second.
