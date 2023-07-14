@@ -1,4 +1,5 @@
-﻿# CoreTimer one-shot mode example
+﻿
+# CoreTimer one-shot mode example
 
 This example program demonstrates the use of the CoreTimer driver used in
 one-shot mode. It toggles a LED on and off every second.

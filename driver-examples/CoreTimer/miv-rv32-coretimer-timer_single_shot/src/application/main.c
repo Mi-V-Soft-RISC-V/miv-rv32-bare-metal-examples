@@ -18,6 +18,13 @@
 static volatile uint32_t gpio_pins_state = 0x0u;
 static uint32_t timer_reload_check = 0x0u;
 
+UART_instance_t g_core_uart_0;
+
+uint8_t g_message[] =
+    "\r\n\r\n\**************  Mi-V CoreTimer: Timer Single-Shot Example Project  "
+    "**************\r\n\r\n\r\nThis example project demonstrates the use of the CoreTimer "
+    "driver operating in\r\nsingle-shot mode\r\n";
+
 /*------------------------------------------------------------------------------
  * Timer load value.
  * This value is calculated to result in the timer timing out after after 1
@@ -34,7 +41,7 @@ gpio_instance_t g_gpio;
 /*------------------------------------------------------------------------------
  * Timer 0 instance
  */
-timer_instance_t core_timer_0;
+timer_instance_t g_core_timer_0;
 
 /*------------------------------------------------------------------------------
  * Interrupt handler for the MIV_RV32 MSYS_EI interrupt connected to CoreTimer 0
@@ -50,13 +57,17 @@ MSYS_EI0_IRQHandler(void)
     GPIO_set_outputs(&g_gpio, gpio_pins_state);
 
     /* Clear the interrupt within the timer */
-    TMR_clear_int(&core_timer_0);
+    TMR_clear_int(&g_core_timer_0);
     return (EXT_IRQ_KEEP_ENABLED);
 }
 
 int
 main(void)
 {
+    UART_init(&g_core_uart_0, COREUARTAPB0_BASE_ADDR, BAUD_VALUE_115200, DATA_8_BITS | NO_PARITY);
+
+    UART_polled_tx_string(&g_core_uart_0, g_message);
+
     /* Enable local interrupt for the MSYS_EI interrupt pin */
     MRV_enable_local_irq(MRV32_MSYS_EIE0_IRQn);
 
@@ -67,7 +78,7 @@ main(void)
     GPIO_set_outputs(&g_gpio, 0x00u);
 
     /* Initialise and configure the timer */
-    TMR_init(&core_timer_0,
+    TMR_init(&g_core_timer_0,
              CORETIMER0_BASE_ADDR,
              TMR_ONE_SHOT_MODE,
              PRESCALER_DIV_1024,
@@ -77,10 +88,10 @@ main(void)
     HAL_enable_interrupts();
 
     /* Enable the timer to generate interrupts */
-    TMR_enable_int(&core_timer_0);
+    TMR_enable_int(&g_core_timer_0);
 
     /* Start the timer */
-    TMR_start(&core_timer_0);
+    TMR_start(&g_core_timer_0);
 
     while (1u)
     {
@@ -89,8 +100,9 @@ main(void)
          */
         if (gpio_pins_state != timer_reload_check)
         {
-            TMR_reload(&core_timer_0, TIMER_LOAD_VALUE);
+            TMR_reload(&g_core_timer_0, TIMER_LOAD_VALUE);
             timer_reload_check = gpio_pins_state;
         }
     }
+    return 0u;
 }
