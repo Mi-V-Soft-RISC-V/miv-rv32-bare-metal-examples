@@ -1,5 +1,7 @@
 /*******************************************************************************
- * (c) Copyright 2019-2021 Microchip FPGA Embedded Systems Solutions.
+ * Copyright 2019-2023 Microchip FPGA Embedded Systems Solutions.
+ *
+ * SPDX-License-Identifier: MIT
  *
  * Register bit offsets and masks definitions for CoreSysServices_PF driver.
  */

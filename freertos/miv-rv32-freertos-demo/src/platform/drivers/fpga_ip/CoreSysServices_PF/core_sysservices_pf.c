@@ -1,21 +1,16 @@
 /*******************************************************************************
- * (c) Copyright 2019-2021 Microchip FPGA Embedded Systems Solutions.
+ * Copyright 2019-2023 Microchip FPGA Embedded Systems Solutions.
+ *
+ * SPDX-License-Identifier: MIT
  *
  * PF_System_Services driver implementation. See file "core_syservices_pf.h" for
  * description of the functions implemented in this file.
  *
  */
-#ifndef LEGACY_DIR_STRUCTURE
-#include "hal/hal.h"
-#include "core_sysservices_pf.h"
-#include "coresysservicespf_regs.h"
 
-#else
-#include "hal.h"
 #include "core_sysservices_pf.h"
 #include "coresysservicespf_regs.h"
-#include "hal_assert.h"
-#endif
+#include <stdbool.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -416,18 +411,26 @@ uint8_t SYS_secure_nvm_write
     uint8_t status = SYS_PARAM_ERR;
 
     HAL_ASSERT(!(NULL_BUFFER == p_data));
-    HAL_ASSERT(!(NULL_BUFFER == p_user_key));
     HAL_ASSERT(!(snvm_module >= 221u));
+    if (format != SNVM_NON_AUTHEN_TEXT_REQUEST_CMD)
+    {
+        HAL_ASSERT(!(NULL_BUFFER == p_user_key));
+    }
 
-    if((p_data  == NULL_BUFFER) || (p_user_key == NULL_BUFFER)
-                                || (snvm_module >= 221))
+    if ((p_data == NULL_BUFFER) || (snvm_module >= 221))
     {
         return status;
     }
 
     if ((format != SNVM_NON_AUTHEN_TEXT_REQUEST_CMD)
-       || (format != SNVM_AUTHEN_TEXT_REQUEST_CMD)
-       || (format != SNVM_AUTHEN_CIPHERTEXT_REQUEST_CMD))
+       && (p_user_key == NULL_BUFFER))
+    {
+        return status;
+    }
+
+    if ((format != SNVM_NON_AUTHEN_TEXT_REQUEST_CMD)
+       && (format != SNVM_AUTHEN_TEXT_REQUEST_CMD)
+       && (format != SNVM_AUTHEN_CIPHERTEXT_REQUEST_CMD))
     {
         return status;
     }
@@ -681,24 +684,66 @@ uint8_t SYS_digest_check_service
 uint8_t SYS_iap_service
 (
     uint8_t iap_cmd,
-    uint32_t spiaddr
+    uint32_t spiaddr,
+    uint16_t mb_offset
 )
 {
     uint8_t status = SYS_PARAM_ERR;
-    uint32_t l_spiaddr = spiaddr;
+    uint16_t l_mb_offset = 0u;
+    uint16_t cmd_data_size = 0u;
+    uint8_t* cmd_data = NULL_BUFFER;
+    bool invalid_param  = false;
 
-    if ((IAP_PROGRAM_BY_SPIIDX_CMD == iap_cmd) || (IAP_VERIFY_BY_SPIIDX_CMD == iap_cmd))
+    if (((IAP_PROGRAM_BY_SPIIDX_CMD == iap_cmd)
+    || (IAP_VERIFY_BY_SPIIDX_CMD == iap_cmd))
+    && (1u == spiaddr))
     {
-        HAL_ASSERT(!(1u == spiaddr));
+        invalid_param = true;
+        HAL_ASSERT(!invalid_param);
     }
 
-    status = execute_ss_command(iap_cmd,
-                                (uint8_t*)&l_spiaddr,
-                                4u,
-                                NULL_BUFFER,
-                                0u,
-                                spiaddr,
-                                0u);
+    if (!invalid_param)
+    {
+        switch(iap_cmd)
+        {
+        case IAP_PROGRAM_BY_SPIIDX_CMD:
+        case IAP_VERIFY_BY_SPIIDX_CMD:
+            /*In SPI_IDX based program and verify commands,
+             *  Mailbox is not Required. Instead of mailbox offset
+             *  SPI_IDX is passed as parameter.*/
+            l_mb_offset = (uint16_t)(0xFFu & spiaddr);
+            break;
+
+        case IAP_PROGRAM_BY_SPIADDR_CMD:
+        case IAP_VERIFY_BY_SPIADDR_CMD:
+            /*In SPI_ADDR based program and verify commands,
+             *  Mailbox is Required*/
+            l_mb_offset = mb_offset;
+            /*command data size is four bytes holding the
+             * SPI Address in it.*/
+            cmd_data_size = 4u;
+            cmd_data = (uint8_t*)&spiaddr;
+            break;
+
+        case IAP_AUTOUPDATE_CMD:
+            /*In auto update command Mailbox is not Required*/
+            l_mb_offset = 0u;
+            break;
+
+        default:
+            l_mb_offset = 0u;
+
+        }
+
+        status = execute_ss_command(
+                (uint8_t)iap_cmd,
+                cmd_data,
+                cmd_data_size,
+                NULL_BUFFER,
+                0,
+                (uint16_t)l_mb_offset,
+                0);
+    }
 
     return status;
 }

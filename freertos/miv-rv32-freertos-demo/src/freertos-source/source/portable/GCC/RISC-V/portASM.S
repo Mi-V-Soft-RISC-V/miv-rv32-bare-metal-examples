@@ -129,6 +129,7 @@ definitions. */
 .extern uxTimerIncrementsForOneTick /* size_t type so 32-bit on 32-bit core and 64-bits on 64-bit core. */
 .extern xISRStackTop
 .extern portasmHANDLE_INTERRUPT
+.extern freeRTOS_trap_jump
 
 /*-----------------------------------------------------------*/
 
@@ -401,7 +402,7 @@ xPortStartFirstTask:
 	/* If there is a clint then interrupts can branch directly to the FreeRTOS
 	trap handler.  Otherwise the interrupt controller will need to be configured
 	outside of this file. */
-	la t0, freertos_risc_v_trap_handler
+	la t0, freeRTOS_trap_jump
 	csrw mtvec, t0
 #endif /* portasmHAS_CLILNT */
 

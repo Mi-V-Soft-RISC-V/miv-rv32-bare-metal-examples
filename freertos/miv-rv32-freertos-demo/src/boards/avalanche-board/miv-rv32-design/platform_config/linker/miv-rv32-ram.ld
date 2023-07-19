@@ -30,11 +30,11 @@ ENTRY(_start)
 
 MEMORY
 {
-    ram (rwx) : ORIGIN = 0x80000000, LENGTH = 256k
+    ram (rwx) : ORIGIN = 0x80000000, LENGTH = 512k
 }
 
 STACK_SIZE          = 2k;               /* needs to be calculated for your application */
-HEAP_SIZE           = 4;               /* needs to be calculated for your application */
+HEAP_SIZE           = 4k;               /* needs to be calculated for your application */
 
 SECTIONS
 {
