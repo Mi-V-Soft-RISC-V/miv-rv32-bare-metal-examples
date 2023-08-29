@@ -142,6 +142,25 @@ All these macros must **not** be defined if you are using a MIV_RV32 core.
 This example project can be targeted to Mi-V designs available at
 https://github.com/Mi-V-Soft-RISC-V
 
+### Renode Emulation
+
+The System Timer Interrupt examples can also be run using Renode. In all cases, the GPIO_config()
+function calls in main.c will need to be included as per the comments in the code. There are two
+launch configurations, one targeting a model of the legacy RV32 and one of the latest MIV_RV32.
+
+The following configurations can be launched using miv-legacy-systick-blinky renode start-platform-and-debug.launch:
+
+ - miv32ima-Release
+
+The following configurations can be launched using miv-rv32i-systick-blinky renode start-platform-and-debug.launch:
+
+ - miv32imc-Release
+ - miv32i-Release
+
+GPIO Output changes will be logged in the console.
+
+**NOTE:**
+The -Debug configurations are not compatible with Renode.
 
 ## Mi-V soft processor revision dependencies
 
