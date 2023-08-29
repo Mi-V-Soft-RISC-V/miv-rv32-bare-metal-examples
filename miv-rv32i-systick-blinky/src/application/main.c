@@ -44,12 +44,20 @@ void Software_IRQHandler()
     MRV_clear_soft_irq();
 }
 
+/*--------------------------------------------------------------------------//**
+ * Systick Handler - Interrupt handler for MTIME timer interrupts.
+ * Toggles the LEDs on the board through the GPIO and counts the number of Ticks
+ * that have occured and prints the interrupt count in message on the UART.
+ */
+
 void SysTick_Handler(void)
 {
+    static uint32_t interrupt_counter = 0;
+    interrupt_counter++;
     static volatile uint32_t val = 0u;
     val ^= 0xFu;
     GPIO_set_outputs(&g_gpio_out, val);
-    printf("\r\nInternal System Timer Interrupt");
+    printf("\r\nInternal System Timer Interrupt Counter = %d", interrupt_counter);
 }
 
 /*-------------------------------------------------------------------------//**
