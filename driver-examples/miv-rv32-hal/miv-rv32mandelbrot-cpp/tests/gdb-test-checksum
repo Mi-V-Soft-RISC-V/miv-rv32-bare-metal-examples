@@ -1,0 +1,18 @@
+source ../tests/gdb-test-common
+
+test_setup_default miv-rv32imaf-raytracer-uart-cpp.elf
+
+# Arrived at the testValidateBreak breakpoint 
+
+test_display_enviroment iteration
+
+if (current_configuration & 4)
+    # hard float
+    assert_equals 0x4d6cd0bc*iteration actualChecksum
+else
+    # soft float
+    assert_equals 0x4d6cd0a7*iteration actualChecksum
+end
+
+# if it doesn't failed on any previous asserts then that means they all passed 
+test_passed 

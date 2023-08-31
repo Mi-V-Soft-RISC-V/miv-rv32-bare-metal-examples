@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<launchConfiguration type="org.eclipse.ui.externaltools.ProgramLaunchConfigurationType">
+    <stringAttribute key="org.eclipse.ui.externaltools.ATTR_LOCATION" value="${env_var:RENODE_BINARY_LAUNCHER}"/>
+    <stringAttribute key="org.eclipse.ui.externaltools.ATTR_TOOL_ARGUMENTS" value="${env_var:RENODE_BINARY_ARGUMENT} -e &quot;$GDB_SERVER_PORT=3333&quot; -e &quot;path add @${env_var:SC_INSTALL_DIR}/renode-microchip-mods/&quot; -e &quot;path add @${project_loc}/src/boards/polarfire-eval-kit/&quot; --plain --console -e &quot;include @scripts/miv-rv32-imfc-design.resc&quot;"/>
+    <stringAttribute key="org.eclipse.ui.externaltools.ATTR_WORKING_DIRECTORY" value="${eclipse_home}../renode/bin"/>
+</launchConfiguration>
