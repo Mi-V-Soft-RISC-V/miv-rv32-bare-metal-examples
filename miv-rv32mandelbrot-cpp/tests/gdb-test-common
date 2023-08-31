@@ -1,0 +1,66 @@
+
+define print_separator
+  printf "\n********************************************************************************\n" 
+end
+
+
+define test_passed
+  print_separator
+  print "PASSED the test\n"
+  print_separator
+
+  # arbirtary number just to make it different from other generic exit codes
+  quit 149 
+end
+
+
+define test_failed
+  # if it is not catched by any pass conditions, then it must be fail
+  print_separator
+  printf "FAILED the test\n"
+  print_separator
+
+  # arbirtary number just to make it different from other generic exit codes
+  quit 150 
+end
+
+
+define test_failed_weak_test
+  print_separator
+  printf "test failing because of weak test suit\n"
+  print_separator
+end
+
+
+define test_display_enviroment
+  printf "Current build_configuration=%08X iteration=%d\n", current_configuration, $arg0
+end
+
+
+define connect_openocd_default
+  target remote localhost:3333
+end
+
+
+define connect_openocd_custom
+  target remote localhost:$arg0
+end
+
+
+define test_setup_default
+  connect_openocd_default
+  load $arg0
+  break testValidateBreak
+  continue
+end
+
+
+define assert_equals
+  printf "expected=%08X actual=%08X\n", $arg0, $arg1
+
+  # if it fails then fail the test, if it passes continue as there might be
+  # more asserts
+  if ($arg0 != $arg1)
+    test_failed
+  end
+end
