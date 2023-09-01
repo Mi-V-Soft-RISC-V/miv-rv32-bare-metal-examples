@@ -55,6 +55,20 @@ void main()
     /* Greeting message */
     UART_polled_tx_string(&g_uart,g_message);
 
+    /* The CoreGPIO IP instantiated in the reference designs provided on github
+     * is configured to have GPIO_0 to GPIO_3 ports as outputs.
+     * This configuration can not be changed by the firmware since it is fixed in
+     * the CoreGPIO IP instance. In your Libero design, if you do not make
+     * the GPIO configurations 'fixed', then you will need to configure them
+     * using GPIO_config() function.
+     *
+     * The Renode GPIO instances do not use 'fixed' configurations and
+     * therefore these GPIO's have to be configured at runtime.
+     * Please uncomment following lines when targeting Renode:
+     */
+     // GPIO_config(&g_gpio, 0, GPIO_OUTPUT_MODE);
+     // GPIO_config(&g_gpio, 1, GPIO_OUTPUT_MODE);
+
     /* Set GPIO LED state */
     GPIO_set_output(&g_gpio, GPIO_1, LED1_state );
     GPIO_set_output(&g_gpio, GPIO_0, LED2_state );
@@ -79,7 +93,7 @@ void main()
 static void delay(uint8_t t_in_ms)
 {
     uint32_t loopcount = (t_in_ms * SYS_CLK_FREQ)/1000U;
-    for (int count  = 0 ; count < loopcount ; count++)
+    for (volatile int count  = 0 ; count < loopcount ; count++)
     {
 
     }
