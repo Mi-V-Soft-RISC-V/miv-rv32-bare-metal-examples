@@ -43,5 +43,16 @@ Tool Settings > GNU RISC-V Cross Create Flash Image > General > Other flags .
 This will allow you to attach the release mode executable as the memory 
 initialization client in Libero when you want to execute it from non-volatile memory. 
 
+### Renode Emulation
+
+The CoreGPIO example can be run using Renode. For this application, the GPIO_config()
+function calls in main.c will need to be included as per the comments in the code.
+
+The following configuration can be launched using miv-rv32-coregpio renode start-platform-and-debug.launch:
+
+ - miv-rv32i-release
+
+GPIO Output changes will be logged in the console.
+
 ## Silicon revision dependencies
 This example is tested on PolarFire MPF300TS device.
