@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2022 Microchip FPGA Embedded Systems Solutions.
+ * Copyright 2022-2023 Microchip FPGA Embedded Systems Solutions.
  *
  * SPDX-License-Identifier: MIT
  *
@@ -32,11 +32,11 @@
 
   @section intro_sec Introduction
   The Mi-V uDMA driver provides a set of functions to control the Mi-V uDMA
-  module in the Mi-V Extended Sub System(MIV_ESS) soft-IP. The Mi-V uDMA module
+  module in the Mi-V Extended Subsystem (MIV_ESS) soft-IP. The Mi-V uDMA module
   allows peripherals with AHB interfaces to transfer data independently of the
   MIV_RV32 RISC-V processor.
 
-  The major features provided by the Mi-V uDMA driver are:
+  Following are the major features provided by the Mi-V uDMA driver:
      - Initialization and configuration
      - Start and reset the transaction
 
@@ -48,61 +48,63 @@
 
   @section hw_dependencies Hardware Flow Dependency
   The application software should initialize and configure the Mi-V uDMA through
-  the call to MIV_uDMA_init(), MIV_uDMA_config() function for Mi-V uDMA
-  instance in the design.
-  The μDMA can operate in two possible transfer configurations:
+  calling the MIV_uDMA_init() and MIV_uDMA_config() functions for each Mi-V 
+  uDMA instance in the design.
+   
+  The uDMA can operate in two possible transfer configurations:
 
-   AHBL Read –> AHBL Write:
-   In this configuration, the μDMA reads data from the source memory over an
-   AHBL (Mirrored Main/Initiator) read interface and writes data to the
-   destination memory over an AHBL (Mirrored Main/Initiator) write interface.
+    - AHBL Read -> AHBL Write:  
+   In this configuration, the uDMA reads data from the source memory over an
+   AHBL (mirrored main/initiator) read interface and writes data to the
+   destination memory over an AHBL (mirrored main/initiator) write interface.
 
-   AHBL Read –> TAS Write:
-   In this configuration, the μDMA reads data from the source memory over an
-   AHBL (Mirrored Main/Initiator) read interface and writes data to the
-   destination memory over the TAS (Mirrored Main/Initiator) write interface.
+    - AHBL Read -> TAS Write:  
+   In this configuration, the uDMA reads data from the source memory over an
+   AHBL (mirrored main/initiator) read interface and writes data to the
+   destination memory over the TAS (mirrored main/initiator) write interface.
 
-   The AHBL Read -> TAS Write configuration is out of scope for this driver.
+   Note: The AHBL Read -> TAS Write configuration is out of scope for this 
+         driver.
 
    @section theory_op Theory of Operation
-   The uDMA module in the Mi-V Extended Sub System(MIV_ESS) is a single channel
-   uDMA module that allows peripherals to perform read write operations between
-   source and destination memory. The Mi-V uDMA driver is generally used in
-   interrupt driven mode and uses the Mi-V uDMA IRQ signal to drive the
-   interrupt service routine(ISR) which signifies a transfer has completed.
+   The uDMA module in the Mi-V Extended Sub System (MIV_ESS) is a single-channel
+   uDMA module that allows peripherals to perform read-write operations between
+   source and destination memory. The Mi-V uDMA driver is used in 
+   interrupt-driven mode and uses the Mi-V uDMA IRQ signal to drive the
+   interrupt service routine (ISR), which signifies a transfer has completed.
    The status is checked in the ISR to ensure the transfer is completed
-   successfully.
-   The reset operation in the ISR will reset the Mi-V uDMA controller.
-   Once the Mi-V uDMA transfer completes, Mi-V uDMA retires. To
-   initiate another transaction, Mi-V uDMA will have to be configured again.
+   successfully.  
+   The reset operation in the ISR resets the Mi-V uDMA controller. Once the Mi-V
+   uDMA transfer is complete, Mi-V uDMA retires. To initiate another 
+   transaction, Mi-V uDMA needs to be configured again.
 
-   The operation of the Mi-V uDMA driver can be divided into following
+   The operation of the Mi-V uDMA driver is divided into the following 
    categories:
        - Initialization
        - Configuration
-       - Start and reset transfer
+       - Start and reset the transfer
 
-   ### Initialization and configuration
-   Mi-V uDMA is first initialized by a call to MIV_uDMA_init(). This function
-   initializes the instance of Mi-V uDMA with base address. The MIV_uDMA_init()
-   function must be called before calling any other Mi-V uDMA driver functions.
+   Initialization and configuration:  
+   Mi-V uDMA is first initialized by calling MIV_uDMA_init() function. This 
+   function initializes the instance of Mi-V uDMA with the base address. The 
+   MIV_uDMA_init() function must be called before calling any other Mi-V uDMA 
+   driver functions.
 
-   The Mi-V uDMA is configured by a call to MIV_uDMA_config(). This function
-   will configure the source_addr and dest_addr registers of the Mi-V uDMA with
-   source and destination addresses for Mi-V uDMA transfers.
+   The Mi-V uDMA is configured by calling MIV_uDMA_config() function. This 
+   function configures the source_addr and dest_addr registers of the Mi-V 
+   uDMA with source and destination addresses for Mi-V uDMA transfers.
    This function also configures the transfer size and interrupt preference for
-   successful transfer of Mi-V uDMA.
+   successful transfers using Mi-V uDMA.
 
-   ### Start and Reset transfer
-   Once the Mi-V uDMA is configured, the transfers can be started with a call to
-   MIV_uDMA_start(). Once the Mi-V uDMA transfer is started, it can not be
-   aborted and the status of the transfer should be read from the ISR by a call
-   to MIV_uDMA_read_status().
+   Start and reset the transfer:  
+   Once the Mi-V uDMA is configured, initiate the transfers by calling the 
+   MIV_uDMA_start() function. Once the Mi-V uDMA transfer is started, it cannot 
+   be aborted, and the status of the transfer should be read from the ISR by 
+   calling the MIV_uDMA_read_status() function.
 
-   The Mi-V uDMA can be reset to the default state by calling MIV_uDMA_reset()
-   function. After performing reset operation, the Mi-V uDMA should be
-   re-configured to perform transfer since MIV_uDMA_reset() resets the Mi-V uDMA
-   controller.
+   Reset the Mi-V uDMA to the default state by calling the MIV_uDMA_reset() 
+   function. After performing the reset operation, reconfigure the Mi-V uDMA to 
+   perform transfers as MIV_uDMA_reset() resets the Mi-V uDMA controller.
  */
 
 #ifndef MIV_uDMA_H_
@@ -149,9 +151,8 @@ extern "C" {
 #define MIV_uDMA_STATUS_ERROR            2u
 
 /***************************************************************************//**
- * Mi-V uDMA instant structure.
- * This structure will hold the base of Mi-V uDMA module which is used in the
- * other functions in the driver to access the uDMA registers.
+ * This structure holds the base of the Mi-V uDMA module, which is used in the
+ * other functions of the driver to access the uDMA registers.
  */
 typedef struct miv_udma_instance
 {
@@ -159,9 +160,10 @@ typedef struct miv_udma_instance
 } miv_udma_instance_t;
 
 /***************************************************************************//**
- * The MIV_uDMA_init() assigns the base address of Mi-V uDMA module to the
- * uDMA instance structure.
- * This address is used in later part of the driver to access the uDMA registers.
+ * The MIV_uDMA_init() function assigns the base address of the Mi-V uDMA module
+ * to the uDMA instance structure.  
+ * This address is used in a later part of the driver to access the uDMA 
+ * registers.
  *
  * @param this_udma
  *      This parameter is a pointer to the miv_udma_instance_t structure.
@@ -180,34 +182,32 @@ MIV_uDMA_init
 );
 
 /***************************************************************************//**
- * The MIV_uDMA_config() is used to configure the Mi-V uDMA controller.
- * This function will set the source address, destination address, block size
- * and IRQ config register.
+ * The MIV_uDMA_config() function is used to configure the Mi-V uDMA controller.
+ * This function will set the source address, destination address, block size,
+ * and IRQ configuration register.  
  *
  * @param this_udma
- *      This parameter is a pointer to the miv_udma_instance_t structure which
- *      holds the base address of Mi-V uDMA module.
+ *      This parameter is a pointer to the miv_udma_instance_t structure, which
+ *      holds the base address of the Mi-V uDMA module.
  *
  * @param base_addr
- *      Base address of the Mi-V uDMA
+ *      Base address of the Mi-V uDMA.
  *
  * @param src_addr
- *      Source address of memory from which the uDMA will read the data.
+ *      Source address of memory from where the uDMA reads the data.
  *
  * @param dest_addr
- *      Destination address where the data will be written from src_addr.
+ *      Destination address where the data is written from src_addr.
  *
  * @param transfer_size
- *      Number of 32-bit words to transfer
+ *      Number of 32-bit words to transfer.
  *
  * @param irq_config
- *      uDMA IRQ Configuration.
- *
- *      When set, the IRQ is asserted when and error occurs during a uDMA
- *      transfer or on the completion of the uDMA transfer.
- *
- *      When clear, the IRQ is only asserted when an error occurs during a uDMA
- *      transfer.
+ *      uDMA IRQ configuration
+ *       - When set, the IRQ is asserted when an error occurs during a uDMA
+ *         transfer or on the completion of the uDMA transfer.  
+ *       - When clear, the IRQ is only asserted when an error occurs during a 
+ *         uDMA transfer.
  *
  * @return
  *      This function does not return any value.
@@ -223,11 +223,11 @@ MIV_uDMA_config
 );
 
 /***************************************************************************//**
- * The MIV_uDMA_start() is used to start the uDMA transfer.
+ * The MIV_uDMA_start() function is used to start the uDMA transfer.
  *
  * @param this_udma
- *      This parameter is a pointer to the miv_udma_instance_t structure which
- *      holds the base address of Mi-V uDMA module.
+ *      This parameter is a pointer to the miv_udma_instance_t structure, which
+ *      holds the base address of the Mi-V uDMA module.
  *
  * @return
  *      This function does not return any value.
@@ -239,15 +239,15 @@ MIV_uDMA_start
 );
 
 /***************************************************************************//**
- * The MIV_uDMA_reset() is used to clear the uDMA interrupt and reset the uDMA
- * transfer.
+ * The MIV_uDMA_reset() function is used to clear the uDMA interrupt and reset 
+ * the uDMA transfer.  
  *
- * This function should be called from interrupt handler and it will reset the
- * values set during MIV_uDMA_config().
+ * This function should be called from the interrupt handler to reset the values
+ * set during MIV_uDMA_config().
  *
  * @param this_udma
- *      This parameter is a pointer to the miv_udma_instance_t structure which
- *      holds the base address of Mi-V uDMA module.
+ *      This parameter is a pointer to the miv_udma_instance_t structure, which
+ *      holds the base address of the Mi-V uDMA module.
  *
  * @return
  *      This function does not return any value.
@@ -259,16 +259,17 @@ MIV_uDMA_reset
 );
 
 /***************************************************************************//**
- * The MIV_uDMA_read_status() will be used to status of the uDMA transfer. When
- * Interrupt is enabled this function can be called from the interrupt handler
- * to know the reason of uDMA interrupt.
+ * The MIV_uDMA_read_status() function is used to read the status of the uDMA
+ * transfer. When interrupt is enabled, this function can be called from the
+ * interrupt handler to know the reason for a uDMA interrupt.
  *
  * @param this_udma
- *      This parameter is a pointer to the miv_udma_instance_t structure which
- *      holds the base address of Mi-V uDMA module.
+ *      This parameter is a pointer to the miv_udma_instance_t structure, which
+ *      holds the base address of the Mi-V uDMA module.
  *
  * @return
- * Return value will indicate error of busy status of the uDMA channel.
+ * The return value indicates an error due to the busy status of the uDMA 
+ * channel.
  *
  * |Bit Number| Name    |           Description                                |
  * |----------|---------|------------------------------------------------------|

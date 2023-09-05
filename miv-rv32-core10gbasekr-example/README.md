@@ -1,4 +1,3 @@
-
 # Core10GBaseKR PHY example on Mi-V soft processors
 
 This project demonstrates the use of Core10GBaseKR PHY driver APIs.
@@ -16,21 +15,20 @@ The Following configurations are provided with the example.
   - no parity
   - no flow control
 
-## phy_sw_cfg
-The PHY software configuration file provides supported PHY models and an interface for overriding driver default values.
-The phy_sw_cfg.h must be stored as shown below
+## Enabling the Core10GMAC and Packet Generator
 
-`
-    <project-root>/boards/<board-name>/platform_config/driver_config/phy_sw_cfg.h
-`
+Please see the [Core10GBaseKR_PHY Application Note](https://mi-v-ecosystem.github.io//redirects/miv-rv32-bare-metal-examples-driver-examples-core10gbasekr_phy-appnote) for guidelines on adding the Core10GMAC and packet generator
+client to your design.
 
-- The PHY demonstrated in this example is enabled by defining the macros; "CORE10GBASEKR_PHY" and "PF_XCVR_C10GB".
-- The Core10GBaseKR_PHY driver defaults configurations can be overridden by defining them in this file.
-- Define the macro "C10GBKR_PERFORMANCE_MESSAGES" to enable 10GBASE-KR performance and debug messages.  
+To enable the Core10GMAC and packet generator client in this example please define the
+macro ```C10GBKR_10GMAC_PACKET_GEN_EXAMPLE```. When this macro is defined the example application
+will configure the Core10GMAC and packet generator client when the link is established. The
+application will display packet performance on the UART terminal.
 
 ## fpga_design_config (formerly known as hw_config.h)
+
 The SoftConsole project targeted for Mi-V processors now use an improved
-directory structure. 
+directory structure.
 The fpga_design_config.h must be stored as shown below
 
 `
@@ -54,7 +52,9 @@ configurations in the Mi-V soft processor match with the memory layout defined
 in the linker script.
 
 ## Target hardware
+
 This project is tested on PolarFire Eval Kit with MIV_RV32 IMC Core.
 
 ## Mi-V soft processor revision dependencies
+
 This project is tested with MIV_RV32 v3.0
