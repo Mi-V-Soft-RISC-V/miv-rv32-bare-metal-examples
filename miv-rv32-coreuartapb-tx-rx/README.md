@@ -42,5 +42,14 @@ Tool Settings > GNU RISC-V Cross Create Flash Image > General > Other flags .
 This will allow you to attach the release mode executable as the memory 
 initialization client in Libero when you want to execute it from non-volatile memory. 
 
+### Renode Emulation
+
+The CoreUARTapb example can be run using Renode. A new window will open displaying the UART
+console messages. Any characters typed into this window will be echoed back on the console.
+
+The following configuration can be launched using miv-rv32-coreuartapb-tx-rx renode start-platform-and-debug.launch:
+
+ - miv-rv32i-release
+
 ## Silicon revision dependencies
 This example is tested on PolarFire MPF300TS device.
