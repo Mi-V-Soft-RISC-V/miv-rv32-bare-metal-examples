@@ -4,7 +4,7 @@
 ; 2. By default, Tera Term log will be stored in Tera Term installation Directory.
 
 changedir '.'
-logopen "MAC_ccm_msg_auth.log" 0 0 0 1
+logopen "CCM_Msg_Auth.log" 0 0 0 1
 
 settitle 'PolarFire User Crypto CCM service'
 

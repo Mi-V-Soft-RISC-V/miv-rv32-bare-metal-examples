@@ -45,9 +45,9 @@ uint32_t g_user_crypto_base_addr = 0x62000000UL;
  */
 const uint8_t g_greeting_msg[] =
 "\r\n\r\n\
-******************************************************************************\r\n\
-********* PolarFire User Crypto AES Cryptography Service Example Project *********\r\n\
-******************************************************************************\r\n\
+***************************************************************************\r\n\
+******* PolarFire User Crypto AES Cryptography Service Example Project ****\r\n\
+***************************************************************************\r\n\
  This example project demonstrates the use of the PolarFire User Crypto \r\n\
  Cryptography Services. The following User Athena services are demonstrated:\r\n\
   1 - AES-256 encryption.\r\n\
