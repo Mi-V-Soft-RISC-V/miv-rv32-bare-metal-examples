@@ -4,7 +4,7 @@
 ; 2. By default, Tera Term log will be stored in Tera Term installation Directory.
 
 changedir '.'
-logopen "RSA_CRYPTO.log" 0 0 0 1
+logopen "RSA_Cryptography.log" 0 0 0 1
 
 settitle 'PolarFire User Crypto RSA Crypto service'
 

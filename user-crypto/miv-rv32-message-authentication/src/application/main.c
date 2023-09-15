@@ -57,8 +57,8 @@ const uint8_t g_greeting_msg[] =
 ************* PolarFire User Crypto Example Project **************************\r\n\
 ******************************************************************************\r\n\
  This example project demonstrates the use of the User Crypto Message \r\n\
- authentication services and hash services. The following User Crypto service\r\n\
- are demonstrated:\r\n\
+ authentication services and hash services. The following User Crypto service are\r\n\
+ demonstrated:\r\n\
   1 - Galois/Counter Mode, GCM Message Authentication.\r\n\
   2 - Message authentication code - HMAC-SHA-256.\r\n\
   3 - Message authentication code - AES-CMAC-256.\r\n\

@@ -1,4 +1,3 @@
-
 /*******************************************************************************
  * Copyright 2019 Microchip FPGA Embedded Systems Solutions.
  *

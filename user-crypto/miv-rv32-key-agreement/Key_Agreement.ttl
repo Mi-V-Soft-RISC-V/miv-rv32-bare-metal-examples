@@ -3,7 +3,7 @@
 ;   and transmit delay in Serial port setup to 5msec/char and 5msec/line.
 ; 2. By default, Tera Term log will be stored in Tera Term installation Directory.
 changedir '.'
-logopen "KEY_AGREEMENT.log" 0 0 0 1
+logopen "Key_Agreement.log" 0 0 0 1
 
 settitle 'PolarFire User Crypto Key Agreement service'
 

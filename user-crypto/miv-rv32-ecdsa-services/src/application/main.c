@@ -418,16 +418,16 @@ void ecdsa_verify(void)
                        sizeof(read_public_key_qx));
 
         /* adjust endianness */
-        CALWordReverse(public_key_qx, sizeof(public_key_qx));
-        CALByteReverseWord(public_key_qx, sizeof(public_key_qx));
+        CALWordReverse(public_key_qx, sizeof(public_key_qx)/4);
+        CALByteReverseWord(public_key_qx, sizeof(public_key_qx)/4);
 
         /* get public key y point */
         get_input_data((uint8_t*)&public_key_qy[0], sizeof(public_key_qy), read_public_key_qy,
                        sizeof(read_public_key_qy));
 
         /* adjust endianness */
-        CALWordReverse(public_key_qy, sizeof(public_key_qy));
-        CALByteReverseWord(public_key_qy, sizeof(public_key_qy));
+        CALWordReverse(public_key_qy, sizeof(public_key_qy)/4);
+        CALByteReverseWord(public_key_qy, sizeof(public_key_qy)/4);
     }
 
     // validate that public key is on the curve
