@@ -1,12 +1,12 @@
 /*******************************************************************************
- * Copyright 2017-2023 Microchip FPGA Embedded Systems Solutions.
+ * Copyright 2017 Microchip FPGA Embedded Systems Solutions.
  *
- * SPDX-License-Identifier: MIT 
+ * SPDX-License-Identifier: MIT
  *
- * This example project demonstrates communications with an external flash
- * device.
- *
- * Please refer to the file README.md for further details about this example.
+ * @file main.c
+ * @author Microchip FPGA Embedded Systems Solutions
+ * @brief This example project demonstrates communications with an external flash
+ * device. Please refer to the file README.md for further details about this example.
  *
  */
 #include "miv_rv32_hal/miv_rv32_hal.h"

@@ -156,14 +156,14 @@ extern "C" {
 #define UART_APB_NO_ERROR        0x00u
 #define UART_APB_INVALID_PARAM   0xFFu
 
-/***************************************************************************//**
+/***************************************************************************//**  
  * There should be one instance of this structure for each instance of 
  * CoreUARTapb in your system. This structure instance identifies various UARTs
- * in a system and should be passed as first parameter to UART functions to 
+ * in a system and should be passed as first parameter to UART functions to
  * identify which UART performs the requested operation. The 'status' element in
  * the structure is used to provide sticky status information. 
  */
-typedef struct
+typedef struct 
 {
     addr_t      base_address;
     uint8_t     status;
@@ -321,7 +321,7 @@ UART_fill_tx_fifo
  *         from the receiver's data register. A call to the UART_get_rx_status()
  *         function returns any receiver errors accumulated during the execution
  *         of the UART_get_rx() function.  
- *
+ * 
  * Note:   When FIFO mode is disabled in the CoreUARTapb hardware configuration,
  *         the driver accumulates a sticky record of any parity errors, framing 
  *         errors, or overflow errors. When FIFO mode is enabled, the driver 
@@ -408,18 +408,18 @@ UART_polled_tx_string
  * @param this_uart     The this_uart parameter is a pointer to a 
  *                      UART_instance_t structure which holds all data regarding 
  *                      this instance of the UART.
- * @return              This function returns the UART receiver error status as 
+ * @return              This function returns the UART receiver error status as
  *                      an 8-bit encoded value. The return value is 0, if there
  *                      are no receiver errors occurred. The driver provides a
  *                      set of bit mask constants, which should be compared with
  *                      and/or used to mask the returned value to determine the 
- *                      receiver error status. 
+ *                      receiver error status.  
  *                      When the return value is compared to the following bit 
  *                      masks, a non-zero result indicates that the 
- *                      corresponding error occurred:
- *                      UART_APB_PARITY_ERROR    (bit mask = 0x01)
- *                      UART_APB_OVERFLOW_ERROR  (bit mask = 0x02)
- *                      UART_APB_FRAMING_ERROR   (bit mask = 0x04)
+ *                      corresponding error occurred:   
+ *                      UART_APB_PARITY_ERROR    (bit mask = 0x01)         
+ *                      UART_APB_OVERFLOW_ERROR  (bit mask = 0x02)  
+ *                      UART_APB_FRAMING_ERROR   (bit mask = 0x04)  
  *                      When the return value is compared to the following bit 
  *                      mask, a non-zero result indicates that no error 
  *                      occurred:  
