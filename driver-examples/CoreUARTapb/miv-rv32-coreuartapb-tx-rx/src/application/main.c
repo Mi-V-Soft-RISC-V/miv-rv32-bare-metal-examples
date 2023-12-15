@@ -1,14 +1,17 @@
 /*******************************************************************************
- * Copyright 2019-2021 Microchip FPGA Embedded Systems Solutions.
+ * Copyright 2019 Microchip FPGA Embedded Systems Solutions.
  *
  * SPDX-License-Identifier: MIT
  *
- * Application demonstrating the use of CoreUARTapb driver. Please see the
- * README.md for more details.
+ * @file main.c
+ * @author Microchip FPGA Embedded Systems Solutions
+ * @brief Application demonstrating the use of CoreUARTapb driver. Please see
+ * the README.md for more details.
+ *
  */
 
 #include <drivers/fpga_ip/CoreUARTapb/core_uart_apb.h>
-#include "fpga_design_config/hw_platform.h"
+#include "fpga_design_config/fpga_design_config.h"
 #include "miv_rv32_hal/miv_rv32_hal.h"
 
 /******************************************************************************
@@ -26,7 +29,12 @@ UART_instance_t g_uart;
  * HyperTerminal when the program starts.
  *****************************************************************************/
 uint8_t g_message[] =
-"\n\r\n\r\n\rThis example demonstrates CoreUARTapb polled transmit and receiver APIs. \
+"\r\n\r\n\
+***************************************************************************\r\n\
+*******************  CoreUARTapb Example Project **************************\r\n\
+***************************************************************************\r\n\
+\r\n\r\n\
+This example demonstrates CoreUARTapb polled transmit and receiver APIs. \
 \n\rAll characters typed will be echoed back.\n\r";
 
 /******************************************************************************
@@ -54,19 +62,19 @@ void main( void )
      *************************************************************************/
     while(1)
     {
-        /*************************************************************************
+        /***********************************************************************
          * Check for any errors in communication while receiving data
-         ************************************************************************/
+         **********************************************************************/
         if(UART_APB_NO_ERROR == UART_get_rx_status(&g_uart))
         {
-            /**********************************************************************
+            /*******************************************************************
              * Read data received by the UART.
-             *********************************************************************/
+             ******************************************************************/
             rx_size = UART_get_rx( &g_uart, rx_data, sizeof(rx_data) );
 
-            /**********************************************************************
+            /*******************************************************************
              * Echo back data received, if any.
-             *********************************************************************/
+             ******************************************************************/
             if ( rx_size > 0 )
             {
                 UART_send( &g_uart, rx_data, rx_size );
