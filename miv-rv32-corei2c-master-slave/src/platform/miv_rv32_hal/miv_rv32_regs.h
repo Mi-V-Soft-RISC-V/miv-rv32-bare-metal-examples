@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2019-2022 Microchip FPGA Embedded Systems Solutions.
+ * Copyright 2019 Microchip FPGA Embedded Systems Solutions.
  *
  * SPDX-License-Identifier: MIT
  *
@@ -8,8 +8,8 @@
  * @brief Mi-V soft processor register bit mask and shift constants encodings.
  *
  */
-#ifndef RISCV_REGS_H
-#define RISCV_REGS_H
+#ifndef MIV_RV32_REGS_H
+#define MIV_RV32_REGS_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -52,30 +52,6 @@ extern "C" {
 #define MIP_SEIP                (1u << IRQ_S_EXT)
 #define MIP_HEIP                (1u << IRQ_H_EXT)
 #define MIP_MEIP                (1u << IRQ_M_EXT)
-
-#ifndef MIV_LEGACY_RV32
-#define MGEUI                   16U
-#define MGECI                   17U
-#define MSYS_EI0                24U
-#define MSYS_EI1                25U
-#define MSYS_EI2                26U
-#define MSYS_EI3                27U
-#define MSYS_EI4                28U
-#define MSYS_EI5                29U
-#define OPSRV_REG               30U
-
-#define MGEUI_MEIP              (1u << MGEUI)
-#define MGECI_MEIP              (1u << MGECI)
-#define MSYS_EI0IP              (1u << MSYS_EI0)
-#define MSYS_EI1IP              (1u << MSYS_EI1)
-#define MSYS_EI2IP              (1u << MSYS_EI2)
-#define MSYS_EI3IP              (1u << MSYS_EI3)
-#define MSYS_EI4IP              (1u << MSYS_EI4)
-#define MSYS_EI5IP              (1u << MSYS_EI5)
-#define MSYS_EXTERNAL_INT       (0x3Fu << MSYS_EI0)
-#define MIP_OPSRV_REG           (1u << OPSRV_REG)
-
-#endif /* MIV_LEGACY_RV32 */
 
 #define PRV_M                   3U
 

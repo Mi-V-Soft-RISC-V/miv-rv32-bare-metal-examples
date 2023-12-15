@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2019-2022 Microchip FPGA Embedded Systems Solutions.
+ * Copyright 2019 Microchip FPGA Embedded Systems Solutions.
  *
  * SPDX-License-Identifier: MIT
  *
@@ -191,47 +191,51 @@ __attribute__((weak)) uint8_t External_31_IRQHandler(void)
 }
 
 #else
-
 __attribute__((weak)) void External_IRQHandler(void)
 {
 }
-
 __attribute__((weak)) void MGECI_IRQHandler(void)
 {
 }
-
 __attribute__((weak)) void MGEUI_IRQHandler(void)
 {
 }
-
-__attribute__((weak)) void OPSRV_IRQHandler(void)
+__attribute__((weak)) void SUBSYS_IRQHandler(void)
 {
 }
-
-__attribute__((weak)) void MSYS_EI5_IRQHandler(void)
-{
-}
-
-__attribute__((weak)) void MSYS_EI4_IRQHandler(void)
-{
-}
-
-__attribute__((weak)) void MSYS_EI3_IRQHandler(void)
-{
-}
-
-__attribute__((weak)) void MSYS_EI2_IRQHandler(void)
-{
-}
-
-__attribute__((weak)) void MSYS_EI1_IRQHandler(void)
-{
-}
-
 __attribute__((weak)) void MSYS_EI0_IRQHandler(void)
 {
 }
-
+__attribute__((weak)) void MSYS_EI1_IRQHandler(void)
+{
+}
+__attribute__((weak)) void MSYS_EI2_IRQHandler(void)
+{
+}
+__attribute__((weak)) void MSYS_EI3_IRQHandler(void)
+{
+}
+__attribute__((weak)) void MSYS_EI4_IRQHandler(void)
+{
+}
+__attribute__((weak)) void MSYS_EI5_IRQHandler(void)
+{
+}
+__attribute__((weak)) void Reserved_IRQHandler(void)
+{
+    _exit(10);
+}
+#ifndef MIV_RV32_V3_0 /* For MIV_RV32 v3.0 */
+__attribute__((weak)) void MSYS_EI6_IRQHandler(void)
+{
+}
+__attribute__((weak)) void MSYS_EI7_IRQHandler(void)
+{
+}
+__attribute__((weak)) void SUBSYSR_IRQHandler(void)
+{
+}
+#endif  /* MIV_RV32_V3_0 */
 #endif  /* MIV_LEGACY_RV32 */
 
 #ifdef __cplusplus

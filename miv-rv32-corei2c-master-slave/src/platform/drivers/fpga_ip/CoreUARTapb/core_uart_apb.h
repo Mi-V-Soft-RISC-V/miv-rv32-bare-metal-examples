@@ -321,7 +321,7 @@ UART_fill_tx_fifo
  *         from the receiver's data register. A call to the UART_get_rx_status()
  *         function returns any receiver errors accumulated during the execution
  *         of the UART_get_rx() function.  
- *
+ * 
  * Note:   When FIFO mode is disabled in the CoreUARTapb hardware configuration,
  *         the driver accumulates a sticky record of any parity errors, framing 
  *         errors, or overflow errors. When FIFO mode is enabled, the driver 

@@ -1,12 +1,12 @@
 /*******************************************************************************
- * Copyright 2009-2023 Microchip FPGA Embedded Systems Solutions.
+ * (c) Copyright 2007 Microchip FPGA Embedded Systems Solutions.
  * 
  * SPDX-License-Identifier: MIT
- * 
+ *
  * @file coretimer_regs.h
  * @author Microchip FPGA Embedded Systems Solutions
  * @brief CoreTimer register definitions
- * 
+ *
  */
 
 #ifndef __CORE_TIMER_REGISTERS
