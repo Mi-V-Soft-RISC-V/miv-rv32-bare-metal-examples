@@ -1,10 +1,11 @@
 /*******************************************************************************
- * Copyright 2019-2023 Microchip FPGA Embedded Systems Solutions.
+ * Copyright 2019 Microchip FPGA Embedded Systems Solutions.
  *
  * SPDX-License-Identifier: MIT
  *
- * PF_System_Services driver Device and design info services example.
- *
+ * @file main.c
+ * @author Microchip FPGA Embedded Systems Solutions
+ * @brief PF_System_Services driver Device and design info services example.
  * This simple example demonstrates how to use the PF_System_Services driver to
  * execute Device and design info services and data security service supported
  * by PolarFire System Controller.
@@ -13,9 +14,9 @@
  * the PolarFire High Speed Validation board.
  *
  * This program displays the return data from System controller for various
- * Device and Design services.
+ * Device and Design services. Please refer README.md in the root folder of this
+ * project for more details.
  *
- * Please refer README.md in the root folder of this project for more details.
  */
 
 
@@ -497,7 +498,7 @@ int main(void)
       Initialize CoreUARTapb with its base address, baud value, and line
       configuration.
      */
-    UART_init(&g_uart, UART_BASE_ADDRESS, BAUD_VALUE_115200, (DATA_8_BITS | NO_PARITY));
+    UART_init(&g_uart, COREUARTAPB0_BASE_ADDR, BAUD_VALUE_115200, (DATA_8_BITS | NO_PARITY));
 
     display_greeting();
 

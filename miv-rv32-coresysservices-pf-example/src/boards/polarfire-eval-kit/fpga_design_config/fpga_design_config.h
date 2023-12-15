@@ -1,11 +1,11 @@
 /*******************************************************************************
- * Copyright 2022-2023 Microchip FPGA Embedded Systems Solutions.
+ * Copyright 2022 Microchip FPGA Embedded Systems Solutions.
  *
  * SPDX-License-Identifier: MIT
  *
- * @file sample_fpga_design_config.h
+ * @file fpga_design_config.h
  * @author Microchip FPGA Embedded Systems Solutions
- * @brief Sample design configuration settings
+ * @brief Sample design configuration settings.
  *
  */
  /*========================================================================*//**
@@ -61,12 +61,12 @@
  * The <instance> field is optional if there is only one instance of the core
  * in the design
  * MIV_ESS is an extended peripheral subsystem IP core with peripherals 
- * connections.
+ * connections as defined below.
  * The system can be further extended by attaching APB peripherals to the 
  * empty APB slots.
  */
-#define UART_BASE_ADDRESS               0x70000000UL
-#define CSS_PF_BASE_ADDRESS             0x70003000UL
+#define COREUARTAPB0_BASE_ADDR               0x71000000UL
+#define CSS_PF_BASE_ADDRESS                  0x70003000UL
 
 /***************************************************************************//**
  * Peripheral Interrupts are mapped to the corresponding Mi-V Soft processor
