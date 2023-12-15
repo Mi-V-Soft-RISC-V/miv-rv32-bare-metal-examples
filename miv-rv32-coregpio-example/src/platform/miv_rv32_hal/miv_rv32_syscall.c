@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2019-2022 Microchip FPGA Embedded Systems Solutions.
+ * Copyright 2019 Microchip FPGA Embedded Systems Solutions.
  *
  * SPDX-License-Identifier: MIT
  *
@@ -18,7 +18,7 @@
 #include <string.h>
 
 #ifndef LEGACY_DIR_STRUCTURE
-#include "drivers/fabric_ip/CoreUARTapb/core_uart_apb.h"
+#include "drivers/fpga_ip/CoreUARTapb/core_uart_apb.h"
 #else
 #include "core_uart_apb.h"
 #endif
@@ -120,8 +120,7 @@ char **environ = __env;
 
 void write_hex(int fd, uint32_t hex)
 {
-      char towrite;
-
+    char towrite;
 
     write( fd , "0x", 2U );
 
