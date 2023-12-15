@@ -1,14 +1,16 @@
 /*******************************************************************************
- * Copyright 2017-2023 Microchip FPGA Embedded Systems Solutions.
+ * Copyright 2017 Microchip FPGA Embedded Systems Solutions.
  *
  * SPDX-License-Identifier: MIT
  *
- * This example program demonstrates the use of the Core I2C driver for master
- * and Slave functions. It configures I2C0 as master and I2C1 as Slave.
+ * @file main.c
+ * @author Microchip FPGA Embedded Systems Solutions
+ * @brief This example program demonstrates the use of the Core I2C driver for
+ * master and Slave functions. It configures I2C0 as master and I2C1 as Slave.
  * It provides a UART command line interface allowing the user to select the I2C
  * transaction type to perform and the parameters to use for the transaction.
  * I2C0 SDA pin is connected to I2C1 SDA and I2C0 SCL pin is connected to I2C1 SCL
- * for testing this example Project.
+ * for testing this example Project. Please see the README.md for more details.
  *
  */
 

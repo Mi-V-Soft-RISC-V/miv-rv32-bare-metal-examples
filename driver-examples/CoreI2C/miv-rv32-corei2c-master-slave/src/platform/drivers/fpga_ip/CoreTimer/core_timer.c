@@ -1,13 +1,12 @@
 /*******************************************************************************
- * Copyright 2009-2023 Microchip FPGA Embedded Systems Solutions.
- *
- * SPDX-License-Identifier: MIT
+ * (c) Copyright 2007 Microchip FPGA Embedded Systems Solutions.
  * 
+ * SPDX-License-Identifier: MIT
+ *
  * @file core_timer.c
  * @author Microchip FPGA Embedded Systems Solutions
- * @brief CoreTimer driver implementation. See file "core_timer.h" for 
- * description of the functions implemented in this file.
- * 
+ * @brief CoreTimer bare metal driver public API.
+ *
  */
 
 #include "core_timer.h"
@@ -24,16 +23,16 @@ static timer_instance_t* NULL_timer_instance;
 void 
 TMR_init
 (
-	timer_instance_t * this_timer,
-	addr_t address,
-	uint8_t mode,
-	uint32_t prescale,
-	uint32_t load_value
+    timer_instance_t * this_timer,
+    addr_t address,
+    uint8_t mode,
+    uint32_t prescale,
+    uint32_t load_value
 )
 {
-	HAL_ASSERT( this_timer != NULL_timer_instance )
-	HAL_ASSERT( prescale <= PRESCALER_DIV_1024 )
-	HAL_ASSERT( load_value != 0 )
+    HAL_ASSERT( this_timer != NULL_timer_instance );
+    HAL_ASSERT( prescale <= PRESCALER_DIV_1024 );
+    HAL_ASSERT( load_value != 0 );
     
     this_timer->base_address = address;
 
@@ -46,7 +45,7 @@ TMR_init
     /* Clear pending interrupt. */
     HAL_set_32bit_reg( address, TimerIntClr, 1 );
 
-    /* Configure prescaler and load value. */	
+    /* Configure prescaler and load value. */    
     HAL_set_32bit_reg( address, TimerPrescale, prescale );
     HAL_set_32bit_reg( address, TimerLoad, load_value );
 
@@ -72,7 +71,7 @@ TMR_start
     timer_instance_t * this_timer
 )
 {
-	HAL_ASSERT( this_timer != NULL_timer_instance )
+    HAL_ASSERT( this_timer != NULL_timer_instance );
     
     HAL_set_32bit_reg_field( this_timer->base_address, TimerEnable, 1 );
 }
@@ -87,7 +86,7 @@ TMR_stop
     timer_instance_t * this_timer
 )
 {
-	HAL_ASSERT( this_timer != NULL_timer_instance )
+    HAL_ASSERT( this_timer != NULL_timer_instance );
     
     HAL_set_32bit_reg_field( this_timer->base_address, TimerEnable, 0 );
 }
@@ -103,7 +102,7 @@ TMR_enable_int
     timer_instance_t * this_timer
 )
 {
-	HAL_ASSERT( this_timer != NULL_timer_instance )
+    HAL_ASSERT( this_timer != NULL_timer_instance );
     
     HAL_set_32bit_reg_field( this_timer->base_address, InterruptEnable, 1 );
 }
@@ -118,7 +117,7 @@ TMR_clear_int
     timer_instance_t * this_timer
 )
 {
-	HAL_ASSERT( this_timer != NULL_timer_instance )
+    HAL_ASSERT( this_timer != NULL_timer_instance );
     
     HAL_set_32bit_reg( this_timer->base_address, TimerIntClr, 0x01 );
 }
@@ -133,12 +132,12 @@ TMR_current_value
     timer_instance_t * this_timer
 )
 {
-	uint32_t value = 0;
-	HAL_ASSERT( this_timer != NULL_timer_instance )
+    uint32_t value = 0;
+    HAL_ASSERT( this_timer != NULL_timer_instance );
     
     value = HAL_get_32bit_reg( this_timer->base_address, TimerValue );
     
-	return value;
+    return value;
 }
 
 /***************************************************************************//**
@@ -147,13 +146,13 @@ TMR_current_value
  */
 void TMR_reload
 (
-	timer_instance_t * this_timer,
-	uint32_t load_value
+    timer_instance_t * this_timer,
+    uint32_t load_value
 )
 {
-	HAL_ASSERT( this_timer != NULL_timer_instance )
-	HAL_ASSERT( load_value != 0 )
-	
-	HAL_set_32bit_reg(this_timer->base_address, TimerLoad, load_value );
+    HAL_ASSERT( this_timer != NULL_timer_instance );
+    HAL_ASSERT( load_value != 0 );
+    
+    HAL_set_32bit_reg(this_timer->base_address, TimerLoad, load_value );
 }
 
