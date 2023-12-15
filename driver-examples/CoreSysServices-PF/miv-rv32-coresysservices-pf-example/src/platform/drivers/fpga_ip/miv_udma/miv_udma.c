@@ -1,5 +1,7 @@
 /*******************************************************************************
- * (c) Copyright 2022 Microchip FPGA Embedded Systems Solutions.
+ * (c) Copyright 2022-2023 Microchip FPGA Embedded Systems Solutions.
+ *
+ * SPDX-License-Identifier: MIT
  *
  * Mi-V uDMA Soft IP bare-metal driver. This module is delivered as part of
  * Mi-V Extended Sub System(MIV_ESS) 

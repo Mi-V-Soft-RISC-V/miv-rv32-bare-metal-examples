@@ -1,56 +1,97 @@
-# CoreSysService_PF driver System Services example.
-  This simple example demonstrates how to use the CoreSysService_PF driver to
-  execute Device and design info services and Data security service supported by
-  PolarFire System Controller.
-  This project can be used with MIV_RV32 IP core as well as the legacy RV32 IP cores.
 
-## How to use this example
+# CoreSysService_PF Driver System Services Example
 
-This sample project is targeted at a MIV_RV32 design running on the
-PolarFire Eval Kit.
+This simple example demonstrates how to use the CoreSysService_PF driver to
+execute Device and design info services and Data security service supported by
+PolarFire System Controller.
 
-This example project requires USB-UART interface to be connected to a host PC.
-The host PC must connect to the serial port using a terminal emulator such as
-HyperTerminal or PuTTY configured as follows:
+There are two different build configurations provided with this project which
+configure this SoftConsole project for RISC-V IMC instruction extension. 
+The following configurations are provided with the example:
+
+  - miv-rv32-imc-debug
+  - miv-rv32-imc-release
+
+## Mi-V Soft Processor
+
+This example uses Mi-V SoftProcessor MIV_RV32. The design is built for debugging
+MIV_RV32 through the PolarFire FPGA programming JTAG port using a FlashPro5.
+To achieve this the CoreJTAGDebug IP is used to connect to the JTAG port of the
+MIV_RV32.
+
+All the platform/design specific definitions such as peripheral base addresses,
+system clock frequency etc. are included in fpga_design_config.h.
+
+The Mi-V Soft Processor MIV_RV32 firmware projects needs the MIV_RV32 HAL and 
+the hal firmware(RISC-V HAL).
+
+The hal is available at GitHub [Mi-V-Soft-RISC-V](https://mi-v-ecosystem.github.io/redirects/platform).
+
+## How to Use This Example
+
+This example project is targeted at a MIV_RV32 design running on a PolarFire-Eval-Kit
+connected via a USB-UART serial cable to a host PC running a terminal emulator
+such as TeraTerm or Putty configured as follows:
+
  - 115200 baud
  - 8 data bits
  - 1 stop bit
  - no parity
- - no flow control
+ - no flow control.
 
-This program displays the return data from System controller for various Device
-and Design services and Data security service:
+Run the example project using a debugger. This program displays the return data
+from System controller for various Device and Design services and Data security
+service.
 
-## Target hardware
-This example can be targeted at the latest Mi-V Soft Processor MIV_RV32 or its
-variants. Choose the build configurations per the target processor in your
-design and the supported ISA extensions that you want to use.
+## fpga_design_config (formerly known as hw_config.h)
+
+The SoftConsole project targeted for Mi-V processors now use an improved
+directory structure. The fpga_design_config.h must be stored as shown below
+
+`
+    <project-root>/boards/<board-name>/fpga_design_config/fpga_design_config.h
+`
+
+Currently, this file must be hand crafted when using the Mi-V Soft Processor.
+In future, all the design and soft IP configurations will be automatically
+generated from the Libero design description data.
+
+You can use the sample file provided with miv_rv32_hal as an example. Rename it
+from sample_fpga_design_config.h to fpga_design_config.h and then customize it
+per your hardware design such as SYS_CLK_FREQ, peripheral BASE addresses,
+interrupt numbers, definition of MSCC_STDIO_UART_BASE_ADDR if you want a
+CoreUARTapb mapped to STDIO, etc.
+
+## Target Hardware
+
+This example can be targeted at the latest Mi-V Soft Processor MIV_RV32. Choose
+the build configurations per the supported ISA extensions that you want to use.
 
 All the design specific definitions such as peripheral base addresses, system
-clock frequency etc. are included in hw_platform.h.
+clock frequency etc. are included in fpga_design_config.h. 
 
-A TCL based Libero design used for testing this project is provided under
-./boards/icicle-kit-es/fpga_design/design_description folder.
 
 This example project can be used with another design using a different hardware
-configuration. This can be achieved by overwriting the content of this example
-project's "hw_platform.h" file with the correct data from your Libero design.
+configurations. This can be achieved by overwriting the content of this example
+project's "fpga_design_config.h (hw_config.h)" file with the correct data from
+your Libero design.
 
 This project was tested on PolarFire Eval Kit with CFG4 configuration of the
 MIV_RV32 design available [here](https://mi-v-ecosystem.github.io/redirects/repo-polarfire-evaluation-kit-mi-v-sample-fpga-designs)
 
-**Booting the system:**
+### Booting the System
 
-Currently the example project is configured to use FlashPro debugger to execute
+Currently the example project is configured to use FlashPro debugger to execute 
 from LSRAM in both Debug and Release mode.
 
 In the release mode build configuration, following setting is used
-`--change-section-lma *-0x80000000`
-under
-Tool Settings > GNU RISC-V Cross Create Flash Image > General > Other flags .
+`--change-section-lma *-0x80000000` under
+Tool Settings > Cross RISCV GNU Create Flash Image > General > Other flags. 
 
-This will allow you to attach the release mode executable as the memory
-initialization client in Libero when you want to execute it from non-volatile memory.
+This will allow you to attach the release mode executable as the memory 
+initialization client in Libero when you want to execute it from non-volatile
+memory. 
 
-## Silicon revision dependencies
-This example is tested on PolarFire MPF300TS device.
+## Silicon Revision Dependencies
+
+This example is tested on PolarFire Evaluation Kit.
