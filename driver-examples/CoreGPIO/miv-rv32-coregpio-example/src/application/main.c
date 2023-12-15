@@ -1,15 +1,18 @@
 /*******************************************************************************
- * Copyright 2019-2021 Microchip FPGA Embedded Systems Solutions.
+ * Copyright 2019 Microchip FPGA Embedded Systems Solutions.
  *
  * SPDX-License-Identifier: MIT
  *
- * Application demonstrating the use of CoreGPIO driver. Please see the
- * Readme.md for more details.
+ * @file main.c
+ * @author Microchip FPGA Embedded Systems Solutions
+ * @brief Application demonstrating the use of CoreGPIO driver. Please see
+ * the README.md for more details.
+ *
  */
 
 #include <drivers/fpga_ip/CoreGPIO/core_gpio.h>
 #include <drivers/fpga_ip/CoreUARTapb/core_uart_apb.h>
-#include "fpga_design_config/hw_platform.h"
+#include "fpga_design_config/fpga_design_config.h"
 #include "miv_rv32_hal/miv_rv32_hal.h"
 
 /*******************************************************************************

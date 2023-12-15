@@ -1,5 +1,5 @@
 /***************************************************************************//**
- * Copyright 2019-2023 Microchip FPGA Embedded Systems Solutions.
+ * Copyright 2019-2022 Microchip FPGA Embedded Systems Solutions.
  *
  * SPDX-License-Identifier: MIT
  * 
@@ -43,4 +43,3 @@ void HAL_restore_interrupts(psr_t saved_psr) {
 #ifdef __cplusplus
 }
 #endif
-
