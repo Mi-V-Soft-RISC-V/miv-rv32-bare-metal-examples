@@ -43,15 +43,14 @@
  * <corename>_<instance>_BASE_ADDR
  */
 #define COREUARTAPB0_BASE_ADDR          0x60000000UL
+#define CORESPI_BASE_ADDR               0x60001000UL
+#define COREGPIO_OUT_BASE_ADDR          0x60003000UL
+#define PF_CORE_SYSTEM_SERVICES         0x60004000UL
 
 #define TSE_BASEADDR                    0x70000000UL
 #define TSE_DESC                        0x71000000UL
 #define TSE_TX_BUF                      0x72000000UL
 #define TSE_RX_BUF                      0x72001000UL
-
-#define CORESPI_BASE_ADDR               0x60001000UL
-#define COREGPIO_OUT_BASE_ADDR          0x60003000UL
-
 
 
 /***************************************************************************//**

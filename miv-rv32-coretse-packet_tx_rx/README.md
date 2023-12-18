@@ -3,9 +3,9 @@
 This example project demonstrates the use of CoreTSE driver APIs implementing a
 transmit and receive packet application.
 
-There are 2 different build configurations provided with this project which
+There are two different build configurations provided with this project which
 configure this SoftConsole project for RISC-V IMC instruction extension.
-The Following configurations are provided with the example.
+The following configurations are provided with the example.
 
 - miv-rv32-imc-debug
 - miv-rv32-imc-release
@@ -47,13 +47,17 @@ to STDIO, etc.
 
 ## Target hardware
 
-This project has been tested on the following boards with the MIV_RV32 IMC Core:
+This project has been tested on the following board with the MIV_RV32 IMC Core:
 
 - PolarFire Evaluation Kit (MPF300-EVAL-KIT)
-- Arrow Electronics Everest Board (MPF300T)
   
-Both the PolarFire Evaluation Kit and the Everest Board use Microchip's VSC8575 PHY.
+The PolarFire Evaluation Kit uses Microchip's VSC8575 PHY.
 The driver for this PHY can be found in the CoreTSE driver directory, `src/platform/drivers/fpga_ip/CoreTSE`.
+
+This project uses a custom hardware design that can be found in the
+[Application Note: AN4569][1].
+
+[1]: https://www.microchip.com/en-us/application-notes/an4569
 
 ## Modifying this example to target other boards or interfaces
 
