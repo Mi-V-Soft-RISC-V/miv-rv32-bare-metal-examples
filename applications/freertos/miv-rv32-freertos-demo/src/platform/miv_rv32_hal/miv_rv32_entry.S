@@ -37,7 +37,6 @@
 .macro STORE_CONTEXT
   addi sp, sp, -SP_SHIFT_OFFSET*REGBYTES
   SREG x1, 0 * REGBYTES(sp)
-  SREG x1, 0 * REGBYTES(sp)
   SREG x2, 1 * REGBYTES(sp)
   SREG x3, 2 * REGBYTES(sp)
   SREG x4, 3 * REGBYTES(sp)
@@ -240,10 +239,6 @@ MSYS_MIE31_trap_entry:
 #ifdef __riscv_compressed
   .2byte 0
 #endif
-
-.global freeRTOS_trap_jump
-freeRTOS_trap_jump:
-  j freertos_risc_v_trap_handler
 
 #endif /* MIV_RV32_V3_0 */
 #endif /* MIV_LEGACY_RV32 */
