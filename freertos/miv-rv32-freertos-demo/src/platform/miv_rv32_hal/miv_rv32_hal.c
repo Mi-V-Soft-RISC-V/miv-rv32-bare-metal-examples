@@ -172,7 +172,7 @@ uint32_t MRV_systick_config(uint64_t ticks)
         g_systick_increment++;
     }
 
-    g_systick_cmp_value = g_systick_increment + MTIME;
+    g_systick_cmp_value = g_systick_increment + MRV_read_mtime();
 
     if (g_systick_increment > 0U)
     {
@@ -192,7 +192,7 @@ void handle_m_timer_interrupt(void)
 {
     clear_csr(mie, MIP_MTIP);
 
-    uint64_t mtime_at_irq = MTIME;
+    uint64_t mtime_at_irq = MRV_read_mtime();
 
 #ifndef NDEBUG
     static volatile uint32_t d_tick = 0u;
