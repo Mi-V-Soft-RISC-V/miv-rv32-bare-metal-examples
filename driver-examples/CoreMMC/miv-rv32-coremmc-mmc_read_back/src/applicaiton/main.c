@@ -19,25 +19,26 @@
 #include "drivers/fpga_ip/CoreUARTapb/core_uart_apb.h"
 #include "drivers/fpga_ip/CoreMMC/core_mmc.h"
 
-#define INTERRUPT_EVERY_10MS (100u)
-#define SECTOR_SIZE_BYTES    (512u)
-#define SECTOR_SIZE_WORDS    (SECTOR_SIZE_BYTES / sizeof(uint32_t))
-#define NUMBER_OF_SECTORS    (1u)
-#define SECTOR_1             (0x1u)
-#define TIMEOUT_10_SECS      (1000u)
-#define INCREASE_BY_2        (8u)
-#define SUCCESS              (0u)
-#define FAILURE              (1u)
+#define NUMBER_OF_SECTORS_TO_WRITE (MAX_NO_OF_BLOCKS)
 
-/* Sector address within eMMC device */
-#define BLOCK_1              0x00000001u
-#define NO_MULTI_BLKS        64
-#define MAX_NO_BLOCKS        15515584 /* 8meg device- can be read from the extended CSR register */
+#define INTERRUPT_EVERY_10MS       (100u)
+#define SECTOR_SIZE_BYTES          (512u)
+#define SECTOR_SIZE_WORDS          (SECTOR_SIZE_BYTES / sizeof(uint32_t))
+/* This value is determined by the FIFO_DEPTH CoreMMC verilog parameter*/
+#define FIFO_DEPTH_BYTES           (4096u)
+#define MAX_NO_OF_BLOCKS           (FIFO_DEPTH_BYTES / SECTOR_SIZE_BYTES)
+#define SECTOR_1                   (0x1u)
+#define TIMEOUT_10_SECS            (1000u)
+#define INCREASE_BY_2              (8u)
+#define SUCCESS                    (0u)
+#define FAILURE                    (1u)
 
-static uint32_t g_write_data_buffer[SECTOR_SIZE_WORDS] = {0u};
-static uint32_t g_read_data_buffer[SECTOR_SIZE_WORDS] = {0u};
+static uint32_t g_write_data_buffer[NUMBER_OF_SECTORS_TO_WRITE * SECTOR_SIZE_WORDS] = {0u};
+static uint32_t g_read_data_buffer[NUMBER_OF_SECTORS_TO_WRITE * SECTOR_SIZE_WORDS] = {0u};
 static uint32_t ten_ms_sys_tick = 0;
 
+static const uint8_t multiblock_message[] = "\r\n\nCoreMMC multi-block write and read-back test:"
+                                            "\r\nWriting and reading back ";
 static const uint8_t init_fail[] = "\r\neMMC device initialisation failure\r\n";
 static const uint8_t read_back_success[] = "\r\nSUCCESS: Write and read data match\r\n";
 static const uint8_t data_mismatch_fail[] = "\r\nFAILURE: Write and read data mismatch\r\n";
@@ -80,11 +81,11 @@ print(const uint8_t *const message)
 }
 
 static void
-fill_buffer(uint32_t *const buffer, const uint32_t increment)
+fill_buffer(uint32_t *const buffer, const uint32_t number_of_sectors, const uint32_t increment)
 {
     uint32_t value = 0u;
 
-    for (uint32_t index = 0u; index < SECTOR_SIZE_WORDS; index++)
+    for (uint32_t index = 0u; index < (number_of_sectors * SECTOR_SIZE_WORDS); index++)
     {
         *(buffer + index) = value;
         value += increment;
@@ -186,8 +187,14 @@ multiblock_write_readback(mmc_instance_t *const this_mmc,
     volatile uint32_t *read_fifo =
         (uint32_t *)MMC_get_fifo_read_address((mmc_instance_t *)this_mmc);
     mmc_transfer_status_t mmc_command_status = MMC_TRANSFER_FAIL;
+    uint8_t report_blocks[25] = {0};
 
-    print("\r\n\nCoreMMC multi-block write and read-back test:");
+    sprintf(report_blocks,
+            "%i Bytes (%i blocks).",
+            (SECTOR_SIZE_BYTES * number_of_sectors),
+            number_of_sectors);
+    print(multiblock_message);
+    print(report_blocks);
 
     MMC_init_fifo(this_mmc);
 
@@ -269,19 +276,19 @@ main(void)
     if (MMC_INIT_SUCCESS == mmc_state)
     {
         memset(g_read_data_buffer, 0x0u, sizeof(g_read_data_buffer));
-        fill_buffer(g_write_data_buffer, INCREASE_BY_2);
+        fill_buffer(g_write_data_buffer, sector, INCREASE_BY_2);
 
         mmc_state =
             single_block_write_readback(&g_emmc, g_write_data_buffer, g_read_data_buffer, SECTOR_1);
 
         memset(g_read_data_buffer, 0x0u, sizeof(g_read_data_buffer));
-        fill_buffer(g_write_data_buffer, INCREASE_BY_2);
+        fill_buffer(g_write_data_buffer, NUMBER_OF_SECTORS_TO_WRITE, INCREASE_BY_2);
 
         mmc_state = multiblock_write_readback(&g_emmc,
                                               g_write_data_buffer,
                                               g_read_data_buffer,
-                                              sector * NO_MULTI_BLKS,
-                                              NUMBER_OF_SECTORS);
+                                              SECTOR_1,
+                                              NUMBER_OF_SECTORS_TO_WRITE);
     }
     else
     {
