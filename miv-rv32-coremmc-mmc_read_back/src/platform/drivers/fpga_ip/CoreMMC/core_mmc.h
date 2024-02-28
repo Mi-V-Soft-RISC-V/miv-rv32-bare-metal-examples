@@ -578,7 +578,7 @@ void MMC_param_config(mmc_params_t *this_mmc_params);
     resp_reg = MMC_init(&g_mmc0, MMC0_BASE_ADDR, &g_mmc0_param);
     if(MMC_INIT_SUCCESS == resp_reg)
     {
-     ...
+      // ...
     }
   @endcode
  */
@@ -605,7 +605,7 @@ mmc_transfer_status_t MMC_init(mmc_instance_t *this_mmc, addr_t base_address,
 
   @code
     uint8_t *pFifoData;
-    ...
+    // ...
     pFifoData = (uint8_t *)MMC_get_fifo_write_address(&g_emmc_1);
     MMC_init_fifo( &g_emmc_1);
     iCount= no_blocks * size_of_block;
@@ -615,6 +615,7 @@ mmc_transfer_status_t MMC_init(mmc_instance_t *this_mmc, addr_t base_address,
     }
   @endcode
  */
+
 addr_t MMC_get_fifo_write_address(mmc_instance_t *this_mmc);
 
 /**
@@ -636,7 +637,7 @@ addr_t MMC_get_fifo_write_address(mmc_instance_t *this_mmc);
 
   @code
     uint8_t *pFifoData;
-    ...
+    // ...
     pFifoData = (uint8_t *)MMC_get_fifo_read_address(&g_emmc_1);
     iCount= no_blocks *size_of_block;
     while(iCount--)
@@ -645,6 +646,7 @@ addr_t MMC_get_fifo_write_address(mmc_instance_t *this_mmc);
     }
   @endcode
  */
+
 addr_t MMC_get_fifo_read_address(mmc_instance_t *this_mmc);
 
 /**
@@ -671,12 +673,13 @@ addr_t MMC_get_fifo_read_address(mmc_instance_t *this_mmc);
   command.
 
   @code
-     ...
+    // ...
     ret_var = MMC_multi_block_write( &g_emmc_1, no_blocks, sect_addr, timeout);
     while(MMC_CMD_PROCESSING == MMC_status(&g_emmc_1))
     {
-      ;   // wait for MMC_multi_block_write() to finish
-          // Could do other stuff here
+      ;
+      // wait for MMC_multi_block_write() to finish
+      // Could do other stuff here
     }
     if(MMC_TRANSFER_SUCCESS != MMC_status(&g_emmc_1, ))
     {
@@ -688,6 +691,7 @@ addr_t MMC_get_fifo_read_address(mmc_instance_t *this_mmc);
     }
   @endcode
  */
+
 mmc_transfer_status_t MMC_status(mmc_instance_t *this_mmc,
                                  uint32_t current_timeout_ticks);
 
@@ -711,7 +715,7 @@ mmc_transfer_status_t MMC_status(mmc_instance_t *this_mmc,
 
   @code
     uint8_t *pFifoData;
-    ...
+    // ...
     pFifoData = (uint8_t *)MMC_get_fifo_write_address(&g_emmc_1);
     MMC_init_fifo( &g_emmc_1);  // makes sure FIFO is empty before starting
     iCount= no_blocks *size_of_block;
@@ -788,11 +792,12 @@ void MMC_init_fifo(const mmc_instance_t *this_mmc);
                              BLOCK_1);
       if(MMC_TRANSFER_SUCCESS == resp_reg)
       {
-         ...
+        // ...
       }
     }
   @endcode
  */
+
 mmc_transfer_status_t MMC_single_block_write(const mmc_instance_t *this_mmc,
                                              const uint32_t *src_addr,
                                              uint32_t dst_addr);
@@ -846,28 +851,28 @@ mmc_transfer_status_t MMC_single_block_write(const mmc_instance_t *this_mmc,
   This example shows how to initialize the device and perform a single block
   transfer.
 
-
   @code
-    MMC_init_fifo(&g_emmc_1)
-    fill the FIFO - from g_buffer_a to FIFO
-    iCount= 512/4;
-    while(iCount--)
+    #define MMC0_BASE_ADDR 0x30000000u
+    #define BLOCK_1        0x00000001u
+
+    mmc_instance_t g_mmc0;
+    mmc_params_t g_mmc0_param;
+
+    mmc_transfer_status_t resp_reg;
+    uint8_t data_buffer[512] = {0u};
+
+    MMC_param_config(&g_mmc0_param);
+
+    // Set the MMC clock rate to 1/10 HCLK.
+    g_mmc0_param.clk_rate_div = 4u;
+    resp_reg = MMC_init(&g_mmc0, MMC0_BASE_ADDR, &g_mmc0_param);
+    if (MMC_INIT_SUCCESS == resp_reg)
     {
-       *pFifoData = p_tx_buff[iCount];
-    }
-    ret_var = MMC_single_block_write_nb( &g_emmc_1, sect_addr,
-                             current_timeout_ticks, timeout);
-    while(MMC_CMD_PROCESSING == MMC_status(&g_emmc_1,GetTickCount()))
-    {
-      ;
-    }
-    if(MMC_TRANSFER_SUCCESS != MMC_status(&g_emmc_1,GetTickCount()))
-    {
-      ..handle the error
-    }
-    else
-    {
-      ..success- continue
+      resp_reg = MMC_single_block_write(&g_mmc0, data_buffer, BLOCK_1);
+      if (MMC_TRANSFER_SUCCESS == resp_reg)
+      {
+        // ...
+      }
     }
   @endcode
  */
@@ -928,33 +933,39 @@ mmc_transfer_status_t MMC_single_block_write_nb(mmc_instance_t *this_mmc,
   transfer.
 
   @code
-     ...
-    pFifoData = (uint32_t *)MMC_get_fifo_write_address(&g_emmc_1);
-    MMC_init_fifo( &g_emmc_1);  -> make sure FIFO empty
+    volatile uint32_t *write_fifo =
+        (uint32_t*)MMC_get_fifo_write_address(&g_emmc_1);
+    MMC_init_fifo(&g_emmc_1); // Ensure the write FIFO is empty
 
-    iCount= no_blocks * 512;
-    while(iCount--)        -> fill the FIFO - from g_buffer_a to FIFO
+    mmc_command_status =
+        MMC_multi_block_write((mmc_instance_t *)&g_emmc_1,
+                              number_of_sectors,
+                              sector_address,
+                              get_clock_ticks(),
+                              TIMEOUT_10_SECS);
+
+    // Fill the write FIFO form the write buffer
+    for (uint32_t index = 0; index < (number_of_sectors * SECTOR_SIZE_WORDS);
+        index++)
     {
-       pFifoData = g_write_data_buff[iCount]; note:in this case filling in
-  reverse
-    }
-    ret_var = MMC_multi_block_write( &g_emmc_1, no_blocks, sect_addr,
-                          GetTickCount(), TEN_SEC_TIMEOUT);
-    while(MMC_CMD_PROCESSING == ret_var)
-    {
-      ret_var = MMC_status(&g_emmc_1,GetTickCount());
+      *write_fifo = *(write_buffer + index);
     }
 
-    if(MMC_TRANSFER_SUCCESS != MMC_status(&g_emmc_1,GetTickCount()))
+    while (MMC_CMD_PROCESSING == mmc_command_status)
     {
-      ... handle the error
+      mmc_command_status = MMC_status(&g_emmc_1, get_clock_ticks());
+    }
+    if (MMC_TRANSFER_SUCCESS == mmc_command_status)
+    {
+      // Success, continue
     }
     else
     {
-      ... success
+      // Handle the error
     }
   @endcode
  */
+
 mmc_transfer_status_t MMC_multi_block_write(mmc_instance_t *this_mmc,
                                             uint16_t no_of_blks,
                                             uint32_t dst_addr,
@@ -1030,7 +1041,7 @@ mmc_transfer_status_t MMC_multi_block_write(mmc_instance_t *this_mmc,
                               rx_data_buffer);
          if(MMC_TRANSFER_SUCCESS == resp_reg)
          {
-            ...
+            // ...
          }
       }
     }
@@ -1103,21 +1114,22 @@ mmc_transfer_status_t MMC_single_block_read(const mmc_instance_t *this_mmc,
       }
       if(MMC_TRANSFER_SUCCESS == MMC_status(&g_emmc_1,GetTickCount()))
       {
-         empty the FIFO -
-         pFifoData = (uint8_t *)MMC_get_fifo_read_address(&g_emmc_1);
-         while( size_of_transfer--)
-         {
-            g_write_data_buff[temp_compare] = *pFifoData;
-         }
+        // empty the FIFO
+        pFifoData = (uint8_t *)MMC_get_fifo_read_address(&g_emmc_1);
+        while (size_of_transfer--)
+        {
+          g_write_data_buff[temp_compare] = *pFifoData;
+        }
       }
       else
       {
-
-         .. handle the error
+        // handle the error
       }
-    }  end of processing- command finished
+    }
+    // end of processing - command finished
   @endcode
  */
+
 mmc_transfer_status_t MMC_single_block_read_nb(mmc_instance_t *this_mmc,
                                                uint32_t src_addr,
                                                uint32_t current_timeout_ticks,
@@ -1200,18 +1212,19 @@ mmc_transfer_status_t MMC_single_block_read_nb(mmc_instance_t *this_mmc,
       }
       if(MMC_TRANSFER_SUCCESS == MMC_status(&g_emmc_1,GetTickCount()))
       {
-         empty the FIFO -
-         pFifoData = (uint8_t *)MMC_get_fifo_read_address(&g_emmc_1);
-         while( index < size_of_transfer)
-         {
-            p_rx_buff[index] = *pFifoData;
-         }
+        // empty the FIFO
+        pFifoData = (uint8_t *)MMC_get_fifo_read_address(&g_emmc_1);
+        while (index < size_of_transfer)
+        {
+          p_rx_buff[index] = *pFifoData;
+        }
       }
       else
       {
-          handle the error
+        // handle the error
       }
-    } end of processing- command finished
+    }
+    // end of processing - command finished
   @endcode
  */
 mmc_transfer_status_t MMC_multi_block_read(mmc_instance_t *this_mmc,
@@ -1246,6 +1259,7 @@ mmc_transfer_status_t MMC_multi_block_read(mmc_instance_t *this_mmc,
     }
   @endcode
  */
+
 void MMC_isr(mmc_instance_t *this_mmc);
 
 #ifdef __cplusplus
