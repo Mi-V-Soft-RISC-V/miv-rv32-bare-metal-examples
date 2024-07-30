@@ -118,6 +118,30 @@ typedef void (*tse_transmit_callback_t)(void *p_user_data);
 typedef void (*tse_receive_callback_t)(uint8_t *p_rx_packet,
                                        uint32_t pckt_length,
                                        void *p_user_data);
+#ifndef CORE_TSE_IP_V3
+/**
+  The application must use this function prototype to define the transmit ECC double
+  bit error detection call-back function, which can be provided as a parameter to
+  `TSE_set_tx_ecc_ded_callback()`.
+ */
+typedef void (*tse_tx_ecc_ded_callback_t)(void);
+
+/**
+  The application must use this function prototype to define the receive ECC double
+  bit error detection call-back function, which can be provided as a parameter to
+  `TSE_set_rx_ecc_ded_callback()`.
+ */
+typedef void (*tse_rx_ecc_ded_callback_t)(void);
+
+#endif
+
+/**
+  The application must use this function prototype to define the statistics counter
+  carry event handler function, which can be provided as a parameter to `TSE_set_stats_callback()`.
+ */
+typedef void (*tse_stats_callback_t)(void);
+
+
 
 /**
   The application must use this function prototype to define the WoL event
@@ -634,6 +658,12 @@ typedef struct tse_instance
     int16_t first_rx_desc_index;
     uint8_t phy_addr; /**< PHY address for this instance of CoreTSE*/
     tse_wol_callback_t wol_callback;
+    tse_stats_callback_t stats_callback;
+#ifndef CORE_TSE_IP_V3
+    tse_tx_ecc_ded_callback_t tx_ecc_ded_callback;
+    tse_rx_ecc_ded_callback_t rx_ecc_ded_callback;
+#endif
+
 } tse_instance_t;
 
 #ifdef __cplusplus

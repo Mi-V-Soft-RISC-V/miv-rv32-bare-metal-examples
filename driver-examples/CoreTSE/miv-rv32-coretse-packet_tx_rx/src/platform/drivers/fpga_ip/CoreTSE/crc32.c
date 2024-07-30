@@ -1,5 +1,5 @@
 
-/*******************************************************************************
+/**
  * Copyright 2014 Microchip FPGA Embedded Systems Solutions.
  *
  * SPDX-License-Identifier: MIT
@@ -7,12 +7,12 @@
  * @file crc32.c
  * @author Microchip FPGA Embedded Systems Solutions
  * @brief crc32 source file
- * 
+ *
  * CRC-32-IEEE 802.3
  * x^32 + x^26 + x^23 + x^22 + x^16 + x^12 + x^11 + x^10 + x^8 + x^7 + x^5 +
  * x^4 +*x^2 + x + 1
  *
- */                                                                              
+ */
 
 #include "crc32.h"
 
@@ -43,7 +43,10 @@ TSE_crc32(uint32_t value, const uint8_t *data, uint32_t data_length)
     return CRC;
 }
 
-/*Calculates 32 bit CRC value of given data, using standard Ethernet CRC function*/
+/*
+  Calculates 32 bit CRC value of given data, using standard Ethernet CRC
+  function.
+ */
 uint32_t
 TSE_ethernet_crc(const uint8_t *data, uint32_t data_length)
 {
@@ -53,5 +56,3 @@ TSE_ethernet_crc(const uint8_t *data, uint32_t data_length)
 #ifdef __cplusplus
 }
 #endif
-
-/******************************** END OF FILE ******************************/

@@ -1,4 +1,4 @@
-/*******************************************************************************
+/**
  * Copyright 2014 Microchip FPGA Embedded Systems Solutions.
  *
  * SPDX-License-Identifier: MIT
@@ -15,22 +15,22 @@
 extern "C" {
 #endif
 
-/*------------------------------------------------------------------------------
- * MAC Configuration register 2
+/*
+  MAC Configuration register 2
  */
 #define CFG2_PREAM_LEN                      12u
 
 #define CFG2_BYTE_MASK                      ((uint32_t)1u << 9)
 #define CFG2_NIBBLE_MASK                    ((uint32_t)1u << 8)
 
-/*------------------------------------------------------------------------------
- * MAC IPG/IFG register
+/*
+  MAC IPG/IFG register
  */
 #define IFG_MINIFGENF                       8u
 #define IFG_NONBTBIPG                       16u
 
-/*------------------------------------------------------------------------------
- * MAC half-duplex register
+/*
+  MAC half-duplex register
  */
 #define HALF_DUPLEX_SLOTTIME                0u
 #define HALF_DUPLEX_RETX_MAX_OFFSET         12u
@@ -41,27 +41,27 @@ extern "C" {
 #define HALF_DUPLEX_ABEB_TUNC_OFFSET        20u
 #define HALF_DUPLEX_SLOTTIME_MASK           ((uint32_t)0x2FF)
 
-/*------------------------------------------------------------------------------
- * MAC MII Management configuration register
+/*
+  MAC MII Management configuration register
  */
 #define MII_CLOCK_SELECT_MASK               ((uint32_t)7u)
 #define MII_PREAM_SUPRESS_MASK              ((uint32_t)1u << 4)
 #define MII_SCAN_AUTO_INC_MASK              ((uint32_t)1u << 5)
 #define MII_RESET_MII_MGMT_MASK             ((uint32_t)1u << 31)
 
-/*------------------------------------------------------------------------------
- * DMA descriptor definitions
+/*
+  DMA descriptor definitions
  */
 #define DMA_DESC_EMPTY_FLAG_MASK            ((uint32_t)1u << 31u)
 #define DMA_DESC_PKT_SIZE_MASK              0xFFFu
 
-/*------------------------------------------------------------------------------
- * DMA descriptor packet size
+/*
+  DMA descriptor packet size
  */
 #define DMA_PKTCOUNT_MASK                   ((uint32_t)0xFFu << 16)
 
-/*------------------------------------------------------------------------------
- * FIFO control registers definitions
+/*
+  FIFO control registers definitions
  */
 #define FIFO_CFG0_DEFVAL                    0x0000FF00u
 #define FIFO_CFG1_DEFVAL                    0x0FFF0000u
@@ -73,32 +73,32 @@ extern "C" {
 /*Changed cfg0 and cfg3 after looking at simulation environment.*/
 #define FIFO_CFG3_DEFVAL                    0x0680FFFFu
 
-/*------------------------------------------------------------------------------
- * Interface control register
+/*
+  Interface control register
  */
 #define INF_STATS_MODULE                    (1u << 2)
 #define STATS_COUNTER_CLEAR_MASK            (1u << 3)
 #define STATS_COUNTER_AUTO_CLEAR_MASK       (1u << 4)
 
-/*------------------------------------------------------------------------------
- * MAC Test register
+/*
+  MAC Test register
  */
 #define TEST_PAUSE                          2u
 
-/*------------------------------------------------------------------------------
- * These constants correspond to the Misc Control register(0x1D4) of CoreTSE.
-   These constants are used to fill the Misc Control register depending on the
-   current link speed.
-   These register bits correspond to the TSM_CONTROL[0:1] signals which can
-   in-turn be used to generate the appropriate TX-RX clocks in the Libero Design
-   depending on the Link Speed.
+/*
+  These constants correspond to the Misc Control register(0x1D4) of CoreTSE.
+  These constants are used to fill the Misc Control register depending on the
+  current link speed.
+  These register bits correspond to the TSM_CONTROL[0:1] signals which can
+  in-turn be used to generate the appropriate TX-RX clocks in the Libero Design
+  depending on the Link Speed.
  */
 #define SPEED_10M                           2u
 #define SPEED_100M                          1u
 #define SPEED_1000M                         0u
 
-/*------------------------------------------------------------------------------
- * CoreTSE register offset, mask and shift definitions
+/*
+  CoreTSE register offset, mask and shift definitions
  */
 #define CFG1_REG_OFFSET                     0x00u
 
@@ -586,9 +586,48 @@ extern "C" {
 #define TFRG_REG_OFFSET                     0x12Cu
 
 #define CAR1_REG_OFFSET                     0x130u
+
+#define CAR1_OFFSET                         0x130u
+#define CAR1_MASK                           0xFE07FFFFu
+#define CAR1_SHIFT                          0u
+
 #define CAR2_REG_OFFSET                     0x134u
+
+#define CAR2_OFFSET                         0x134u
+#define CAR2_MASK                           0x003FFFFFu
+#define CAR2_SHIFT                          0u
+
 #define CAM1_REG_OFFSET                     0x138u
 #define CAM2_REG_OFFSET                     0x13Cu
+
+/*
+  The following registers 0x140u - 0x14Cu are only implemented when the ECC_EMABLE
+  parameter is true, irrespective fo the Include Statistics Counter logic parameter
+  value.
+ */
+#define TSBECC_REG_OFFSET                   0x140u
+
+#define TSBECC_OFFSET                       0x140u
+#define TSBECC_MASK                         0x0000FFFFu
+#define TSBECC_SHIFT                        0u
+
+#define TDBEDC_REG_OFFSET                   0x144u
+
+#define TDBEDC_OFFSET                       0x144u
+#define TDBEDC_MASK                         0x0000FFFFu
+#define TDBEDC_SHIFT                        0u
+
+#define RSBECC_REG_OFFSET                   0x148u
+
+#define RSBECC_OFFSET                       0x148u
+#define RSBECC_MASK                         0x0000FFFFu
+#define RSBECC_SHIFT                        0u
+
+#define RDBEDC_REG_OFFSET                   0x14Cu
+
+#define RDBEDC_OFFSET                       0x14Cu
+#define RDBEDC_MASK                         0x0000FFFFu
+#define RDBEDC_SHIFT                        0u
 
 #define DMATXCTRL_REG_OFFSET                0x180u
 
@@ -620,6 +659,14 @@ extern "C" {
 #define DMATXSTATUS_TXPKT_CNT_MASK          0x00FF0000UL
 #define DMATXSTATUS_TXPKT_CNT_SHIFT         16u
 
+#define DMATXSTATUS_TX_RAM_DED_OFFSET       0x188u
+#define DMATXSTATUS_TX_RAM_DED_MASK         0x01000000UL
+#define DMATXSTATUS_TX_RAM_DED_SHIFT        24u
+
+#define DMATXSTATUS_TX_RAM_SEC_OFFSET       0x188u
+#define DMATXSTATUS_TX_RAM_SEC_MASK         0x02000000UL
+#define DMATXSTATUS_TX_RAM_SEC_SHIFT        25u
+
 #define DMARXCTRL_REG_OFFSET                0x18Cu
 
 #define DMARXCTRL_RX_EN_OFFSET              0x18Cu
@@ -649,6 +696,14 @@ extern "C" {
 #define DMARXSTATUS_RXPKT_CNT_OFFSET        0x194u
 #define DMARXSTATUS_RXPKT_CNT_MASK          0x00FF0000UL
 #define DMARXSTATUS_RXPKT_CNT_SHIFT         16u
+
+#define DMARXSTATUS_RX_RAM_DED_OFFSET       0x194u
+#define DMARXSTATUS_RX_RAM_DED_MASK         0x01000000UL
+#define DMARXSTATUS_RX_RAM_DED_SHIFT        24u
+
+#define DMARXSTATUS_RX_RAM_SEC_OFFSET       0x194u
+#define DMARXSTATUS_RX_RAM_SEC_MASK         0x02000000UL
+#define DMARXSTATUS_RX_RAM_SEC_SHIFT        25u
 
 #define DMAINTRMASK_REG_OFFSET              0x198u
 
@@ -684,6 +739,22 @@ extern "C" {
 #define DMAINTRMASK_RXIRQ_COAL_MASK         0x00000200UL
 #define DMAINTRMASK_RXIRQ_COAL_SHIFT        9u
 
+#define DMAINTRMASK_RX_ECC_DED_OFFSET       0x198u
+#define DMAINTRMASK_RX_ECC_DED_MASK         0x00000400UL
+#define DMAINTRMASK_RX_ECC_DED_SHIFT        10u
+
+#define DMAINTRMASK_RX_ECC_SEC_OFFSET       0x198u
+#define DMAINTRMASK_RX_ECC_SEC_MASK         0x00000800UL
+#define DMAINTRMASK_RX_ECC_SEC_SHIFT        11u
+
+#define DMAINTRMASK_TX_ECC_DED_OFFSET       0x198u
+#define DMAINTRMASK_TX_ECC_DED_MASK         0x00001000UL
+#define DMAINTRMASK_TX_ECC_DED_SHIFT        12u
+
+#define DMAINTRMASK_TX_ECC_SEC_OFFSET       0x198u
+#define DMAINTRMASK_TX_ECC_SEC_MASK         0x00002000UL
+#define DMAINTRMASK_TX_ECC_SEC_SHIFT        13u
+
 #define DMAINTR_REG_OFFSET                  0x19Cu
 
 #define DMAINTR_TXPKT_SENT_OFFSET           0x19Cu
@@ -717,6 +788,22 @@ extern "C" {
 #define DMAINTR_RXIRQ_COAL_OFFSET           0x19Cu
 #define DMAINTR_RXIRQ_COAL_MASK             0x00000200UL
 #define DMAINTR_RXIRQ_COAL_SHIFT            9u
+
+#define DMAINTR_RX_ECC_DED_OFFSET           0x19Cu
+#define DMAINTR_RX_ECC_DED_MASK             0x00000400UL
+#define DMAINTR_RX_ECC_DED_SHIFT            10u
+
+#define DMAINTR_RX_ECC_SEC_OFFSET           0x19Cu
+#define DMAINTR_RX_ECC_SEC_MASK             0x00000800UL
+#define DMAINTR_RX_ECC_SEC_SHIFT            11u
+
+#define DMAINTR_TX_ECC_DED_OFFSET           0x19Cu
+#define DMAINTR_TX_ECC_DED_MASK             0x00001000UL
+#define DMAINTR_TX_ECC_DED_SHIFT            12u
+
+#define DMAINTR_TX_ECC_SEC_OFFSET           0x19Cu
+#define DMAINTR_TX_ECC_SEC_MASK             0x00002000UL
+#define DMAINTR_TX_ECC_SEC_SHIFT            13u
 
 #define FPC_REG_OFFSET                      0x1C0u
 

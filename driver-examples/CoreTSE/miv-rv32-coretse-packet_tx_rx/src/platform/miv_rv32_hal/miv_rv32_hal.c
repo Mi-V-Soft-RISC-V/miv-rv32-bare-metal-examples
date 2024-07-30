@@ -403,6 +403,16 @@ void handle_trap(uintptr_t mcause, uintptr_t mepc)
 #endif  /* NDEBUG */
     }
 }
+/*------------------------------------------------------------------------------
+    Reconfigure the BootROM source and destination addresses
+*/
+void MRV_BootROM_reconfigure(uint32_t start_addr, uint32_t end_addr, uint32_t destination_addr)
+{
+    HW_set_32bit_reg(BOOTROM_START, start_addr);
+    HW_set_32bit_reg(BOOTROM_END, end_addr);
+    HW_set_32bit_reg(BOOTROM_DEST, destination_addr);
+
+}
 
 #ifdef __cplusplus
 }

@@ -65,7 +65,7 @@
 
   The PHY interface type is selected using the Firmware Catalogue configuration
   dialogue window.
-  This driver supports MII, GMII and TBI interfaces.
+  This driver supports MII, GMII, and TBI interfaces.
   See the "PHY Interface Types" sub-section for an explanation of the PHY interface.
 
   The size of the transmit and receive rings defines the maximum number of transmit
@@ -222,10 +222,10 @@
   Control register is inferred from the values of the MAC addresses passed to the
   driver in the allowed MAC addresses list.
 
-  - If all MAC addresses included in the allowed MAC addresses list are unicast
+  - If all MAC addresses included in the allowed MAC addresses list are unicast,
   then hash-unicast filtering is selected. This results in more unwanted frames
   being rejected.
-  - If all MAC addresses included in the allowed MAC addresses list are multicast
+  - If all MAC addresses included in the allowed MAC addresses list are multicast,
   then hash-multicast filtering is selected.
   - If the allowed MAC addresses list contains a mix of unicast and multicast MAC
   addresses, then hash-unicast and hash-multicast filtering is selected.
@@ -233,14 +233,14 @@
   is included in the allowed MAC addresses list.
 
   If the allowed MAC addresses list contains a mix of broadcast, unicast, and multicast
-  MAC addresses then broadcast, hash-unicast and hash-multicast filtering is selected.
+  MAC addresses then broadcast, hash-unicast, and hash-multicast filtering is selected.
   The local base station MAC address must be included in the allowed MAC addresses
   list if the application wants to receive frames addressed to it after calling the
   `TSE_set_address_filter()` function.
 
 
   The filtering is not perfect since the filtering hardware uses a hash table.
-  Therefore, some frames with addresses are not included in the allowed MAC
+  Therefore, some frames with addresses not included in the allowed MAC
   addresses list are still passed because the hash value for their MAC address
   is identical to the hash value of an allowed MAC address. The hash
   unicast/multicast setting allows further reduction of the number of unwanted
@@ -248,13 +248,13 @@
   checking the received MAC address unicast/multicast bit against the hash
   unicast/multicast setting of the filtering IP.
 
-  The following functions is used as part of the frame filtering
+  The following function is used as part of the frame filtering
       - `TSE_set_address_filter()`
 
   @subsection frame_drop Frame Drop Criterion
 
   Apart from the address-based frame filtering, the CoreTSE
-  provides the facility to drop frames based on certain criteria.
+  provides the facility to drop the frames based on certain criteria.
   The criteria for the frame drop logic can be configured using the framedrop_mask
   element of the tse_cfg_t structure. The value of this element is set to
   TSE_DEFVAL_FRAMEDROP_MASK by the `TSE_cfg_struct_def_init()` function.
@@ -316,7 +316,7 @@ extern "C" {
   `TSE_receive_pkt()` to report success or failure in assigning the packet memory
   buffer to a transmit/receive descriptor.
 
-  | Constant    | Description |
+  | Constant    | Description                                                                       |
   | ----------- | --------------------------------------------------------------------------------- |
   | TSE_SUCCESS | The memory buffer was successfully assigned to a transmit/receive descriptor.     |
   | TSE_FAILED  | The memory buffer was not successfully assigned to a transmit/receive descriptor. |
@@ -706,10 +706,10 @@ extern "C" {
 /**
   # Frame Filter configuration options
 
-| Constant                         | Description |
-| -------------------------------- |----------------------------------------------------------------------------------- | 
+| Constant                         | Description                                                                        |
+| -------------------------------- |----------------------------------------------------------------------------------- |
 | TSE_FC_PASS_BROADCAST_MASK       | Pass all broadcast frames.                                                         |
-| TSE_FC_PASS_MULTICAST_MASK       | Pass all broadcast frames.                                                         |
+| TSE_FC_PASS_MULTICAST_MASK       | Pass all multicast frames.                                                         |
 | TSE_FC_PASS_UNICAST_MASK         | Pass the frame if its Unicast-DA matches the configured destination address.       |
 | TSE_FC_PROMISCOUS_MODE_MASK      | Promiscuous mode, allow all the frames to pass.                                    |
 | TSE_FC_PASS_UNICAST_HASHT_MASK   | Pass the frame if the hash table entry matches for Unicast destination addresses.  |
@@ -1030,7 +1030,7 @@ extern "C" {
   This function does not return a value.
 
   @example
-  The example below demonstrates the use of the `TSE_cfg_struct_def_init()`
+  The following example shows the use of the `TSE_cfg_struct_def_init()`
   function. It retrieves the default MAC configuration and modifies it to
   connect through an MII Ethernet PHY at MII management interface address 0x01.
 
@@ -1154,8 +1154,7 @@ void TSE_init(tse_instance_t *this_tse, uint32_t base_addr, tse_cfg_t *cfg);
 
   @param this_tse
     The this_tse parameter is a pointer to the tse_instance_t structure holding
-    all data regarding the CoreTSE instance controlled through this
-    function call.
+    all data regarding the CoreTSE instance controlled through this function call.
 
   @param tx_complete_handler
     The tx_complete_handler parameter is a pointer to the call-back function
@@ -1202,7 +1201,6 @@ void TSE_init(tse_instance_t *this_tse, uint32_t base_addr, tse_cfg_t *cfg);
 void TSE_set_tx_callback(tse_instance_t *this_tse, tse_transmit_callback_t tx_complete_handler);
 
 /**
-
     `TSE_set_rx_callback()` registers the function the CoreTSE driver calls when a
     packet is received.
 
@@ -1219,7 +1217,7 @@ void TSE_set_tx_callback(tse_instance_t *this_tse, tse_transmit_callback_t tx_co
     when the packet is received by CoreTSE.
 
   @example
-    The example below demonstrates the use of the `TSE_set_rx_callback()` function.
+    The following example shows the use of the `TSE_set_rx_callback()` function.
     The `init()` function calls the `TSE_set_rx_callback()` function to register
     the `rx_callback()` receive callback function with the CoreTSE driver. The
     `TSE_receive_pkt()` function is then called to assign the rx_buffer to an
@@ -1256,6 +1254,98 @@ void TSE_set_tx_callback(tse_instance_t *this_tse, tse_transmit_callback_t tx_co
 
 void TSE_set_rx_callback(tse_instance_t *this_tse, tse_receive_callback_t rx_callback);
 
+#ifndef CORE_TSE_IP_V3
+
+/**
+    `TSE_set_tx_ecc_ded_callback()` registers the function that is called by the
+    CoreTSE driver whenever the transmit ECC double bit error interrupt is triggered.
+    This fucntion is only used with CoreTSE IP versions from v4.0 and above, ECC
+    error interrupts are not implemented in versions below this.
+    Undefine the macro CORE_TSE_IP_V4 in the coretse_user_config.h file to disable
+    this function.
+
+  @param this_tse
+    The this_tse parameter is a pointer to the tse_instance_t structure holding
+    all data regarding the CoreTSE instance controlled through this function call.
+
+  @param tx_ecc_ded_callback
+    The tx_ecc_ded_callback parameter is a pointer to the call-back function
+    that is called when a double bit ECC error is detected in the transmit buffer.
+
+  @example
+    The following example shows the use of the `TSE_set_tx_ecc_ded_callback()`
+    function.
+    The `init()` function calls the `TSE_set_tx_ecc_ded_callback()` function to
+    register the `tx_ecc_ded_callback()` callback function with the CoreTSE driver.
+    The tx_ecc_ded_callback function is called by the CoreTSE driver once the ECC
+    double bit error interrupt is triggered.
+    `tx_ecc_ded_callback()` can implement the application-specific action when
+    the transmit ECC double bit error interrupt is triggered.
+
+  @code
+    tse_instance_t g_tse;
+
+    void
+    tx_ecc_ded_callback()
+    {
+        //Process transmit ECC double bit error interrupt here.
+    }
+    void init(void)
+    {
+        TSE_set_tx_ecc_ded_callback(&g_tse, tx_ecc_ded_callback);
+    }
+  @endcode
+ */
+
+void TSE_set_tx_ecc_ded_callback(tse_instance_t *this_tse,
+                                 tse_tx_ecc_ded_callback_t tx_ecc_ded_callback);
+
+/**
+    `TSE_set_rx_ecc_ded_callback()` registers the function that is called by the
+    CoreTSE driver whenever the recieve ECC double bit error interrupt is triggered.
+    This fucntion is only used with CoreTSE IP versions from v4.0 and above, ECC
+    error interrupts are not implemented in versions below this.
+    Undefine the macro CORE_TSE_IP_V4 in the coretse_user_config.h file to disable
+    this function.
+
+  @param this_tse
+    The this_tse parameter is a pointer to the tse_instance_t structure holding
+    all data regarding the CoreTSE instance controlled through this function call.
+
+  @param rx_ecc_ded_callback
+    The rx_ecc_ded_callback parameter is a pointer to the call-back function
+    that is called when a double bit ECC error is detected in the recieve buffer.
+
+  @example
+    The following example shows the use of the `TSE_set_rx_ecc_ded_callback()`
+    function.
+    The `init()` function calls the `TSE_set_rx_ecc_ded_callback()` function to
+    register the `rx_ecc_ded_callback()` callback function with the CoreTSE driver.
+    The rx_ecc_ded_callback function is called by the CoreTSE driver once the ECC
+    double bit error interrupt is triggered.
+    `rx_ecc_ded_callback()` can implement the application-specific action when
+    the recieve ECC double bit error interrupt is triggered.
+
+  @code
+    tse_instance_t g_tse;
+
+    void
+    rx_ecc_ded_callback()
+    {
+        //Process recieve ECC double bit error interrupt here.
+    }
+    void init(void)
+    {
+        TSE_set_rx_ecc_ded_callback(&g_tse, rx_ecc_ded_callback);
+    }
+  @endcode
+ */
+
+void TSE_set_rx_ecc_ded_callback(tse_instance_t *this_tse,
+                                 tse_rx_ecc_ded_callback_t rx_ecc_ded_callback);
+
+#endif
+
 /**
 
     The `TSE_set_wol_callback()` function registers the function that is
@@ -1278,7 +1368,7 @@ void TSE_set_rx_callback(tse_instance_t *this_tse, tse_receive_callback_t rx_cal
     This function does not return a value.
 
   @example
-    The example below demonstrates the use of the `TSE_set_wol_callback()` function.
+    The following example shows the use of the `TSE_set_wol_callback()` function.
     The `init()` function calls the `TSE_set_wol_callback()` function to register the
     wol_callback() receive callback function with the CoreTSE driver. The wol_callback
     function is called by the CoreTSE driver once a WoL event is detected.
@@ -1302,6 +1392,52 @@ void TSE_set_rx_callback(tse_instance_t *this_tse, tse_receive_callback_t rx_cal
   @endcode
     */
 void TSE_set_wol_callback(tse_instance_t *this_tse, tse_wol_callback_t wol_callback);
+
+/**
+    The `TSE_set_stats_callback()` function registers the function that is
+    called by the CoreTSE driver whenever the statistics counter carry interrupt
+    is generated.
+    The interrupt is triggered when a carry is produced in any of the implemented
+    statistics counters.
+
+  @param this_tse
+    The this_tse parameter is a pointer to the tse_instance_t structure holding
+    all data regarding the CoreTSE instance controlled through this
+    function call.
+
+  @param stats_callback
+    The stats_callback parameter is a pointer to the function that is called
+    when a statistics counter carry interrupt is generated.
+
+  @return
+    This function does not return a value.
+
+  @example
+    The following example shows the use of the `TSE_set_stats_callback()` function.
+    The `init()` function calls the `TSE_set_stats_callback()` function to register
+    the stats_callback() callback function with the CoreTSE driver.
+    The stats_callback function is called by the CoreTSE driver once a statistics
+    counter carry interrup is generated.
+    `stats_callback()` can implement the application-specific action when a statistics
+    counter carry interrup is generated.
+
+  @code
+    tse_instance_t g_tse;
+
+    void stats_callback
+    (
+        void * p_user_data
+    )
+    {
+        //Process statistics counter carry interrupt here.
+    }
+    void init(void)
+    {
+        TSE_set_stats_callback(&g_tse, stats_callback);
+    }
+  @endcode
+    */
+void TSE_set_stats_callback(tse_instance_t *this_tse, tse_stats_callback_t stats_callback);
 
 /**
 
@@ -1426,7 +1562,7 @@ uint8_t TSE_send_pkt(tse_instance_t *this_tse,
     descriptor. It returns 0 otherwise.
 
   @example
-    The example below demonstrates the use of `TSE_receive_pkt()` to
+    The following example shows the use of `TSE_receive_pkt()` to
     handle packet reception using two receive buffers. The `init()` function calls
     `TSE_set_rx_callback()` to register the `rx_callback()` receive
     callback function with the CoreTSE driver. `TSE_receive_pkt()`
@@ -1488,7 +1624,7 @@ uint8_t TSE_receive_pkt(tse_instance_t *this_tse, uint8_t *rx_pkt_buffer, void *
     This function also adjusts the CoreTSE's internal configuration
     if some of the link characteristics have changed since the previous call to
     this function.
-    As such, it is recommended to call this funciton periodically, so that the driver
+    As such, it is recommended to call this function periodically, so that the driver
     can automatically adapt to changes in the network link status.
 
   @param this_tse
@@ -1664,12 +1800,12 @@ void TSE_write_phy_reg(tse_instance_t *this_tse, uint8_t phyaddr, uint8_t regadd
 
 /**
 
-    `TSE_isr()` is the top-level interrupt handler function for the
-    CoreTSE driver. You must call `TSE_isr()` from the system-level
-    (CoreInterrupt and NVIC level) interrupt handler assigned to the interrupt
-    triggered by the CoreTSE INTR signal. Your system-level interrupt
-    handler must also clear the system-level interrupt triggered by the
-    CoreTSE INTR signal before returning, to prevent a re-assertion
+    `TSE_isr()` is the top-level common interrupt handler function for the
+    CoreTSE driver.
+    You must call `TSE_isr()` from the system-level interrupt handler assigned to
+    the interrupt triggered by the CoreTSE TSM_INTR signal.
+    Your system-level interrupt handler must also clear the system-level interrupt
+    triggered by the CoreTSE TSM_INTR signal before returning, to prevent a re-assertion
     of the same interrupt.
 
   @param this_tse
@@ -1685,16 +1821,88 @@ void TSE_write_phy_reg(tse_instance_t *this_tse, uint8_t phyaddr, uint8_t regadd
 
     tse_instance_t g_tse;
 
-    void FabricIrq0_IRQHandler
-    (
-        void
-    )
+    void External_IRQHandler(void)
     {
         TSE_isr(&g_tse);
     }
   @endcode
  */
 void TSE_isr(tse_instance_t *this_tse);
+
+#ifndef CORE_TSE_IP_V3
+/**
+    `TSE_tx_isr()` is the top-level transmit interrupt handler function for the
+    CoreTSE driver.
+    The transmit interrupt handler is only used with CoreTSE IP versions v4.0 and
+    above.
+    Seperate transmit and recieve interrupts are not implemented in IP versions below v4.0.
+    Undefine the macro CORE_TSE_IP_V4 in the coretse_user_config.h file to disable
+    this function.
+
+    You must call `TSE_tx_isr()` from the system-level interrupt handler assigned
+    to the interrupt triggered by the CoreTSE TSM_TX_INTR signal.
+    Your system-level interrupt handler must also clear the system-level interrupt
+    triggered by the CoreTSE TSM_TX_INTR signal before returning, to prevent a re-assertion
+    of the same interrupt.
+
+  @param this_tse
+    The this_tse parameter is a pointer to the tse_instance_t structure holding
+    all data regarding the CoreTSE instance controlled through this
+    function call.
+
+  @return
+  This function does not return a value.
+
+  @example
+  @code
+
+    tse_instance_t g_tse;
+
+    void External_IRQHandler(void)
+    {
+        TSE_tx_isr(&g_tse);
+    }
+  @endcode
+ */
+void TSE_tx_isr(tse_instance_t *this_tse);
+
+/**
+    `TSE_rx_isr()` is the top-level recieve interrupt handler function for the
+    CoreTSE driver.
+    The transmit interrupt handler is only used with CoreTSE IP versions v4.0 and
+    above.
+    Seperate transmit and recieve interrupts are not implemented in IP versions below v4.0.
+    Undefine the macro CORE_TSE_IP_V4 in the coretse_user_config.h file to disable
+    this function.
+
+    You must call `TSE_rx_isr()` from the system-level interrupt handler assigned
+    to the interrupt triggered by the CoreTSE TSM_RX_INTR signal.
+    Your system-level interrupt handler must also clear the system-level interrupt
+    triggered by the CoreTSE TSM_RX_INTR signal before returning, to prevent a re-assertion
+    of the same interrupt.
+
+  @param this_tse
+    The this_tse parameter is a pointer to the tse_instance_t structure holding
+    all data regarding the CoreTSE instance controlled through this
+    function call.
+
+  @return
+  This function does not return a value.
+
+  @example
+  @code
+
+    tse_instance_t g_tse;
+
+    void External_IRQHandler(void)
+    {
+        TSE_rx_isr(&g_tse);
+    }
+  @endcode
+ */
+void TSE_rx_isr(tse_instance_t *this_tse);
+
+#endif
 
 /**
 
@@ -1717,8 +1925,8 @@ void TSE_isr(tse_instance_t *this_tse);
     Note:
     The address filtering choice can also be selected using
     `TSE_cfg_struct_def_init()` function. The configuration value returned by this
-    function can be modified and then passed on to the `TSE_init()` function. If
-    The `TSE_set_address_filter()` function is used, the original filter setting
+    function can be modified and then passed on to the `TSE_init()` function.
+    If the `TSE_set_address_filter()` function is used, the original filter setting
     chosen at the initialization time gets overwritten.
 
   @param this_tse

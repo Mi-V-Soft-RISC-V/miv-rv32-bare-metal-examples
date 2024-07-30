@@ -1,18 +1,15 @@
-/*
- * vsc8575.c
+
+/**
+ * Copyright 2018 Microchip FPGA Embedded Systems Solutions.
  *
- *  Created on: 18.07.2018
- *      Author: rieche
+ * SPDX-License-Identifier: MIT
+ *
+ * @file vsc8575.c
+ * @author Microchip FPGA Embedded Systems Solutions
+ * @brief Microchip's VSC8575 PHY driver implementation.
+ *
  */
 
-/*******************************************************************************
- * (c) Copyright 2014-2016 Microsemi SoC Products Group.  All rights reserved.
- *
- * Marvell's M88E1340 PHY interface driver implementation.
- *
- * SVN $Revision: 8432 $
- * SVN $Date: 2016-06-20 15:56:50 +0530 (Mon, 20 Jun 2016) $
- */
 #include "phy.h"
 #include "core_tse.h"
 #include "coretse_regs.h"
@@ -27,10 +24,10 @@ extern "C" {
 
 #define PAGE_0 0x00
 
-/* function prototypes ********************************************************/
+/*-------------------------- Function Prototypes ---------------------------------*/
 static void set_page(tse_instance_t *this_tse, uint8_t phy_addr, uint16_t page);
 
-/* functions ******************************************************************/
+/*-------------------------------- Functions ---------------------------------*/
 void
 TSE_phy_init(tse_instance_t *this_tse, uint8_t phy_addr)
 {
@@ -244,5 +241,3 @@ phy_far_end_loopback(tse_instance_t *this_tse, uint8_t phy_addr, int mode)
 #ifdef __cplusplus
 }
 #endif
-
-/******************************** END OF FILE ******************************/
