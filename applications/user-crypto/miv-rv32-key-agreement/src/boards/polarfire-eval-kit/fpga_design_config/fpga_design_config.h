@@ -51,7 +51,7 @@
  * This is the only clock brought over from the Mi-V Libero design.
  */
 #ifndef SYS_CLK_FREQ
-#define SYS_CLK_FREQ                    83000000UL
+#define SYS_CLK_FREQ                    70000000UL
 #endif
 
 /***************************************************************************//**
