@@ -67,7 +67,7 @@ extern "C" {
   SUBSYS Register Configuration
   =======================================
   For the SUBSYS registers configutation, the following definitions are used in 
-  the SUBSUS API functions. For example, to raise soft interrupts, enable parity
+  the SUBSYS API functions. For example, to raise soft interrupts, enable parity
   checks, soft reset, and so on.
 
   |      Configuration       | Value |                   Description                  |  
@@ -97,11 +97,11 @@ extern "C" {
 
   |        Interrupt Mask      |  Value  |               Description           |
   |----------------------------|---------|-------------------------------------|
-  | SUBSYS_TCM_ECC_CE_IRQ      |  0x01u  | TCM ECC controllable error irq enable |
-  | SUBSYS_TCM_ECC_UCE_IRQ     |  0x02u  | TCM ECC uncontrollable error irq enable | 
-  | SUBSYS_AXI_WR_RESP_IRQ     |  0x10u  | AXI write response error irq enable | 
-  | SUBSYS_ICACHE_ECC_CE_IRQ   |  0x40u  | Icache ECC Correctable error irq    | 
-  | SUBSYS_ICACHE_ECC_UCE_IRQ  |  0x80u  | Icache ECC Uncorrectable error irq  | 
+  | SUBSYS_TCM_ECC_CE_IRQ      |  0x01u  | TCM ECC controllable error IRQ enable |
+  | SUBSYS_TCM_ECC_UCE_IRQ     |  0x02u  | TCM ECC uncontrollable error IRQ enable | 
+  | SUBSYS_AXI_WR_RESP_IRQ     |  0x10u  | AXI write response error IRQ enable | 
+  | SUBSYS_ICACHE_ECC_CE_IRQ   |  0x40u  | Icache ECC Correctable error IRQ    | 
+  | SUBSYS_ICACHE_ECC_UCE_IRQ  |  0x80u  | Icache ECC Uncorrectable error IRQ  | 
   | SUBSYS_BASE_ADDR           | 0x6000u | Base address of the SUBSYS          |
  */
 /* TCM ECC correctable error irq enable mask value */

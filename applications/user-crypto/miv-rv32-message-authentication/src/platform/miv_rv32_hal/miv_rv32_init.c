@@ -15,7 +15,7 @@
 extern "C" {
 #endif
 
-extern void main(void);
+extern int main(void);
 
 void _init(void)
 {
@@ -24,7 +24,10 @@ void _init(void)
      * code. You can implement it here. */
 
     /* Jump to the application code after all initializations are completed */
-    main();
+    int code = 0;
+
+    code = main();
+    _exit(code);
 }
 
 /* Function called after main() finishes */

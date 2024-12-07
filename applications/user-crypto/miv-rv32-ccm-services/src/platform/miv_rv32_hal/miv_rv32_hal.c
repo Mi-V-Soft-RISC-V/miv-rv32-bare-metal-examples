@@ -264,12 +264,12 @@ void (* const local_irq_handler_table[16])(void) =
 #ifndef MIV_RV32_V3_0
     MGEUI_IRQHandler,
     MGECI_IRQHandler,
-    SUBSYS_IRQHandler,
+    Reserved_IRQHandler,    
+    Reserved_IRQHandler,
+    Reserved_IRQHandler,
+    Reserved_IRQHandler,    
     SUBSYSR_IRQHandler,
-    Reserved_IRQHandler,    
-    Reserved_IRQHandler,
-    Reserved_IRQHandler,
-    Reserved_IRQHandler,    
+    SUBSYS_IRQHandler,
     MSYS_EI0_IRQHandler,
     MSYS_EI1_IRQHandler,
     MSYS_EI2_IRQHandler,
@@ -402,6 +402,16 @@ void handle_trap(uintptr_t mcause, uintptr_t mepc)
         _exit(1 + mcause);
 #endif  /* NDEBUG */
     }
+}
+/*------------------------------------------------------------------------------
+    Reconfigure the BootROM source and destination addresses
+*/
+void MRV_BootROM_reconfigure(uint32_t start_addr, uint32_t end_addr, uint32_t destination_addr)
+{
+    HW_set_32bit_reg(BOOTROM_START, start_addr);
+    HW_set_32bit_reg(BOOTROM_END, end_addr);
+    HW_set_32bit_reg(BOOTROM_DEST, destination_addr);
+
 }
 
 #ifdef __cplusplus
