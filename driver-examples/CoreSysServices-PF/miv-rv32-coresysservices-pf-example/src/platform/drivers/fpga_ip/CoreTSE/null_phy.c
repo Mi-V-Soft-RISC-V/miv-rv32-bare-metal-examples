@@ -1,12 +1,12 @@
 
-/*******************************************************************************
+/**
  * Copyright 2023 Microchip FPGA Embedded Systems Solutions.
  *
  * SPDX-License-Identifier: MIT
  *
  * @file null_phy.c
  * @author Microchip FPGA Embedded Systems Solutions
- * @brief NULL PHY implementation 
+ * @brief NULL PHY implementation
  *
  */
 
@@ -20,13 +20,13 @@
 #include "fpga_design_config/fpga_design_config.h"
 #else
 #include "hw_platform.h"
-#endif  /*LEGACY_DIR_STRUCTURE*/
+#endif /*LEGACY_DIR_STRUCTURE*/
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#if !defined(M88E1340_PHY) && !defined(M88E1111_PHY)
+#if !defined(M88E1340_PHY) && !defined(M88E1111_PHY) && !defined(VSC8575_PHY)
 
 void
 TSE_phy_init(tse_instance_t *this_tse, uint8_t phy_addr)
@@ -34,27 +34,18 @@ TSE_phy_init(tse_instance_t *this_tse, uint8_t phy_addr)
     /* Nothing to see here... */
 }
 
-/***************************************************************************/ /**
-
-  */
 void
 TSE_phy_set_link_speed(tse_instance_t *this_tse, uint8_t phy_addr, uint32_t speed_duplex_select)
 {
     /* Nothing to see here... */
 }
 
-/***************************************************************************/ /**
-
-  */
 void
 TSE_phy_autonegotiate(tse_instance_t *this_tse, uint8_t phy_addr)
 {
     /* Nothing to see here... */
 }
 
-/***************************************************************************/ /**
-
-  */
 uint8_t
 TSE_phy_get_link_status(tse_instance_t *this_tse,
                         uint8_t phy_addr,
@@ -70,5 +61,3 @@ TSE_phy_get_link_status(tse_instance_t *this_tse,
 #ifdef __cplusplus
 }
 #endif
-
-/******************************** END OF FILE ******************************/

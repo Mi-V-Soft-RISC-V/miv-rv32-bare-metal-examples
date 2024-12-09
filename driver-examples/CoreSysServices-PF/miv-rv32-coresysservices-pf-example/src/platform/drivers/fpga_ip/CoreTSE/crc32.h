@@ -1,5 +1,5 @@
 
-/*******************************************************************************
+/**
  * Copyright 2014 Microchip FPGA Embedded Systems Solutions.
  *
  * SPDX-License-Identifier: MIT
@@ -8,7 +8,7 @@
  * @author Microchip FPGA Embedded Systems Solutions
  * @brief crc32 header file
  *
- */                                                                              
+ */
 
 #ifndef __CRC32_H
 #define __CRC32_H 1

@@ -1,5 +1,5 @@
 
-/*******************************************************************************
+/**
  * Copyright 2014 Microchip FPGA Embedded Systems Solutions.
  *
  * SPDX-License-Identifier: MIT
@@ -22,9 +22,7 @@
 extern "C" {
 #endif
 
-/**************************************************************************/
-/* Preprocessor Macros                                                    */
-/**************************************************************************/
+/*--------------------------- Preprocessor Macros ----------------------------*/
 #define NULL_POINTER           0
 
 #define MAC_ADDRESS_LENGTH     6u
@@ -57,17 +55,25 @@ extern "C" {
 #define TSE_RGMII                        0x04
 #define TSE_RMII                         0x05
 
-/*******************************************************************************
- * MAC interrupt definitions
- */
+/*------------------------ MAC interrupt definitions -------------------------*/
+
 #define TSE_TXPKTSENT_IRQ                0u
 #define TSE_TXUNDRRUN_IRQ                1u
 #define TSE_TXBUSERR_IRQ                 3u
 #define TSE_RXPKTRCVD_IRQ                4u
 #define TSE_RXOVRFLOW_IRQ                6u
 #define TSE_RXBUSERR_IRQ                 7u
-#define TSE_INVALID_IRQ                  255u
 
+#ifndef CORE_TSE_IP_V3
+
+#define TSE_RX_ECC_DED_IRQ               10u
+#define TSE_RX_ECC_SEC_IRQ               11u
+#define TSE_TX_ECC_DED_IRQ               12u
+#define TSE_TX_ECC_SEC_IRQ               13u
+
+#endif
+
+#define TSE_INVALID_IRQ                  255u
 #define TSE_TXPKTSENT_IRQ_MASK           0x01u
 #define TSE_RXPKTRCVD_IRQ_MASK           ((uint32_t)0x01u << TSE_RXPKTRCVD_IRQ)
 
@@ -76,9 +82,9 @@ extern "C" {
 #define MSGMII_1000BASEX_HD              0x4000
 
 #define MSGMII_AUTO_NEGOTIATION_COMPLETE 0x0020u
-/**************************************************************************/
-/* Private Functions declarations                                         */
-/**************************************************************************/
+
+/*------------------------ MAC interrupt definitions -------------------------*/
+
 static void mac_reset(tse_instance_t *this_tse);
 static void config_mac_hw(tse_instance_t *this_tse, const tse_cfg_t *cfg);
 static void tx_desc_ring_init(tse_instance_t *this_tse);
@@ -104,15 +110,11 @@ static uint8_t msgmii_get_link_status(tse_instance_t *this_tse,
 static void rgmii_set_link_speed(tse_instance_t *this_tse, tse_speed_t speed);
 #endif
 
-/**************************************************************************/
-/* Public Functions                                                       */
-/**************************************************************************/
+/*----------------------------- Public Functions -----------------------------*/
 
-/**************************************************************************/ /**
-                                                                              * See core_tse.h for
-                                                                              * details of how to
-                                                                              * use this function.
-                                                                              */
+/**
+  See core_tse.h for details of how to use this function.
+ */
 void
 TSE_init(tse_instance_t *this_tse, uint32_t base_addr, tse_cfg_t *cfg)
 {
@@ -277,11 +279,9 @@ update_mac_cfg(tse_instance_t *this_tse, uint8_t phy_addr)
     }
 }
 
-/**************************************************************************/ /**
-                                                                              * See core_tse.h for
-                                                                              * details of how to
-                                                                              * use this function.
-                                                                              */
+/**
+  See core_tse.h for details of how to use this function.
+ */
 uint8_t
 TSE_get_link_status(tse_instance_t *this_tse, tse_speed_t *speed, uint8_t *fullduplex)
 {
@@ -390,11 +390,9 @@ TSE_get_link_status(tse_instance_t *this_tse, tse_speed_t *speed, uint8_t *fulld
     return link_up;
 }
 
-/**************************************************************************/ /**
-                                                                              * See core_tse.h for
-                                                                              * details of how to
-                                                                              * use this function.
-                                                                              */
+/**
+  See core_tse.h for details of how to use this function.
+ */
 void
 TSE_cfg_struct_def_init(tse_cfg_t *cfg)
 {
@@ -445,11 +443,9 @@ TSE_cfg_struct_def_init(tse_cfg_t *cfg)
     }
 }
 
-/**************************************************************************/ /**
-                                                                              * See core_tse.h for
-                                                                              * details of how to
-                                                                              * use this function.
-                                                                              */
+/**
+  See core_tse.h for details of how to use this function.
+ */
 static void
 mac_reset(tse_instance_t *this_tse)
 {
@@ -643,9 +639,7 @@ config_mac_hw(tse_instance_t *this_tse, const tse_cfg_t *cfg)
         }
     }
 
-    /*--------------------------------------------------------------------------
-     * Configure FIFOs
-     */
+    /* Configure FIFOs */
     HAL_set_32bit_reg_field(this_tse->base_addr, FIFOCFG0_WMM_EN, 0x01);
     HAL_set_32bit_reg_field(this_tse->base_addr, FIFOCFG0_RSYS_EN, 0x01);
     HAL_set_32bit_reg_field(this_tse->base_addr, FIFOCFG0_RFAB_EN, 0x01);
@@ -677,11 +671,9 @@ config_mac_hw(tse_instance_t *this_tse, const tse_cfg_t *cfg)
     }
 }
 
-/**************************************************************************/ /**
-                                                                              * See core_tse.h for
-                                                                              * details of how to
-                                                                              * use this function.
-                                                                              */
+/**
+  See core_tse.h for details of how to use this function.
+ */
 void
 TSE_write_phy_reg(tse_instance_t *this_tse, uint8_t phyaddr, uint8_t regaddr, uint16_t regval)
 {
@@ -711,11 +703,9 @@ TSE_write_phy_reg(tse_instance_t *this_tse, uint8_t phyaddr, uint8_t regaddr, ui
     }
 }
 
-/**************************************************************************/ /**
-                                                                              * See core_tse.h for
-                                                                              * details of how to
-                                                                              * use this function.
-                                                                              */
+/**
+  See core_tse.h for details of how to use this function.
+ */
 uint16_t
 TSE_read_phy_reg(tse_instance_t *this_tse, uint8_t phyaddr, uint8_t regaddr)
 {
@@ -773,11 +763,9 @@ TSE_read_phy_reg(tse_instance_t *this_tse, uint8_t phyaddr, uint8_t regaddr)
     return read_val;
 }
 
-/**************************************************************************/ /**
-                                                                              * See core_tse.h for
-                                                                              * details of how to
-                                                                              * use this function.
-                                                                              */
+/**
+  See core_tse.h for details of how to use this function.
+ */
 uint32_t
 TSE_read_stat(tse_instance_t *this_tse, tse_stat_t stat)
 {
@@ -930,7 +918,7 @@ TSE_read_stat(tse_instance_t *this_tse, tse_stat_t stat)
     return stat_val;
 }
 
-/***************************************************************************/ /**
+/**
   See core_tse.h for details of how to use this function
  */
 void
@@ -940,11 +928,9 @@ TSE_clear_statistics(tse_instance_t *instance)
     HAL_set_32bit_reg_field(instance->base_addr, IFC_STATS_CLR_ALL, 0x00u);
 }
 
-/**************************************************************************/ /**
-                                                                              * See core_tse.h for
-                                                                              * details of how to
-                                                                              * use this function.
-                                                                              */
+/**
+  See core_tse.h for details of how to use this function.
+ */
 uint8_t
 TSE_receive_pkt(tse_instance_t *this_tse, uint8_t *rx_pkt_buffer, void *p_user_data)
 {
@@ -1016,11 +1002,9 @@ TSE_receive_pkt(tse_instance_t *this_tse, uint8_t *rx_pkt_buffer, void *p_user_d
     return status;
 }
 
-/**************************************************************************/ /**
-                                                                              * See core_tse.h for
-                                                                              * details of how to
-                                                                              * use this function.
-                                                                              */
+/**
+  See core_tse.h for details of how to use this function.
+ */
 uint8_t
 TSE_send_pkt(tse_instance_t *this_tse,
              uint8_t const *tx_buffer,
@@ -1101,17 +1085,17 @@ TSE_send_pkt(tse_instance_t *this_tse,
     return status;
 }
 
-/**************************************************************************/ /**
-                                                                              * See core_tse.h for
-                                                                              * details of how to
-                                                                              * use this function.
-                                                                              */
+/**
+  See core_tse.h for details of how to use this function.
+ */
 void
 TSE_isr(tse_instance_t *this_tse)
 {
     uint32_t dma_irq;
     uint32_t packet_sent;
     uint32_t packet_received;
+    uint32_t car1 = 0u;
+    uint32_t car2 = 0u;
 
     dma_irq = HAL_get_32bit_reg(this_tse->base_addr, DMAINTR);
 
@@ -1133,13 +1117,13 @@ TSE_isr(tse_instance_t *this_tse)
 
     if (dma_irq & (1u << TSE_TXUNDRRUN_IRQ))
     {
-        /* Clear the tx packet sent interrupt. */
+        /* Clear the tx packet underrun interrupt. */
         HAL_set_32bit_reg_field(this_tse->base_addr, DMATXSTATUS_TXPKT_UR, 0x1);
     }
 
     if (dma_irq & (1u << TSE_TXBUSERR_IRQ))
     {
-        /* Clear the tx packet sent interrupt. */
+        /* Clear the tx bus error interrupt. */
         HAL_set_32bit_reg_field(this_tse->base_addr, DMATXSTATUS_BUSERR, 0x1);
     }
 
@@ -1151,12 +1135,223 @@ TSE_isr(tse_instance_t *this_tse)
 
     if (dma_irq & (1u << TSE_RXBUSERR_IRQ))
     {
-        /*
-          Clear the rx packet received interrupt once. If this bit still persists,
-          then another rx packet received interrupt will be generated. Rx count
-          will be decremented.
-         */
         HAL_set_32bit_reg_field(this_tse->base_addr, DMARXSTATUS_BUSERR, 0x1);
+    }
+
+#ifndef CORE_TSE_IP_V3
+    if (dma_irq & (1u << TSE_RX_ECC_DED_IRQ))
+    {
+        /*call the application callback handler*/
+        if (NULL_POINTER != this_tse->rx_ecc_ded_callback)
+        {
+            this_tse->rx_ecc_ded_callback();
+        }
+
+        HAL_get_32bit_reg_field(this_tse->base_addr, RDBEDC);
+    }
+
+    if (dma_irq & (1u << TSE_RX_ECC_SEC_IRQ))
+    {
+        HAL_get_32bit_reg_field(this_tse->base_addr, RSBECC);
+    }
+
+    if (dma_irq & (1u << TSE_TX_ECC_DED_IRQ))
+    {
+        /*call the application callback handler*/
+        if (NULL_POINTER != this_tse->tx_ecc_ded_callback)
+        {
+            this_tse->tx_ecc_ded_callback();
+        }
+
+        HAL_get_32bit_reg_field(this_tse->base_addr, TDBEDC);
+    }
+
+    if (dma_irq & (1u << TSE_TX_ECC_SEC_IRQ))
+    {
+        HAL_get_32bit_reg_field(this_tse->base_addr, TSBECC);
+    }
+#endif
+
+    if (HAL_get_32bit_reg_field(this_tse->base_addr, IFS_WOL_DET))
+    {
+        /*call the application callback handler*/
+        if (NULL_POINTER != this_tse->wol_callback)
+        {
+            this_tse->wol_callback();
+        }
+
+        /* Clear the WoL interrupt */
+        HAL_set_32bit_reg_field(this_tse->base_addr, IFC_MCXWOL_ST_CLR, 0x01);
+        HAL_set_32bit_reg_field(this_tse->base_addr, IFC_MCXWOL_ST_CLR, 0x00);
+    }
+
+    /* Detect a statistics counter carry interrupt here */
+    car1 = HAL_get_32bit_reg_field(this_tse->base_addr, CAR1);
+    car2 = HAL_get_32bit_reg_field(this_tse->base_addr, CAR2);
+
+    if (car1 || car2)
+    {
+        /*call the application callback handler*/
+        if (NULL_POINTER != this_tse->stats_callback)
+        {
+            this_tse->stats_callback();
+        }
+
+        /*
+         The CAR1 and CAR2 registers are W1C so to clear the interrupt we write-
+         back the value that was read from the CAR registers when the interrupt
+         was triggered.
+        */
+        if (0u != car1)
+        {
+            HAL_set_32bit_reg(this_tse->base_addr, CAR1, car1);
+        }
+        else
+        {
+            HAL_set_32bit_reg(this_tse->base_addr, CAR2, car2);
+        }
+    }
+}
+
+#ifndef CORE_TSE_IP_V3
+void
+TSE_tx_isr(tse_instance_t *this_tse)
+{
+    uint32_t dma_irq;
+    uint32_t packet_sent;
+    uint32_t car1 = 0u;
+    uint32_t car2 = 0u;
+
+    dma_irq = HAL_get_32bit_reg(this_tse->base_addr, DMAINTR);
+
+    /* Transmit packet sent interrupt */
+    packet_sent = dma_irq & TSE_TXPKTSENT_IRQ_MASK;
+
+    if (packet_sent != 0u)
+    {
+        txpkt_handler(this_tse);
+    }
+
+    if (dma_irq & (1u << TSE_TXUNDRRUN_IRQ))
+    {
+        /* Clear the tx packet underrun interrupt. */
+        HAL_set_32bit_reg_field(this_tse->base_addr, DMATXSTATUS_TXPKT_UR, 0x1);
+    }
+
+    if (dma_irq & (1u << TSE_TXBUSERR_IRQ))
+    {
+        /* Clear the tx buserror interrupt. */
+        HAL_set_32bit_reg_field(this_tse->base_addr, DMATXSTATUS_BUSERR, 0x1);
+    }
+
+    if (dma_irq & (1u << TSE_TX_ECC_SEC_IRQ))
+    {
+        HAL_get_32bit_reg_field(this_tse->base_addr, TSBECC);
+    }
+
+    /* Tx ECC Error Interrupt Handlers */
+    if (dma_irq & (1u << TSE_TX_ECC_DED_IRQ))
+    {
+        /*call the application callback handler*/
+        if (NULL_POINTER != this_tse->tx_ecc_ded_callback)
+        {
+            this_tse->tx_ecc_ded_callback();
+        }
+
+        HAL_get_32bit_reg_field(this_tse->base_addr, TDBEDC);
+    }
+
+    if (car1 || car2)
+    {
+        /*call the application callback handler*/
+        if (NULL_POINTER != this_tse->stats_callback)
+        {
+            this_tse->stats_callback();
+        }
+
+        /*
+         The CAR1 and CAR2 registers are W1C so to clear the interrupt we write-
+         back the value that was read from the CAR registers when the interrupt
+         was triggered.
+        */
+        if (0u != car1)
+        {
+            HAL_set_32bit_reg(this_tse->base_addr, CAR1, car1);
+        }
+        else
+        {
+            HAL_set_32bit_reg(this_tse->base_addr, CAR2, car2);
+        }
+    }
+
+    /* Tx ECC Error Interrupt Handlers */
+    if (dma_irq & (1u << TSE_TX_ECC_DED_IRQ))
+    {
+        /*call the application callback handler*/
+        if (NULL_POINTER != this_tse->tx_ecc_ded_callback)
+        {
+            this_tse->tx_ecc_ded_callback();
+        }
+
+        HAL_get_32bit_reg_field(this_tse->base_addr, TDBEDC);
+    }
+
+    if (car1 || car2)
+    {
+        /*call the application callback handler*/
+        if (NULL_POINTER != this_tse->stats_callback)
+        {
+            this_tse->stats_callback();
+        }
+
+        /*
+         The CAR1 and CAR2 registers are W1C so to clear the interrupt we write-
+         back the value that was read from the CAR registers when the interrupt
+         was triggered.
+        */
+        if (0u != car1)
+        {
+            HAL_set_32bit_reg(this_tse->base_addr, CAR1, car1);
+        }
+        else
+        {
+            HAL_set_32bit_reg(this_tse->base_addr, CAR2, car2);
+        }
+    }
+}
+
+void
+TSE_rx_isr(tse_instance_t *this_tse)
+{
+    uint32_t dma_irq;
+    uint32_t packet_reveived;
+    uint32_t car1 = 0u;
+    uint32_t car2 = 0u;
+
+    dma_irq = HAL_get_32bit_reg(this_tse->base_addr, DMAINTR);
+
+    /* Packet received interrupt */
+    packet_reveived = dma_irq & TSE_RXPKTRCVD_IRQ_MASK;
+
+    if (packet_reveived != 0u)
+    {
+        rxpkt_handler(this_tse);
+    }
+
+    if (dma_irq & (1u << TSE_RXOVRFLOW_IRQ))
+    {
+        HAL_set_32bit_reg_field(this_tse->base_addr, DMARXSTATUS_RXPKT_OVR, 0x1);
+        HAL_set_32bit_reg_field(this_tse->base_addr, DMARXCTRL_RX_EN, 0x1);
+    }
+
+    if (dma_irq & (1u << TSE_RXBUSERR_IRQ))
+    {
+        HAL_set_32bit_reg_field(this_tse->base_addr, DMARXSTATUS_BUSERR, 0x1);
+    }
+
+    if (dma_irq & (1u << TSE_RX_ECC_SEC_IRQ))
+    {
+        HAL_get_32bit_reg_field(this_tse->base_addr, RSBECC);
     }
 
     if (HAL_get_32bit_reg_field(this_tse->base_addr, IFS_WOL_DET))
@@ -1171,42 +1366,103 @@ TSE_isr(tse_instance_t *this_tse)
         HAL_set_32bit_reg_field(this_tse->base_addr, IFC_MCXWOL_ST_CLR, 0x01);
         HAL_set_32bit_reg_field(this_tse->base_addr, IFC_MCXWOL_ST_CLR, 0x00);
     }
-}
 
-/**************************************************************************/ /**
-                                                                              * See core_tse.h for
-                                                                              * details of how to
-                                                                              * use this function.
-                                                                              */
+    /* Rx ECC Error Interrupt Handlers*/
+    if (dma_irq & (1u << TSE_RX_ECC_DED_IRQ))
+    {
+        /*call the application callback handler*/
+        if (NULL_POINTER != this_tse->rx_ecc_ded_callback)
+        {
+            this_tse->rx_ecc_ded_callback();
+        }
+
+        HAL_get_32bit_reg_field(this_tse->base_addr, RDBEDC);
+    }
+
+    if (car1 || car2)
+    {
+        /*call the application callback handler*/
+        if (NULL_POINTER != this_tse->stats_callback)
+        {
+            this_tse->stats_callback();
+        }
+
+        /*
+         The CAR1 and CAR2 registers are W1C so to clear the interrupt we write-
+         back the value that was read from the CAR registers when the interrupt
+         was triggered.
+        */
+        if (0u != car1)
+        {
+            HAL_set_32bit_reg(this_tse->base_addr, CAR1, car1);
+        }
+        else
+        {
+            HAL_set_32bit_reg(this_tse->base_addr, CAR2, car2);
+        }
+    }
+}
+#endif
+
+/**
+  See core_tse.h for details of how to use this function.
+ */
 void
 TSE_set_tx_callback(tse_instance_t *this_tse, tse_transmit_callback_t tx_complete_handler)
 {
     this_tse->tx_complete_handler = tx_complete_handler;
 }
 
-/**************************************************************************/ /**
-                                                                              * See core_tse.h for
-                                                                              * details of how to
-                                                                              * use this function.
-                                                                              */
+/**
+  See core_tse.h for details of how to use this function.
+ */
 void
 TSE_set_rx_callback(tse_instance_t *this_tse, tse_receive_callback_t rx_callback)
 {
     this_tse->pckt_rx_callback = rx_callback;
 }
 
-/**************************************************************************/ /**
-                                                                              * See core_tse.h for
-                                                                              * details of how to
-                                                                              * use this function.
-                                                                              */
+#ifndef CORE_TSE_IP_V3
+/**
+  See core_tse.h for details of how to use this function.
+ */
+void
+TSE_set_tx_ecc_ded_callback(tse_instance_t *this_tse, tse_tx_ecc_ded_callback_t tx_ecc_ded_callback)
+{
+    this_tse->tx_ecc_ded_callback = tx_ecc_ded_callback;
+}
+
+/**
+  See core_tse.h for details of how to use this function.
+ */
+void
+TSE_set_rx_ecc_ded_callback(tse_instance_t *this_tse, tse_rx_ecc_ded_callback_t rx_ecc_ded_callback)
+{
+    this_tse->rx_ecc_ded_callback = rx_ecc_ded_callback;
+}
+
+#endif
+
+/**
+  See core_tse.h for details of how to use this function.
+ */
+void
+TSE_set_stats_callback(tse_instance_t *this_tse, tse_stats_callback_t stats_callback)
+{
+    this_tse->stats_callback = stats_callback;
+}
+
+/**
+  See core_tse.h for details of how to use this function.
+ */
 void
 TSE_set_wol_callback(tse_instance_t *this_tse, tse_wol_callback_t wol_callback)
 {
     this_tse->wol_callback = wol_callback;
 }
-/***************************************************************************/ /**
-  See core_tse.h for details of how to use this function
+
+/**
+  See core_tse.h for details of how to use this function.
  */
 void
 TSE_set_address_filter(tse_instance_t *this_tse,
@@ -1304,27 +1560,14 @@ TSE_set_address_filter(tse_instance_t *this_tse,
     HAL_set_32bit_reg(this_tse->base_addr, HASHTAB3, mac_hash_table[3]);
 }
 
-/**************************************************************************/
-/* Private Function definitions                                           */
-/**************************************************************************/
+/*----------------------------- Private Functions ----------------------------*/
 
-/**************************************************************************/ /**
-                                                                              * This is default
-                                                                              * "Receive packet
-                                                                              * interrupt handler.
-                                                                              * This function finds
-                                                                              * the descriptor that
-                                                                              * received the packet
-                                                                              * and caused the
-                                                                              * interrupt. This
-                                                                              * informs the received
-                                                                              * packet size to the
-                                                                              * application and
-                                                                              * relinquishes the
-                                                                              * packet buffer from
-                                                                              * the associated DMA
-                                                                              * descriptor.
-                                                                              */
+/**
+  This is default "Receive packet" interrupt handler.
+  This function finds the descriptor that received the packet and caused the interrupt.
+  This informs the received packet size to the application and relinquishes the packet buffer from
+  the associated DMA descriptor.
+ */
 static void
 rxpkt_handler(tse_instance_t *this_tse)
 {
@@ -1379,20 +1622,11 @@ rxpkt_handler(tse_instance_t *this_tse)
     } while (0u != rxcnt);
 }
 
-/**************************************************************************/ /**
-                                                                              * This is default
-                                                                              * "Transmit packet
-                                                                              * interrupt handler.
-                                                                              * This function finds
-                                                                              * the descriptor that
-                                                                              * transmitted the
-                                                                              * packet and caused
-                                                                              * the interrupt. This
-                                                                              * relinquishes the
-                                                                              * packet buffer from
-                                                                              * the associated DMA
-                                                                              * descriptor.
-                                                                              */
+/**
+  This is default "Transmit packet" interrupt handler.
+  This function finds the descriptor that transmitted the packet and caused the interrupt.
+  This relinquishes the packet buffer from the associated DMA descriptor.
+ */
 static void
 txpkt_handler(tse_instance_t *this_tse)
 {
@@ -1520,14 +1754,11 @@ assign_station_addr(tse_instance_t *this_tse, const uint8_t mac_addr[6])
     }
 }
 
-/***************************************************************************/ /**
-                                                                               * Probe used PHY.
-                                                                               *
-                                                                               * return    PHY
-                                                                               * address. If PHY is
-                                                                               * not found, function
-                                                                               * returns 255.
-                                                                               */
+/**
+  Probe used PHY.
+  Return PHY address.
+  If PHY is not found, function returns 255.
+ */
 static uint8_t
 phy_probe(tse_instance_t *this_tse)
 {
@@ -1549,8 +1780,8 @@ phy_probe(tse_instance_t *this_tse)
     return phy_address;
 }
 
-/***************************************************************************/ /**
-  This function initializes the TBI/1000BaseX module
+/**
+  This function initializes the TBI/1000BaseX module.
   */
 #if ((TSE_PHY_INTERFACE == TSE_SGMII) || (TSE_PHY_INTERFACE == TSE_1000BASEX))
 static void
@@ -1580,9 +1811,9 @@ msgmii_init(tse_instance_t *this_tse)
     TSE_write_phy_reg(this_tse, TSE_MSGMII_ADDR, 0x00, phy_reg);
 }
 
-/***************************************************************************/ /**
-                                                                               *
-                                                                               */
+/*
+  MSGMII auto-negotiation function
+ */
 static void
 msgmii_autonegotiate(tse_instance_t *this_tse)
 {
@@ -1667,5 +1898,3 @@ rgmii_set_link_speed(tse_instance_t *this_tse, tse_speed_t speed)
 #ifdef __cplusplus
 }
 #endif
-
-/******************************** END OF FILE ******************************/

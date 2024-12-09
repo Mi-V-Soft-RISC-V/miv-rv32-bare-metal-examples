@@ -1,5 +1,5 @@
 
-/*******************************************************************************
+/**
  * Copyright 2014 Microchip FPGA Embedded Systems Solutions.
  *
  * SPDX-License-Identifier: MIT
@@ -17,6 +17,8 @@
 #define CORE_LIBRARY        "Firmware"
 #define CORE_NAME           "SmartFusion2_CORE_TSE_Driver"
 #define CORE_VERSION        "1.0.1"
+
+#undef CORE_TSE_IP_V3
 
 #define TSE_PHY_INTERFACE   2
 #define TSE_MSGMII_ADDR     18
