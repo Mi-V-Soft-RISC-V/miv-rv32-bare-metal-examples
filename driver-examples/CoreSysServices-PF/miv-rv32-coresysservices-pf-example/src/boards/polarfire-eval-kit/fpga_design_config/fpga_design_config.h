@@ -51,7 +51,7 @@
  * This is the only clock brought over from the Mi-V Libero design.
  */
 #ifndef SYS_CLK_FREQ
-#define SYS_CLK_FREQ                    83000000UL
+#define SYS_CLK_FREQ                    83330000UL
 #endif
 
 /***************************************************************************//**
@@ -65,8 +65,8 @@
  * The system can be further extended by attaching APB peripherals to the 
  * empty APB slots.
  */
-#define COREUARTAPB0_BASE_ADDR               0x71000000UL
-#define CSS_PF_BASE_ADDRESS                  0x70003000UL
+#define COREUARTAPB0_BASE_ADDR          0x61000000UL
+#define CSS_PF_BASE_ADDRESS             0x63000000UL
 
 /***************************************************************************//**
  * Peripheral Interrupts are mapped to the corresponding Mi-V Soft processor
@@ -134,7 +134,8 @@ e.g
 #define MSCC_STDIO_UART_BASE_ADDR COREUARTAPB0_BASE_ADDR
 
 #ifndef MSCC_STDIO_UART_BASE_ADDR
-#error MSCC_STDIO_UART_BASE_ADDR not defined- e.g. #define MSCC_STDIO_UART_BASE_ADDR COREUARTAPB1_BASE_ADDR
+#error MSCC_STDIO_UART_BASE_ADDR not defined- e.g. \
+                      #define MSCC_STDIO_UART_BASE_ADDR COREUARTAPB1_BASE_ADDR
 #endif
 
 #ifndef MSCC_STDIO_BAUD_VALUE
