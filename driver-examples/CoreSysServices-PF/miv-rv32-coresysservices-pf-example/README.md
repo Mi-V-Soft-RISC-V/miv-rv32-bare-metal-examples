@@ -70,14 +70,19 @@ the build configurations per the supported ISA extensions that you want to use.
 All the design specific definitions such as peripheral base addresses, system
 clock frequency etc. are included in fpga_design_config.h. 
 
-
 This example project can be used with another design using a different hardware
 configurations. This can be achieved by overwriting the content of this example
 project's "fpga_design_config.h (hw_config.h)" file with the correct data from
 your Libero design.
 
-This project was tested on PolarFire Eval Kit with CFG4 configuration of the
-MIV_RV32 design available [here](https://mi-v-ecosystem.github.io/redirects/repo-polarfire-evaluation-kit-mi-v-sample-fpga-designs)
+Please refer to the prerequisites section of application note [AN4660](https://www.microchip.com/en-us/application-notes/an4660)
+for the design files. The application note provides detailed information about
+the design description, programming the polarfire FPGA device and SPI flash,
+and as well as running CoreSystemServices example project. All the services work
+with [AN4660](https://www.microchip.com/en-us/application-notes/an4660). In
+addition to [AN4660](https://www.microchip.com/en-us/application-notes/an4660),
+for the additional description on the device serial number, user code design,
+and other system services refer to [AN4663](https://www.microchip.com/en-us/application-notes/an4663). 
 
 ### Booting the System
 
