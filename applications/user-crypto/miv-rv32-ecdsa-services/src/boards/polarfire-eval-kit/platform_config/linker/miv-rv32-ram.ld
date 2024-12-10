@@ -31,7 +31,7 @@ ENTRY(_start)
 MEMORY
 {
     ram (rwx) : ORIGIN = 0x80000000, LENGTH = 64k
-    crypto_ram (rw) : ORIGIN = 0x61000000, LENGTH = 32k
+    crypto_ram (rw) : ORIGIN = 0x61000000, LENGTH = 16k
 }
 
 RAM_START_ADDRESS   = 0x80000000;       /* Must be the same value MEMORY region ram ORIGIN above. */
@@ -120,7 +120,7 @@ SECTIONS
     __sbss_end = .;
   } > ram
   
-  /* sbss section */
+  /* bss section */
   .bss : ALIGN(0x10)
   { 
     __bss_start = .;
@@ -151,7 +151,7 @@ SECTIONS
   } > ram
   
       . = 0x61000000;
-   .crypto_data : ALIGN(0x10)
+   .crypto_data (NOLOAD) : ALIGN(0x10)
   {
     . = ALIGN(0x10);
     *(.crypto_data)
