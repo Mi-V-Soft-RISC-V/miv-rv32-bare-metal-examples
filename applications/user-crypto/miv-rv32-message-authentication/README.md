@@ -29,7 +29,7 @@ The following configurations are provided with the example:
 
 ## Mi-V Soft Processor
 
-This example uses Mi-V SoftProcessor MIV_RV32.The design is built for debugging
+This example uses Mi-V SoftProcessor MIV_RV32. The design is built for debugging
 MIV_RV32 through the PolarFire FPGA programming JTAG port using a FlashPro5.
 To achieve this the CoreJTAGDebug IP is used to connect to the JTAG port of the
 MIV_RV32.
@@ -41,10 +41,10 @@ The Mi-V Soft Processor MIV_RV32 firmware projects needs the MIV_RV32 HAL and
 the hal firmware(RISC-V HAL).
 
 The hal is available at GitHub [Mi-V-Soft-RISC-V](https://mi-v-ecosystem.github.io/redirects/platform).
-    
-## How to use this example
 
-This example project is targeted at a MIV_RV32 design running on a PolarFire-Eval-Kit 
+## How to Use This Example
+
+This example project is targeted at a MIV_RV32 design running on a PolarFire-Eval-Kit
 connected via a USB-UART serial cable to a host PC running a terminal emulator
 such as TeraTerm or Putty configured as follows:
 
@@ -129,7 +129,6 @@ UART terminal.
 ### Configurations
 
 The CAL library needs a config_user.h containing the configuration data.
-
 This application provides following settings as per CAL requirement   
   1. A variable which provides the base address of the User Crypto hardware block
      is defined in main.c
@@ -169,17 +168,21 @@ Hashing services.
 
 ## Target Hardware
 
-This project is tested on PolarFire-Eval-Kit with CFG4 configuration of the
-MIV_RV32 base design available at github [Mi-V-Soft-RISC-V](https://mi-v-ecosystem.github.io/redirects/repo-polarfire-evaluation-kit-mi-v-sample-fpga-designs)
+This example can be targeted at the latest Mi-V Soft Processor MIV_RV32. Choose
+the build configurations per the supported ISA extensions that you want to use.
 
 All the design specific definitions such as peripheral base addresses, system
 clock frequency etc. are included in fpga_design_config.h. 
 
-The firmware projects needs the HAL and the MIV_RV32 HAL firmware components.
-
 This example project can be used with another design using a different hardware
 configurations. This can be achieved by overwriting the content of this example
-project's "fpga_design_config.h" file with the correct data per your Libero design.
+project's "fpga_design_config.h (hw_config.h)" file with the correct data from
+your Libero design.
+
+Please refer to the application note ([AN4591](https://www.microchip.com/en-us/application-notes/an4591))
+for the design files in the prerequisites section. The application note provides
+detailed information about the design description, programming the polarfire
+device and SPI flash, and running user crypto example project.
 
 ### Booting the System
 
@@ -191,7 +194,8 @@ In the release mode build configuration, following setting is used
 Tool Settings > Cross RISCV GNU Create Flash Image > General > Other flags. 
 
 This will allow you to attach the release mode executable as the memory 
-initialization client in Libero when you want to execute it from non-volatile memory. 
+initialization client in Libero when you want to execute it from non-volatile
+memory. 
 
 ## Silicon Revision Dependencies
 
