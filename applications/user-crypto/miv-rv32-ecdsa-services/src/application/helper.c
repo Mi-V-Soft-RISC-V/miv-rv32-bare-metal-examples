@@ -301,3 +301,34 @@ uint16_t get_data_from_uart
     return ret_size;
 }
 
+/*==============================================================================
+  Function to get the key from user.
+ */
+uint8_t enable_dma
+(
+    const uint8_t* msg,
+    uint8_t msg_size
+)
+{
+    volatile uint8_t invalid_ip = 1u;
+    uint8_t dma_enable = 0;
+    
+    const uint8_t invalid_ms[] = "\r\n Invalid input. ";
+    
+    while(invalid_ip != 0)
+    {
+        /* Read the 16 bytes of input data from UART terminal. */
+        get_input_data(&dma_enable, 1, msg, msg_size);
+    
+        if(dma_enable >= 2)
+        {
+            UART_send(&g_uart, invalid_ms, sizeof( invalid_ms));
+        }
+        else
+        {
+          invalid_ip = 0;
+        }
+    }
+    
+    return dma_enable;
+}

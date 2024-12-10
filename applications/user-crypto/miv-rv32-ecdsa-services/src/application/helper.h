@@ -58,4 +58,9 @@ void display_output
     uint32_t byte_length,
     uint8_t reverse_buffer
 );
+uint8_t enable_dma
+(
+    const uint8_t* msg,
+    uint8_t msg_size
+);
 #endif /* __HELPER_H_ */

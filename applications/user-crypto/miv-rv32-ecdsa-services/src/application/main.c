@@ -127,6 +127,10 @@ static const uint8_t read_Gy[] =
 
 static const uint8_t read_k[] =
       "\r\n Enter the random value k (exactly 12 words):\r\n";
+
+static const uint8_t read_dma_enable_ip[] =
+    "\r\n Enter 1 to perform ECDSA signature with DMA for message input, or \r\n\
+           0 to perform ECDSA signature without DMA for message input : \r\n";
 /*==============================================================================
   Global Variables.
  */
@@ -139,55 +143,55 @@ uint16_t msg_len = 0 ;
 uint8_t sig_gen_flag ;
 /* for simplicity the value of k is fixed */
 
-uint32_t __attribute__ ((section (".crypto_data"))) k_g[PARAM_WORD_SIZE] = {
+uint32_t k_g[PARAM_WORD_SIZE] = {
     0xdc6b4403,0x6989a196,0xe39d1cda,0xc000812f,
     0x4bdd8b2d,0xb41bb33a,0xf5137258,0x5ebd1db6,
     0x3f0ce827,0x5aa1fd45,0xe2d2a735,0xf8749359
 };
-uint32_t __attribute__ ((section (".crypto_data"))) private_key_d[PARAM_WORD_SIZE] = {
+uint32_t private_key_d[PARAM_WORD_SIZE] = {
 0x00};
-uint32_t __attribute__ ((section (".crypto_data"))) public_key_qx[PARAM_WORD_SIZE] = { 0x00 };
-uint32_t __attribute__ ((section (".crypto_data"))) public_key_qy[PARAM_WORD_SIZE] = { 0x00 };
+uint32_t public_key_qx[PARAM_WORD_SIZE] = { 0x00 };
+uint32_t public_key_qy[PARAM_WORD_SIZE] = { 0x00 };
 /* signature paramters */
 
-uint32_t __attribute__ ((section (".crypto_data"))) r_g[PARAM_WORD_SIZE] = {0x00};
-uint32_t __attribute__ ((section (".crypto_data"))) s_g[PARAM_WORD_SIZE] = {0x00};
+uint32_t r_g[PARAM_WORD_SIZE] = {0x00};
+uint32_t s_g[PARAM_WORD_SIZE] = {0x00};
 
-uint32_t __attribute__ ((section (".crypto_data"))) P384_Gx[PARAM_WORD_SIZE] = {
+uint32_t P384_Gx[PARAM_WORD_SIZE] = {
     0x72760aB7,0x3a545e38,0xbf55296c,0x5502f25d,
     0x82542a38,0x59f741e0,0x8ba79b98,0x6e1d3b62,
     0xf320ad74,0x8eb1c71e,0xbe8b0537,0xaa87ca22
 };
-uint32_t __attribute__ ((section (".crypto_data"))) P384_Gy[PARAM_WORD_SIZE] = {
+uint32_t P384_Gy[PARAM_WORD_SIZE] = {
     0x90ea0e5F,0x7a431d7c,0x1d7e819d,0x0a60b1ce,
     0xb5f0b8c0,0xe9da3113,0x289a147c,0xf8f41dbd,
     0x9292dc29,0x5d9e98bf,0x96262c6f,0x3617de4a
 };
-uint32_t __attribute__ ((section (".crypto_data"))) P384_n[PARAM_WORD_SIZE] = {
+uint32_t P384_n[PARAM_WORD_SIZE] = {
 
     0xccc52973, 0xecec196a, 0x48b0a77a, 0x581a0db2,
     0xf4372ddf, 0xc7634d81, 0xffffffff, 0xffffffff,
     0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff
 };
-uint32_t __attribute__ ((section (".crypto_data"))) P384_npc[PARAM_WORD_SIZE+1] = {
+uint32_t P384_npc[PARAM_WORD_SIZE+1] = {
     0x333ad68d, 0x1313e695, 0xb74f5885, 0xa7e5f24d,
     0x0bc8d220, 0x389cb27e, 0x00000000, 0x00000000,
     0x00000000, 0x00000000, 0x00000000, 0x00000000,
     0x00000001
 };
-uint32_t __attribute__ ((section (".crypto_data"))) P384_n1[PARAM_WORD_SIZE] = {
+uint32_t P384_n1[PARAM_WORD_SIZE] = {
 
     0xccc52973, 0xecec196a, 0x48b0a77a, 0x581a0db2,
     0xf4372ddf, 0xc7634d81, 0xffffffff, 0xffffffff,
     0xffffffff, 0xffffffff, 0xffffffff, 0xfffffffE
 };
-uint32_t __attribute__ ((section (".crypto_data"))) P384_npc1[PARAM_WORD_SIZE+1] = {
+uint32_t P384_npc1[PARAM_WORD_SIZE+1] = {
     0x333ad68d, 0x1313e695, 0xb74f5885, 0xa7e5f24d,
     0x0bc8d220, 0x389cb27e, 0x00000000, 0x00000000,
     0x00000000, 0x00000000, 0x00000000, 0x00000000,
     0x00000001
 };
-uint32_t __attribute__ ((section (".crypto_data"))) P384_b[PARAM_WORD_SIZE] = {
+uint32_t P384_b[PARAM_WORD_SIZE] = {
     0xd3ec2aef, 0x2a85c8ed, 0x8a2ed19d, 0xc656398d,
     0x5013875a, 0x0314088f, 0xfe814112, 0x181d9c6e,
     0xe3f82d19, 0x988e056b, 0xe23ee7e4, 0xb3312fa7
@@ -208,6 +212,7 @@ void ecdsa_sign(void)
     SATR result;
     uint16_t mod_len = 0;
     uint8_t opt = 0;
+    uint8_t use_dma = 0;
 
     /* Read message value. */
     msg_len = get_input_data((uint8_t*)&msg_g[0], sizeof(msg_g), msg,
@@ -315,13 +320,29 @@ void ecdsa_sign(void)
         CALWordReverse(private_key_d, sizeof(private_key_d)/4);
         CALByteReverseWord(private_key_d, sizeof(private_key_d)/4);
     }
+    /* Use dma or not */
+    use_dma = enable_dma(read_dma_enable_ip, sizeof(read_dma_enable_ip));
+
+    if(use_dma != 1)
+    {
 
     /* Calculates ECDSA signature */
     result = CALECDSASignHash(&msg_g[0], SATHASHTYPE_SHA384, msg_len, P384_Gx,
                                 P384_Gy, (const uint32_t*)&k_g,
                                 (const uint32_t*)&private_key_d, P384_b,
                                 P384_MOD, SAT_NULL, P384_n, P384_npc, 12, r_g,
-                                s_g, SAT_TRUE, X52CCR_DEFAULT);
+                                s_g, SAT_FALSE, X52CCR_DEFAULT);
+    }
+    else
+    {
+        /* Calculates ECDSA signature */
+        result = CALECDSASignHash(&msg_g[0], SATHASHTYPE_SHA384, msg_len, P384_Gx,
+                                    P384_Gy, (const uint32_t*)&k_g,
+                                    (const uint32_t*)&private_key_d, P384_b,
+                                    P384_MOD, SAT_NULL, P384_n, P384_npc, 12, r_g,
+                                    s_g, SAT_TRUE, X52CCR_DEFAULT);
+
+    }
     if(SATR_SUCCESS == result)
     {
         result = CALPKTrfRes(SAT_TRUE);
