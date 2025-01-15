@@ -157,6 +157,7 @@ This example is tested on PolarFire MPF300TS device.
 
 ### CAL Library Src
 
-The CAL source code is bound by license agreement. If you need access to the CAL
-source code, please contact FPGA_marketing@microchip.com for further details on
-NDA requirements.
+The CAL source code is bound by a license agreement. Please refer to the
+application note ([AN4591](https://www.microchip.com/en-us/application-notes/an4591))
+and navigate to the **Steps to Access PolarFire Security CAL and Documentation**
+section for instructions on accessing the CAL source code.
