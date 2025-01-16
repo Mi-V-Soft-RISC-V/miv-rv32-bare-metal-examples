@@ -30,7 +30,7 @@
 /******************************************************************************
  * Maximum receiver buffer size.
  *****************************************************************************/
-#define MAX_RX_DATA_SIZE                        256
+#define MAX_RX_DATA_SIZE                        256u
 #define ENTER                                   13u
 
 /******************************************************************************
@@ -125,6 +125,7 @@ static void clear_data_buffer(void)
 
     while (idx < 1024u)
     {
+        /* Initialize the data buffer to zero */
         data_buffer[idx++] = 0x00u;
     }
 }
@@ -173,6 +174,7 @@ void execute_iap(void)
             UART_polled_tx_string(&g_uart,(const uint8_t*)
                     "\n\rEnter Index number in decimal\n\r");
             spiaddr = get_value_from_uart(10);
+            UART_polled_tx_string(&g_uart, (const uint8_t*)"\r\nIAP PROGRAM for image by index is in progress...\n\rIt takes few seconds\n\r");
 
             break;
         case 2:
@@ -187,6 +189,7 @@ void execute_iap(void)
             UART_polled_tx_string(&g_uart,(const uint8_t*)
                     "\n\rEnter 32 bit Address in hex without 0x prefix \n\r");
             spiaddr = get_value_from_uart(16);
+            UART_polled_tx_string(&g_uart, (const uint8_t*)"\r\nIAP PROGRAM for image by address is in progress...\n\rIt takes few seconds\n\r");
 
             break;
         case 4:
@@ -197,6 +200,7 @@ void execute_iap(void)
 
             break;
         case 5:
+            UART_polled_tx_string(&g_uart, (const uint8_t*)"\r\nAuto update is in progress...\r\nIt takes few seconds\n\r");
             cmd = IAP_AUTOUPDATE_CMD;
             /* SPI Directory index 1 is used for auto update image */
 
@@ -212,49 +216,63 @@ void execute_bitstream_authenticate(void)
 {
     uint32_t spi_flash_address = 0u;
     uint32_t mb_offset = 0u;
-    uint8_t uart_input[8] = {0};
-    uint32_t* ptr = 0u;
-    uint32_t count = 0u;
+    uint8_t status = SYS_PARAM_ERR;
 
-    get_input_data(uart_input,(sizeof(spi_flash_address)),
-                  (const uint8_t*)"Enter the address within SPI FLASH",
-				  sizeof("Enter the address within SPI FLASH"));
-
-    revers_sequence(uart_input, count);
-
-    ptr = ((uint32_t*)&uart_input);
-    spi_flash_address = *ptr;
+    UART_polled_tx_string(&g_uart,(const uint8_t*)
+        "\n\rEnter the address within SPI FLASH in hex without 0x prefix \n\r");
+    spi_flash_address = get_value_from_uart(16);
 
     /* Read mb_offset where timeout value will be stored in MB*/
-    count = get_input_data(uart_input,(sizeof(mb_offset)),
-                  (const uint8_t*)"Enter MailBox offset for this service.(0 to 0x200)",
-				  sizeof("Enter MailBox offset for this service.(0 to 0x200)"));
+    UART_polled_tx_string(&g_uart,(const uint8_t*)
+        "\n\n\rEnter MailBox offset for this service.(0 to 0x200)");
+    mb_offset = get_value_from_uart(10);
 
-    revers_sequence(uart_input, count);
-    ptr = ((uint32_t*)&uart_input);
-    mb_offset = *ptr;
+    UART_polled_tx_string(&g_uart, (const uint8_t*)"\r\n\nBitstream authentication for image is in progress...\n\r");
 
-    SYS_bitstream_authenticate_service(spi_flash_address, mb_offset);
+    status = SYS_bitstream_authenticate_service(spi_flash_address, mb_offset);
+
+    UART_polled_tx_string(&g_uart, (const uint8_t*)"\n\rAuthentication status: ");
+
+    if(SYS_SUCCESS == status)
+    {
+        UART_polled_tx_string(&g_uart, (const uint8_t*)"SUCCESS ");
+    }
+    else
+    {
+        display_output(&status, 1);
+    }
+
+    UART_polled_tx_string(&g_uart, (const uint8_t*)"\r\n");
 }
 
 void execute_iap_image_authenticate(void)
 {
     uint32_t spi_idx = 0u;
-    uint8_t uart_input[8] = {0};
-    uint32_t* ptr = 0u;
-    uint32_t count = 0u;
+    uint8_t status = SYS_PARAM_ERR;
 
-    count = get_input_data(uart_input,(sizeof(spi_idx)),
-                  (const uint8_t*)"Enter the index within SPI FLASH. (Index = 1 is not a valid value)",
-				  sizeof("Enter the index within SPI FLASH. (Index = 1 is not a valid value)"));
+    UART_polled_tx_string(&g_uart,(const uint8_t*)
+      "\n\rEnter the index within SPI FLASH. (Index = 1 is not a valid value)");
+    spi_idx = get_value_from_uart(10);
 
-    revers_sequence(uart_input, count);
-    ptr = ((uint32_t*)&uart_input);
-    spi_idx = *ptr;
+    UART_polled_tx_string(&g_uart, (const uint8_t*)"\r\nIAP image authentication for image is in progress...\n\r");
 
-    SYS_IAP_image_authenticate_service(spi_idx);
+    status = SYS_IAP_image_authenticate_service(spi_idx);
+
+    UART_polled_tx_string(&g_uart, (const uint8_t*)"\n\rAuthentication status: ");
+
+    if(SYS_SUCCESS == status)
+    {
+        UART_polled_tx_string(&g_uart, (const uint8_t*)"SUCCESS ");
+    }
+    else
+    {
+        display_output(&status, 1);
+    }
+
+    UART_polled_tx_string(&g_uart, (const uint8_t*)"\r\n");
 }
 
+/* Note: Execute digest check service will be supported Rev E silicon onwards*/
 void execute_digest_check(void)
 {
     uint32_t options = 0u;
@@ -657,7 +675,7 @@ static void execute_secure_nvm(void)
            SYS_secure_nvm_read(addr, 0, &admin[0], text, 252u, 0);
            UART_polled_tx_string(&g_uart,(const uint8_t*)"\r\n Page admin data");
            display_output(&admin[0], 4);
-           UART_polled_tx_string(&g_uart, (const uint8_t*)"\r\n Data read from sNVM region:");
+           UART_polled_tx_string(&g_uart, (const uint8_t*)"\r\n Data read from sNVM region:\n\r");
            display_output(&text[0], 252);
         }
         else
@@ -665,7 +683,7 @@ static void execute_secure_nvm(void)
            SYS_secure_nvm_read(addr, user_key, &admin[0], text, 236u, 0);
            UART_polled_tx_string(&g_uart,(const uint8_t*)"\r\n Page admin data");
            display_output(&admin[0], 4);
-           UART_polled_tx_string(&g_uart, (const uint8_t*)"\r\n Data read from sNVM region:");
+           UART_polled_tx_string(&g_uart, (const uint8_t*)"\r\n Data read from sNVM region:\n\r");
            display_output(&text[0], 236);
         }
     }
