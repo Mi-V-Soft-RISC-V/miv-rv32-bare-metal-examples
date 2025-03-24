@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<launchConfiguration type="org.eclipse.debug.core.groups.GroupLaunchConfigurationType">
+    <stringAttribute key="bad_container_name" value="\miv-rv32-freerto"/>
+    <stringAttribute key="org.eclipse.debug.core.launchGroup.0.action" value="NONE"/>
+    <booleanAttribute key="org.eclipse.debug.core.launchGroup.0.adoptIfRunning" value="false"/>
+    <booleanAttribute key="org.eclipse.debug.core.launchGroup.0.enabled" value="true"/>
+    <stringAttribute key="org.eclipse.debug.core.launchGroup.0.mode" value="run"/>
+    <stringAttribute key="org.eclipse.debug.core.launchGroup.0.name" value="Mi-V-Renode-emulation-platform"/>
+    <stringAttribute key="org.eclipse.debug.core.launchGroup.1.action" value="NONE"/>
+    <booleanAttribute key="org.eclipse.debug.core.launchGroup.1.adoptIfRunning" value="false"/>
+    <booleanAttribute key="org.eclipse.debug.core.launchGroup.1.enabled" value="true"/>
+    <stringAttribute key="org.eclipse.debug.core.launchGroup.1.mode" value="inherit"/>
+    <stringAttribute key="org.eclipse.debug.core.launchGroup.1.name" value="miv-rv32-freertos renode-legacy-rv32 debug"/>
+</launchConfiguration>
