@@ -139,6 +139,5 @@ the MTIME prescaler in the Libero design.
 
 [Mi-V soft CPUs](https://mi-v-ecosystem.github.io/docs/mi-v-soft-cpu/#mi-v-soft-cpus)
 
-[Future Avalanche board](https://mi-v-soft-risc-v.github.io/Future-Avalanche-Board/)
 ___
 Libero&reg; and PolarFire&reg; are the property of Microchip Technology Inc. (MCHP).
