@@ -39,10 +39,10 @@
   --------------------------------
   MIV_RV32 V3.1
   --------------------------------
-  This is the latest release of the MIV_RV32 Soft IP core. For more details, 
-  refer to the MIV_RV32 User [Guide](https://www.microchip.com/en-us/products/fpgas-and-plds/ip-core-tools/miv-rv32)
+  This is the latest release of the MIV_RV32 Soft IP core. For more details, see
+  the MIV_RV32 User [Guide](https://www.microchip.com/en-us/products/fpgas-and-plds/ip-core-tools/miv-rv32)
 
-  The MIV_RV32 Core as well as this document use the terms defined below:
+  The MIV_RV32 Core and this document use the following terms:
 
   --------------------------------
     - SUBSYS - Processor Subsystem for RISC-V
@@ -58,15 +58,13 @@
   ==============================================================================
   Customizing MIV_RV32 HAL
   ==============================================================================
-  To use the HAL with older releases of MIV_RV32, preprocessor macros have been 
-  provided. Using these macros, any of the IP version is targeted.
-  The HAL is used to target any of the mentioned platforms by adding the 
-  following macros in the way :
-  Project Properties > C/C++ Build > Settings > Preprocessor in Assembler and 
-  Compiler settings.
-  The table below shows the macros corresponding to the MIV Core being used in 
-  your libero project. By default, the HAL targets v3.1 of the IP core and no 
-  macros need to be set for this configutation.
+  To use the HAL with older releases of MIV_RV32 preprocessor, macros have been
+  provided. Using these macros, any of the IP version is targeted. The HAL is used
+  to target the mentioned platforms by adding the following macros in Project
+  Properties > C/C++ Build > Settings > Preprocessor available in the Assembler
+  and Compiler settings. The following table shows the macros corresponding to the
+  MIV Core being used in your libero project. By default, the HAL targets v3.1 of
+  the IP core and no macros need to be set for this configutation.
   
   | Libero MI-V Soft IP Version | SoftConsole Macro |
   |-----------------------------|-------------------|
@@ -113,7 +111,7 @@
   SUBSYSR is currently not being used by the core and is Reserved for future use.
 
   The mtvec.BASE field corresponds to the bits [31:2], where mtvec stands for 
-  Machine Trap Vector, and all traps set the PC to the the value stored in the 
+  Machine Trap Vector, and all traps set the PC to the value stored in the 
   mtvec.BASE field when in Non-Vectored mode. In this case, a generic trap 
   handler is as an interrupt service routine.
 
@@ -152,7 +150,7 @@
   correctly. To use this feature, enable the provided macro in the 
   Softconsole build settings.
   This feature is turned off by default as it adds overhead which is not required 
-  when the ISR does not used FP insturctions and saving the general purpose 
+  when the ISR does not use FP insturctions and saving the general purpose 
   register context is sufficient.
 
   |       Macro Name       |                    Definition                     |
@@ -163,11 +161,11 @@
   --------------------------------
   SUBSYS - SubSystem for RISC-V
   --------------------------------
-  SUBSYS stands for SubSystem for RISC-V. This was previously (MIV_RV32 v3.0) 
-  known as OPSRV, which stands for "Offload Processor Subsystem
-  for RISC-V". See the earlier versions of the handbook for more details.
-  In the latest release of the MIV_RV32 IP core v3.1, OPSRV has been renamed to 
-  SUBSYS. The MIV_RV32 HAL now uses SUBSYS instead of OPSRV.
+  SUBSYS stands for SubSystem for RISC-V. Refer to the MIV_RV32 v3.1 Handbook for
+  more details.  
+  NOTE: This was previously (MIV_RV32 v3.0) known as OPSRV, which stands for 
+  "Offload Processor Subsystem for RISC-V". See the earlier versions of the 
+  handbook for more details. The MIV_RV32 HAL now uses SUBSYS instead of OPSRV.
 
  *//*=========================================================================*/
 #ifndef RISCV_HAL_H
@@ -335,13 +333,13 @@ NOTE: All these macros must not be defined if you are using a MIV_RV32 core.
  */
 #define MIMPID                          read_csr(mimpid)
 
-/*Used as a mask to read and write to mte mtvec.BASE address*/
-#define MTVEC_BASE_ADDR_MASK            0xFFFFFFFC
-
 #else
 #define MTIME                           (0u)
 #define MTIMEH                          (0u)
 #endif  /*MIV_RV32_EXT_TIMER*/
+
+/* Used as a mask to read and write to mtvec.BASE address */
+#define MTVEC_BASE_ADDR_MASK            0xFFFFFFFC
 
 /*-------------------------------------------------------------------------*//**
   RISC-V Specification Interrupts
@@ -352,8 +350,8 @@ NOTE: All these macros must not be defined if you are using a MIV_RV32 core.
   of the additional interrupts correspond to the names as used in the MIV_RV32
   handbook. Please refer the MIV_RV32 handbook for more details.
  
-  All the interrups, provided by the MIV_RV32 core, follow the interrupt priority
-  order and register description as mentioned in the RISC-V spec.
+  All the interrups, provided by the MIV_RV32 core, following table shows the 
+  interrupt priority order and register description as mentioned in the RISC-V spec.
 
   | Macro Name  | Value |  Description|
   |-------------------|--------|----------------|
@@ -365,6 +363,41 @@ NOTE: All these macros must not be defined if you are using a MIV_RV32 core.
 #define MRV32_SOFT_IRQn                 MIE_3_IRQn
 #define MRV32_TIMER_IRQn                MIE_7_IRQn
 #define MRV32_EXT_IRQn                  MIE_11_IRQn
+
+/*-------------------------------------------------------------------------*//**
+  BootROM
+  =================================
+  When BootROM is enabled, on reset, the core copies data from a memory mapped
+  source memory into a destination memory location and then the core boots from
+  the destination memory location. The source start or end addresses and the
+  destination start address can be provided through GUI inputs. If the 
+  Reconfigurable option is enabled, then the addresses become software 
+  reconfigurable, which can be used with a soft reset to reboot and run alternative
+  code. The source and destination memory must be a memory mapped location 
+  accessible by the core across the full transfer size.
+  
+  MTVEC address - By default, the mtvec.BASE is set at Reset Vector Address + 0x04.
+  When the BootROM is enabled, the mtvec.BASE is set at destination address + 0x04.
+  When using Reconfigurable BootROM, the MTVEC register needs to be defined 
+  and programmed through software.
+  
+  Reset Behaviour - With the BootROM feature enabled, upon reset, the PC takes on
+  the value of the BootROM dest_addr. When the BootROM is enabled, ensure that the
+  boot code linker script matches the dest_addr, since booting starts from the
+  destination_addr.
+  
+  BootROM Register Map:
+  |  Name  |  Address  | Description |
+  |--------|-----------|-------------|
+  | src_start_addr     |0xA100| Core copies data beginning here       |
+  | src_end_addr       |0xA104| Last address copied by BootROM        |
+  | destination_addr   |0xA108| Destination memory beginning from here|
+  
+*/
+
+#define BOOTROM_START                    0x0000A100
+#define BOOTROM_END                      0x0000A104
+#define BOOTROM_DEST                     0x0000A108
 
 /***************************************************************************//**
   Interrupt numbers:
@@ -634,7 +667,7 @@ static inline void MRV_disable_interrupts(void)
 
 /***************************************************************************//**
   The MRV_read_mtvec_base() function reads the mtvec base value, which is the 
-  addr used when an interrupt/trap occurs. In the mtvec register, [31:2] is the 
+  address used when an interrupt/trap occurs. In the mtvec register, [31:2] is the 
   BASE address. NOTE: The BASE address must be aligned on a 4B boundary.
 
   @param
@@ -766,6 +799,24 @@ void SysTick_Handler(void);
   Returns 1 if the interrupt interval is not achieved.
  */
 uint32_t MRV_systick_config(uint64_t ticks);
+
+/***************************************************************************//**
+  BootROM Address Reconfiguration
+
+  Configures the BootROM registers with the source start, end, and destination 
+  addresses for the core when BootROM addresses are reconfigurable. 
+
+  @param start_addr
+  Starting address for the BootROM copy.
+
+  @param end_addr
+  End address for the BootROM copy.
+
+  @param destination_addr
+  On Reset, the core will start running code from this memory address.
+ */
+void MRV_BootROM_reconfigure(uint32_t start_addr, uint32_t end_addr, uint32_t destination_addr);
+
 
 #ifdef __cplusplus
 }
