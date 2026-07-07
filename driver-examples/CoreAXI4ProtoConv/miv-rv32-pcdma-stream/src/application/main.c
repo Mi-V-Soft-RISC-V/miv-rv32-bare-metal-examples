@@ -29,6 +29,9 @@ PCDMA_instance_t  g_pcdma;
 #define CMD_ID_SHIFT                                16u
 #define PASS                                        0u
 #define FAIL                                        1u
+#ifdef TUSER_SIDEBAND_ENABLE
+#define M2SS_TUSER_DATA                             0xABCD
+#endif
 
 uint8_t *ddr_memory_sm = (uint8_t *)DDR_BASE_ADDR;
 uint8_t *ddr_memory_ms = (uint8_t *)DDR_MID_ADDR;
@@ -58,6 +61,9 @@ static void pcdma_single_desc_stream_transfer(void);
 static void pcdma_multi_desc_stream_transfer(void);
 static void memory_init(uint8_t *, uint32_t);
 static uint8_t verify_transfer(uint8_t *, uint8_t *, uint32_t);
+#ifdef TUSER_SIDEBAND_ENABLE
+static uint8_t verify_TUSER_data(uint32_t expected_tuser, uint32_t received_tuser);
+#endif
 
 /***************************************************************************//**
  * main function.
@@ -135,9 +141,15 @@ int main(void)
 void pcdma_single_desc_stream_transfer(void)
 {
     uint8_t status = FAIL;
+#ifdef TUSER_SIDEBAND_ENABLE
+    uint8_t tuser_status = FAIL;
+#endif
     UART_polled_tx_string( &g_uart, "\r\n\n ---------------------------------");
     UART_polled_tx_string( &g_uart, "\r\n\n Selected Single Descriptor Stream "
                                                              "Transfer.... \n");
+#ifdef TUSER_SIDEBAND_ENABLE
+    PCDMA_MM2S_set_tuser_sideband(&g_pcdma, M2SS_TUSER_DATA);
+#endif
 
     /* Set the MM2S transfer size, 64-bit address, command id, and burst type.*/
     PCDMA_MM2S_configure(&g_pcdma, TRANSFER_SIZE_BYTES, DDR_BASE_ADDR,
@@ -153,6 +165,12 @@ void pcdma_single_desc_stream_transfer(void)
     /* Initiate the data transfer */
     PCDMA_S2MM_start_transfer(&g_pcdma);
 
+#ifdef TUSER_SIDEBAND_ENABLE
+    /* Verify TUSER sideband data */
+    uint32_t received_tuser = PCDMA_S2MM_get_tuser_sideband(&g_pcdma);
+    tuser_status = verify_TUSER_data(M2SS_TUSER_DATA, received_tuser);
+#endif
+    /* Verify data transfer */
     status = verify_transfer(ddr_memory_sm, ddr_memory_ms, TRANSFER_SIZE_BYTES);
 
     if(status)
@@ -165,18 +183,35 @@ void pcdma_single_desc_stream_transfer(void)
         UART_polled_tx_string( &g_uart, "\r\n\n Single Descriptor Stream Data "
                                           "Transfer Successful: Data matches");
     }
+#ifdef TUSER_SIDEBAND_ENABLE
+    if(tuser_status)
+    {
+        UART_polled_tx_string( &g_uart, "\r\n\n Error: TUSER Sideband data Mismatch");
+    }
+    else
+    {
+        UART_polled_tx_string( &g_uart, "\r\n\n Success: TUSER Sideband data Matches");
+    }
+#endif
     UART_polled_tx_string( &g_uart, "\r\n\n ---------------------------------");
 }
 
 void pcdma_multi_desc_stream_transfer(void)
 {
     uint8_t status = FAIL;
+#ifdef TUSER_SIDEBAND_ENABLE
+    uint8_t tuser_status = FAIL;
+#endif
     UART_polled_tx_string( &g_uart, "\r\n\n ---------------------------------");
     UART_polled_tx_string( &g_uart, "\r\n\n Selected Multiple Descriptor "
                                                     "Stream Transfer..... \n");
 
     for(uint8_t d = 1; d < NO_OF_DESCRIPTOR; d++)
     {
+#ifdef TUSER_SIDEBAND_ENABLE
+        PCDMA_MM2S_set_tuser_sideband(&g_pcdma, M2SS_TUSER_DATA);
+#endif
+
     /* Set the MM2S transfer size, 64-bit address, command id, and burst type.*/
         PCDMA_MM2S_configure(&g_pcdma, (d * d), DDR_BASE_ADDR,
                                      (MM2S_CMD_ID + d), PCDMA_BURST_TYPE_INCR);
@@ -210,6 +245,16 @@ void pcdma_multi_desc_stream_transfer(void)
                                              g_cmd_id_m2s[0], g_cmd_id_s2m[0]);
             UART_polled_tx_string(&g_uart, g_buffer);
         }
+#ifdef TUSER_SIDEBAND_ENABLE
+        /* Verify TUSER sideband data */
+        uint32_t received_tuser = PCDMA_S2MM_get_tuser_sideband(&g_pcdma);
+        tuser_status = verify_TUSER_data(M2SS_TUSER_DATA, received_tuser);
+
+        if(tuser_status)
+        {
+            UART_polled_tx_string( &g_uart, "\r\n\n Error: TUSER Mismatch");
+        }
+#endif
         /* Verify data transfer */
         status = verify_transfer(ddr_memory_sm, ddr_memory_ms, (d * d));
     }
@@ -224,6 +269,16 @@ void pcdma_multi_desc_stream_transfer(void)
         UART_polled_tx_string( &g_uart, "\r\n\n Multiple Descriptor Stream Data "
                                            "Transfer Successful: Data matches");
     }
+#ifdef TUSER_SIDEBAND_ENABLE
+        if(tuser_status)
+        {
+            UART_polled_tx_string( &g_uart, "\r\n\n Error: TUSER Sideband data Mismatch");
+        }
+        else
+        {
+            UART_polled_tx_string( &g_uart, "\r\n\n Success: TUSER Sideband data Matches");
+        }
+#endif
     UART_polled_tx_string( &g_uart, "\r\n\n ---------------------------------");
 }
 
@@ -253,6 +308,25 @@ uint8_t verify_transfer(uint8_t *source_addr, uint8_t *dest_addr, uint32_t size)
     }
     return error;
 }
+
+#ifdef TUSER_SIDEBAND_ENABLE
+static
+uint8_t verify_TUSER_data(uint32_t expected_tuser, uint32_t received_tuser)
+{
+    uint8_t status = PASS;
+
+    sprintf(g_buffer, "\r\n TUSER Expected: 0x%04x, Received: 0x%04x\n",
+            (unsigned int)expected_tuser, (unsigned int)received_tuser);
+    UART_polled_tx_string(&g_uart, g_buffer);
+
+    if (expected_tuser != received_tuser)
+    {
+        status = FAIL;
+    }
+
+    return status;
+}
+#endif
 
 /******************************************************************************
  * Interrupt Service Routine (ISR) for the MSYS external interrupt 0,
