@@ -137,3 +137,8 @@ LSRAM.
 
 This example is tested on the PolarFire Evaluation Kit (MPF300T-EVAL-KIT) with
 CoreQSE v2.0.101.
+
+**Note :** A data integrity issue may be present at 2.5G where the data 
+transferred sometimes may not match the data received. However, the data 
+transfer is successful. An update will be provided in an intermediate release.
+ 
